@@ -1,0 +1,113 @@
+/**
+ * ToolTile Composite Styles
+ */
+
+.tool-tile {
+  position: relative;
+  width: 291px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--background-main, #ffffff);
+  border: 1px solid var(--border-moderate, #ced5dd);
+  border-radius: var(--radius-xs, 3px);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.tool-tile:hover {
+  background-color: var(--background-tertiary, #eff1f4);
+}
+
+.tool-tile:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* Header row */
+.tool-tile__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+}
+
+.tool-tile__title-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tool-tile__title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--text-corporate, #00205b);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Platform icons */
+.tool-tile__platforms {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool-tile__platform-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+}
+
+.tool-tile__platform-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* More options button */
+.tool-tile__more-options {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  background-color: var(--background-tertiary, #eff1f4);
+  border-radius: var(--radius-xs, 3px);
+}
+
+.tool-tile:hover .tool-tile__more-options {
+  opacity: 1;
+}
+
+.tool-tile__more-options:focus-within {
+  opacity: 1;
+}
+
+/* Description */
+.tool-tile__description {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-secondary, #63728a);
+  margin: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.tool-tile__description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

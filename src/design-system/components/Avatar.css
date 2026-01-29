@@ -1,0 +1,93 @@
+/**
+ * Avatar Component Styles
+ */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.avatar--xs {
+  width: 16px;
+  height: 16px;
+  font-size: 8px;
+}
+
+.avatar--s {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
+.avatar--m {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+.avatar--l {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+/* ============================================================================
+   AVATAR STACK
+   ============================================================================ */
+
+.avatar-stack {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.avatar-stack__item {
+  display: inline-flex;
+  position: relative;
+}
+
+.avatar-stack__item .avatar {
+  box-shadow: 0 0 0 2px var(--background-main, #ffffff);
+}
+
+/* Overlap via negative margin-left — all items except the first */
+.avatar-stack__item + .avatar-stack__item {
+  margin-left: -10px;
+}
+
+/* Size-specific overlap */
+.avatar-stack--xs .avatar-stack__item + .avatar-stack__item {
+  margin-left: -6px;
+}
+
+.avatar-stack--s .avatar-stack__item + .avatar-stack__item {
+  margin-left: -8px;
+}
+
+.avatar-stack--m .avatar-stack__item + .avatar-stack__item {
+  margin-left: -12px;
+}
+
+.avatar-stack--l .avatar-stack__item + .avatar-stack__item {
+  margin-left: -12px;
+}
+
+/* Overflow indicator */
+.avatar-stack__overflow {
+  background-color: var(--cool-grey-30, #ced5dd);
+  color: var(--text-corporate, #00205b);
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--background-main, #ffffff);
+}

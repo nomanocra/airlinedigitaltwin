@@ -1,0 +1,213 @@
+/**
+ * VToggle Component Styles (Vanilla - pure React)
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+.vtoggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   TRACK (The pill-shaped background)
+   ============================================================================ */
+
+.vtoggle__track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--primary-default, #063b9e);
+  border-radius: 999px;
+  background-color: var(--background-main, #ffffff);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.vtoggle__track:focus {
+  outline: none;
+}
+
+.vtoggle__track:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   THUMB (The circular knob)
+   ============================================================================ */
+
+.vtoggle__thumb {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--primary-default, #063b9e);
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.2);
+  transition: left 0.2s ease, background-color 0.2s ease;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.vtoggle__label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+}
+
+/* ============================================================================
+   SIZES - Thumb: 12, 18, 24px | Border: 1px inside | Padding: S=2px, M=3px, L=4px
+   ============================================================================ */
+
+/* Size L - 64x32px track, 24px thumb, 4px padding (3px from content edge) */
+.vtoggle--l .vtoggle__track {
+  width: 64px;
+  height: 32px;
+}
+
+.vtoggle--l .vtoggle__thumb {
+  width: 24px;
+  height: 24px;
+  top: 3px;   /* 4px from outer - 1px border = 3px */
+  left: 3px;
+}
+
+.vtoggle--l.vtoggle--selected .vtoggle__thumb {
+  left: 35px; /* 62 (content) - 24 (thumb) - 3 (padding) = 35px */
+}
+
+/* Size M - 48x24px track, 18px thumb, 3px padding (2px from content edge) */
+.vtoggle--m .vtoggle__track {
+  width: 48px;
+  height: 24px;
+}
+
+.vtoggle--m .vtoggle__thumb {
+  width: 18px;
+  height: 18px;
+  top: 2px;   /* 3px from outer - 1px border = 2px */
+  left: 2px;
+}
+
+.vtoggle--m.vtoggle--selected .vtoggle__thumb {
+  left: 26px; /* 46 (content) - 18 (thumb) - 2 (padding) = 26px */
+}
+
+/* Size S - 32x16px track, 12px thumb, 2px padding (1px from content edge) */
+.vtoggle--s .vtoggle__track {
+  width: 32px;
+  height: 16px;
+}
+
+.vtoggle--s .vtoggle__thumb {
+  width: 12px;
+  height: 12px;
+  top: 1px;   /* 2px from outer - 1px border = 1px */
+  left: 1px;
+}
+
+.vtoggle--s.vtoggle--selected .vtoggle__thumb {
+  left: 17px; /* 30 (content) - 12 (thumb) - 1 (padding) = 17px */
+}
+
+/* ============================================================================
+   STATES - UNSELECTED
+   ============================================================================ */
+
+/* Default unselected */
+.vtoggle:not(.vtoggle--selected) .vtoggle__track {
+  background-color: var(--background-main, #ffffff);
+}
+
+.vtoggle:not(.vtoggle--selected) .vtoggle__thumb {
+  background-color: var(--primary-default, #063b9e);
+}
+
+/* Hover unselected */
+.vtoggle:not(.vtoggle--selected):not(.vtoggle--disabled) .vtoggle__track:hover {
+  background-color: var(--background-secondary, #f1f1f1);
+}
+
+/* ============================================================================
+   STATES - SELECTED
+   ============================================================================ */
+
+/* Default selected */
+.vtoggle.vtoggle--selected .vtoggle__track {
+  background-color: var(--primary-default, #063b9e);
+  border-color: var(--primary-default, #063b9e);
+}
+
+.vtoggle.vtoggle--selected .vtoggle__thumb {
+  background-color: var(--background-main, #ffffff);
+}
+
+/* Hover selected */
+.vtoggle.vtoggle--selected:not(.vtoggle--disabled) .vtoggle__track:hover {
+  background-color: var(--primary-active, #002d80);
+  border-color: var(--primary-active, #002d80);
+}
+
+/* ============================================================================
+   DISABLED STATE
+   ============================================================================ */
+
+.vtoggle--disabled,
+.vtoggle.vtoggle--disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.vtoggle--disabled .vtoggle__track,
+.vtoggle.vtoggle--disabled .vtoggle__track {
+  cursor: default;
+  pointer-events: none;
+}
+
+.vtoggle--disabled .vtoggle__label,
+.vtoggle.vtoggle--disabled .vtoggle__label {
+  cursor: default;
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+:root.dark .vtoggle__label {
+  color: var(--text-main, #ffffff);
+}
+
+:root.dark .vtoggle:not(.vtoggle--selected) .vtoggle__track {
+  background-color: var(--background-main, #1a1a1a);
+  border-color: var(--primary-default, #255fcc);
+}
+
+:root.dark .vtoggle:not(.vtoggle--selected) .vtoggle__thumb {
+  background-color: var(--primary-default, #255fcc);
+}
+
+:root.dark .vtoggle:not(.vtoggle--selected):not(.vtoggle--disabled) .vtoggle__track:hover {
+  background-color: var(--background-secondary, #2a2a2a);
+}
+
+:root.dark .vtoggle.vtoggle--selected .vtoggle__track {
+  background-color: var(--primary-default, #255fcc);
+  border-color: var(--primary-default, #255fcc);
+}
+
+:root.dark .vtoggle.vtoggle--selected .vtoggle__thumb {
+  background-color: var(--background-main, #1a1a1a);
+}
+
+:root.dark .vtoggle.vtoggle--selected:not(.vtoggle--disabled) .vtoggle__track:hover {
+  background-color: var(--primary-hover, #3d7ae0);
+  border-color: var(--primary-hover, #3d7ae0);
+}

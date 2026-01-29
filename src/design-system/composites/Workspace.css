@@ -1,0 +1,194 @@
+/**
+ * Workspace Composite Styles
+ * A collapsible card for workspace folders
+ */
+
+.workspace {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-xs, 3px);
+  background-color: var(--background-main, #ffffff);
+  box-shadow: var(--shadow-1, 0 0 3px 0 rgba(0, 0, 0, 0.15));
+  overflow: hidden;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.workspace__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  background-color: var(--background-main, #ffffff);
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.workspace__header:hover {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+.workspace__header:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: -2px;
+}
+
+/* ============================================================================
+   TOGGLE ICON
+   ============================================================================ */
+
+.workspace__toggle-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  transition: transform 250ms ease-in-out;
+  transform: rotate(-90deg);
+}
+
+.workspace--open .workspace__toggle-icon {
+  transform: rotate(0deg);
+}
+
+/* ============================================================================
+   TITLE BLOCK (column: title + sub-row)
+   ============================================================================ */
+
+.workspace__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.workspace__title {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  color: var(--text-main, #14171d);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================================================
+   STUDY COUNT CHIP
+   ============================================================================ */
+
+.workspace__study-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--radius-xs, 3px);
+  background-color: var(--background-tertiary, #eff1f4);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-secondary, #63728a);
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   COMPUTING TEXT (in sub-row next to chip)
+   ============================================================================ */
+
+.workspace__computing-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary, #63728a);
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   SPACER
+   ============================================================================ */
+
+.workspace__spacer {
+  flex: 1;
+}
+
+/* ============================================================================
+   LAST MODIFICATION (two-line block)
+   ============================================================================ */
+
+.workspace__last-modified {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 1px;
+  margin-right: 12px;
+}
+
+.workspace__last-modified-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-tertiary, #b3bbc8);
+  white-space: nowrap;
+}
+
+.workspace__last-modified-date {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary, #63728a);
+  white-space: nowrap;
+}
+
+/* Avatars removed - now using individual Avatar tooltips via Radix UI */
+
+/* ============================================================================
+   CONTENT (animated collapse)
+   ============================================================================ */
+
+.workspace__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms ease-in-out;
+}
+
+.workspace--open .workspace__body {
+  grid-template-rows: 1fr;
+}
+
+.workspace__content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  overflow: hidden;
+  transition: padding 250ms ease-in-out;
+}
+
+.workspace--open .workspace__content {
+  padding: 8px 16px 16px;
+}
+
+/* ============================================================================
+   TABLE WRAPPER (shadow card around study table)
+   ============================================================================ */
+
+.workspace__table-wrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-main, #ffffff);
+  box-shadow: var(--shadow-1, 0 0 3px 0 rgba(0, 0, 0, 0.15));
+  border-radius: var(--radius-xs, 3px);
+  overflow: hidden;
+}

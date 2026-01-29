@@ -1,0 +1,308 @@
+/**
+ * Select Component Styles (Radix UI)
+ * Utilise les tokens du design system
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.select-label-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.select-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+}
+
+.select-optional {
+  font-weight: 400;
+  color: var(--text-secondary, #63728a);
+}
+
+.select-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-default, #063b9e);
+  cursor: pointer;
+}
+
+/* ============================================================================
+   TRIGGER (Main Select Button)
+   ============================================================================ */
+
+.select-trigger {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: var(--radius-xs, 3px) var(--radius-xs, 3px) 0 0;
+  padding: 0 8px;
+  background-color: var(--background-secondary, #fafafa);
+  box-shadow: inset 0 -1px 0 0 var(--border-default, #919cb0);
+  color: var(--text-main, #14171d);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.select-trigger:hover {
+  background-color: var(--background-tertiary, #eff1f4);
+}
+
+.select-trigger:focus {
+  outline: none;
+}
+
+.select-trigger:focus-visible {
+  box-shadow: inset 0 -1px 0 0 var(--primary-default, #063b9e);
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+.select-trigger[data-state='open'] {
+  box-shadow: inset 0 -1px 0 0 var(--primary-default, #063b9e);
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+.select-trigger[data-disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.select-trigger[data-placeholder] {
+  color: var(--text-secondary, #63728a);
+}
+
+/* ============================================================================
+   TRIGGER SIZES
+   ============================================================================ */
+
+.select-trigger--xs {
+  height: 24px;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0 8px;
+  gap: 4px;
+}
+
+.select-trigger--s {
+  height: 32px;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.select-trigger--m {
+  height: 40px;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.select-trigger--l {
+  height: 48px;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 0 16px;
+  gap: 8px;
+}
+
+/* ============================================================================
+   TRIGGER STATES
+   ============================================================================ */
+
+.select-trigger--error {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-error-default, #e4002b);
+}
+
+.select-trigger--error:hover,
+.select-trigger--error:focus {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-error-default, #e4002b);
+}
+
+.select-trigger--valid {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-success-default, #08875b);
+}
+
+.select-trigger--valid:hover,
+.select-trigger--valid:focus {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-success-default, #08875b);
+}
+
+/* Read-only state */
+.select-container--read-only .select-trigger {
+  background-color: transparent;
+  box-shadow: inset 0 -1px 0 0 var(--border-minimal, #eff1f4);
+  color: var(--text-main, #14171d);
+  cursor: default;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.select-container--read-only .select-icon--chevron {
+  display: none;
+}
+
+/* ============================================================================
+   ICONS
+   ============================================================================ */
+
+.select-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--primary-default, #063b9e);
+}
+
+.select-icon--left {
+  margin-right: 0;
+}
+
+.select-icon--chevron {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.select-trigger[data-state='open'] .select-icon--chevron {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   CONTENT (Dropdown)
+   ============================================================================ */
+
+.select-content {
+  overflow: hidden;
+  background-color: var(--background-main, #ffffff);
+  border-radius: 0;
+  border: none;
+  box-shadow: 0px 3px 12px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  min-width: var(--radix-select-trigger-width);
+}
+
+.select-viewport {
+  padding: 4px;
+}
+
+/* ============================================================================
+   ITEM (Dropdown Options)
+   ============================================================================ */
+
+.select-item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  color: var(--text-main, #14171d);
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-item[data-highlighted] {
+  outline: none;
+  background-color: var(--primary-t-hover, rgba(6, 59, 158, 0.1));
+}
+
+.select-item[data-state='checked'] {
+  background-color: var(--primary-t-active, rgba(6, 59, 158, 0.2));
+  font-weight: 700;
+}
+
+.select-item[data-disabled] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   ITEM SIZES
+   ============================================================================ */
+
+.select-item--xs {
+  font-size: 12px;
+  line-height: 16px;
+  padding: 4px 8px;
+}
+
+.select-item--s {
+  font-size: 12px;
+  line-height: 16px;
+  padding: 6px 12px;
+}
+
+.select-item--m {
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px 12px;
+}
+
+.select-item--l {
+  font-size: 16px;
+  line-height: 24px;
+  padding: 10px 16px;
+}
+
+/* ============================================================================
+   ITEM INDICATOR (Checkmark)
+   ============================================================================ */
+
+.select-item-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  color: var(--primary-default, #063b9e);
+}
+
+/* ============================================================================
+   LEGEND
+   ============================================================================ */
+
+.select-legend {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-secondary, #63728a);
+}
+
+.select-container--error .select-legend {
+  color: var(--feedback-error-default, #e4002b);
+}
+
+.select-container--valid .select-legend {
+  color: var(--feedback-success-default, #08875b);
+}

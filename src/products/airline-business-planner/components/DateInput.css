@@ -1,0 +1,99 @@
+/**
+ * DateInput - Month Picker Styles
+ */
+
+/* Popover content */
+.date-input-popover {
+  background-color: var(--background-main, #ffffff);
+  border-radius: var(--radius-s, 6px);
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  z-index: 1000;
+  width: 280px;
+  animation: dateInputFadeIn 0.15s ease;
+}
+
+@keyframes dateInputFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Year navigation */
+.date-input-popover__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.date-input-popover__year {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+}
+
+.date-input-popover__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-xs, 3px);
+  cursor: pointer;
+  color: var(--text-secondary, #63728a);
+}
+
+.date-input-popover__nav-btn:hover {
+  background-color: var(--background-tertiary, #eff1f4);
+}
+
+/* Month grid */
+.date-input-popover__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.date-input-popover__month {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-xs, 3px);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+}
+
+.date-input-popover__month:hover {
+  background-color: var(--background-tertiary, #eff1f4);
+}
+
+.date-input-popover__month--selected {
+  background-color: var(--primary-default, #063b9e);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.date-input-popover__month--selected:hover {
+  background-color: var(--primary-hover, #052e7a);
+}
+
+/* Trigger - make the input wrapper clickable */
+.date-input-trigger {
+  cursor: pointer;
+  width: 100%;
+}
+
+.date-input-trigger .text-input-field {
+  cursor: pointer;
+}

@@ -1,0 +1,258 @@
+/**
+ * TextInput Component Styles
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.text-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.text-input-label-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.text-input-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+}
+
+.text-input-optional {
+  font-weight: 400;
+  color: var(--text-secondary, #63728a);
+}
+
+.text-input-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-default, #063b9e);
+  cursor: pointer;
+}
+
+/* ============================================================================
+   INPUT WRAPPER
+   ============================================================================ */
+
+.text-input-wrapper {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-xs, 3px) var(--radius-xs, 3px) 0 0;
+  background-color: var(--background-secondary, #fafafa);
+  box-shadow: inset 0 -1px 0 0 var(--border-default, #919cb0);
+  box-sizing: border-box;
+}
+
+.text-input-wrapper:hover {
+  background-color: var(--background-tertiary, #eff1f4);
+}
+
+.text-input-wrapper:focus-within {
+  background-color: var(--background-tertiary, #eff1f4);
+  box-shadow: inset 0 -1px 0 0 var(--primary-default, #063b9e);
+}
+
+/* ============================================================================
+   INPUT WRAPPER SIZES
+   ============================================================================ */
+
+.text-input-wrapper--xs {
+  height: 24px;
+  padding: 0 8px;
+  gap: 8px;
+}
+
+.text-input-wrapper--s {
+  height: 32px;
+  padding: 0 8px;
+  gap: 8px;
+}
+
+.text-input-wrapper--m {
+  height: 40px;
+  padding: 0 12px;
+  gap: 12px;
+}
+
+.text-input-wrapper--l {
+  height: 48px;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+/* Adjust right padding when icon button is present (same as vertical spacing) */
+/* XS: (24 - 20) / 2 = 2px */
+.text-input-wrapper--xs.text-input-wrapper--has-icon-button {
+  padding-right: 2px;
+}
+
+/* S: (32 - 20) / 2 = 6px */
+.text-input-wrapper--s.text-input-wrapper--has-icon-button {
+  padding-right: 6px;
+}
+
+/* M: (40 - 32) / 2 = 4px */
+.text-input-wrapper--m.text-input-wrapper--has-icon-button {
+  padding-right: 4px;
+}
+
+/* L: (48 - 40) / 2 = 4px */
+.text-input-wrapper--l.text-input-wrapper--has-icon-button {
+  padding-right: 4px;
+}
+
+/* ============================================================================
+   INPUT WRAPPER STATES
+   ============================================================================ */
+
+.text-input-wrapper--error {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-error-default, #e4002b);
+}
+
+.text-input-wrapper--error:hover,
+.text-input-wrapper--error:focus-within {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-error-default, #e4002b);
+}
+
+.text-input-wrapper--valid {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-success-default, #08875b);
+}
+
+.text-input-wrapper--valid:hover,
+.text-input-wrapper--valid:focus-within {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-success-default, #08875b);
+}
+
+.text-input-wrapper--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+.text-input-wrapper--read-only {
+  background-color: var(--background-secondary, #fafafa);
+  box-shadow: inset 0 -1px 0 0 var(--border-moderate, #ced5dd);
+  cursor: default;
+}
+
+.text-input-wrapper--read-only:hover {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+.text-input-wrapper--read-only .text-input-field {
+  color: var(--text-secondary, #63728a);
+  cursor: default;
+}
+
+/* ============================================================================
+   INPUT FIELD
+   ============================================================================ */
+
+.text-input-field {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  color: var(--text-main, #14171d);
+  outline: none;
+}
+
+.text-input-field::placeholder {
+  color: var(--text-secondary, #63728a);
+}
+
+/* Field sizes - All sizes use 14px font per Figma specs */
+.text-input-wrapper--xs .text-input-field,
+.text-input-wrapper--s .text-input-field,
+.text-input-wrapper--m .text-input-field,
+.text-input-wrapper--l .text-input-field {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* ============================================================================
+   ICONS
+   ============================================================================ */
+
+.text-input-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   RIGHT ICON BUTTON
+   ============================================================================ */
+
+.text-input-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-xs, 3px);
+  cursor: pointer;
+}
+
+.text-input-icon-button:hover {
+  background-color: var(--primary-t-hover, rgba(6, 59, 158, 0.08));
+}
+
+.text-input-icon-button:active {
+  background-color: var(--primary-t-active, rgba(6, 59, 158, 0.16));
+}
+
+.text-input-icon-button:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+.text-input-icon-button:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   LEGEND
+   ============================================================================ */
+
+.text-input-legend {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-tertiary, #b3bbc8);
+}
+
+.text-input-container--error .text-input-legend {
+  color: var(--feedback-error-default, #e4002b);
+}
+
+.text-input-container--valid .text-input-legend {
+  color: var(--feedback-success-default, #08875b);
+}

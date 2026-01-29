@@ -1,0 +1,253 @@
+/**
+ * Typography CSS Classes
+ * Classes réutilisables basées sur les tokens de typographie
+ */
+
+/* Font Families */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
+
+/* Headings */
+.heading-1 {
+  font-family: 'Inter', sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 80px;
+}
+
+.subheading-1 {
+  font-family: 'Inter', sans-serif;
+  font-size: 56px;
+  font-weight: 300;
+  line-height: 80px;
+}
+
+.heading-2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 72px;
+}
+
+.subheading-2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 72px;
+}
+
+.heading-3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 56px;
+}
+
+.subheading-3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 56px;
+}
+
+.heading-4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 48px;
+}
+
+.subheading-4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 48px;
+}
+
+.heading-5 {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.subheading-5 {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 40px;
+}
+
+.heading-6 {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.subheading-6 {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 32px;
+}
+
+/* Labels - Large */
+.label-bold-l {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.label-medium-l {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 32px;
+}
+
+.label-regular-l {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 32px;
+}
+
+.label-light-l {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 32px;
+}
+
+/* Labels - Medium */
+.label-bold-m {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.label-medium-m {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.label-regular-m {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.label-light-m {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 24px;
+}
+
+/* Labels - Small */
+.label-bold-s {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.label-medium-s {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.label-regular-s {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.label-light-s {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 20px;
+}
+
+/* Labels - Extra Small */
+.label-bold-xs {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.label-medium-xs {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.label-regular-xs {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.label-light-xs {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 20px;
+}
+
+/* Legends */
+.legend-bold {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.legend-medium {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+/* System (Monospace) */
+.system-l {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+}
+
+.system-m {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.system-s {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.system-xs {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+}

@@ -1,0 +1,142 @@
+/**
+ * AppHeader Component Styles
+ * Background uses corporate color (fixed)
+ * Titles and buttons inside use dark mode styling
+ */
+
+/* Header Container - NO border-radius */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 16px;
+  background-color: var(--background-corporate, #00205b);
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 100;
+  color: var(--white);
+}
+
+/* Left Section - Logo & Label */
+.app-header__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Logo */
+.app-header__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.app-header__logo svg {
+  height: 16px;
+  width: auto;
+  color: var(--white);
+}
+
+.app-header__logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Separator Line */
+.app-header__separator {
+  width: 1px;
+  height: 24px;
+  background-color: #919cb0;
+  flex-shrink: 0;
+}
+
+/* App Titles */
+.app-header__titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-header__app-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-header__app-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Right Section - Actions */
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Actions Container */
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Dark mode colors for buttons in header */
+/* Override default icon button styles for dark header */
+.app-header__right .icon-button,
+.app-header__right .icon-button svg {
+  color: var(--white);
+}
+
+.app-header__right .icon-button:not(:disabled):hover,
+.app-header__right .icon-button.icon-button--ghost:not(:disabled):hover,
+.app-header__right .icon-button.icon-button--outlined:not(:disabled):hover,
+.app-header__right .icon-button.icon-button--default:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-header__right .icon-button:not(:disabled):active,
+.app-header__right .icon-button.icon-button--ghost:not(:disabled):active,
+.app-header__right .icon-button.icon-button--outlined:not(:disabled):active,
+.app-header__right .icon-button.icon-button--default:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Override default button styles for dark header */
+.app-header__right .button,
+.app-header__right .button .button__label,
+.app-header__right .button .button__icon svg {
+  color: var(--white);
+}
+
+.app-header__right .button:not(:disabled):hover,
+.app-header__right .button.button--ghost:not(:disabled):hover,
+.app-header__right .button.button--outlined:not(:disabled):hover,
+.app-header__right .button.button--default:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-header__right .button:not(:disabled):active,
+.app-header__right .button.button--ghost:not(:disabled):active,
+.app-header__right .button.button--outlined:not(:disabled):active,
+.app-header__right .button.button--default:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.2);
+}

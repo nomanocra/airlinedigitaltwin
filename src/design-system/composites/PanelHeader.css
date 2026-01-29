@@ -1,0 +1,159 @@
+/**
+ * PanelHeader Composite Styles
+ * Dark corporate panel header with background image, navigation, and study info
+ */
+
+.panel-header {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-xs, 3px);
+}
+
+/* ============================================================================
+   BACKGROUND
+   ============================================================================ */
+
+.panel-header__background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: var(--radius-xs, 3px);
+}
+
+.panel-header__background-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.panel-header__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--background-corporate, #00205b) 80%, transparent) 0%,
+    var(--background-corporate, #00205b) 100%
+  );
+}
+
+/* Without background image, use solid color */
+.panel-header:not(:has(.panel-header__background-image)) .panel-header__overlay {
+  background-color: var(--background-corporate, #00205b);
+}
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.panel-header__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+}
+
+/* ============================================================================
+   BACK BUTTON
+   ============================================================================ */
+
+.panel-header__back-button.button--ghost {
+  color: var(--sea-blue-20, #cfddf8);
+  align-self: flex-start;
+}
+
+.panel-header__back-button.button--ghost .button__label {
+  color: var(--sea-blue-20, #cfddf8);
+}
+
+.panel-header__back-button.button--ghost:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-header__back-button.button--ghost:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   STUDY INFO
+   ============================================================================ */
+
+.panel-header__study-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panel-header__legend {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--cool-grey-50, #919cb0);
+  padding-left: 8px;
+}
+
+.panel-header__study-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.panel-header__study-row .panel-study-name {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============================================================================
+   ACTIONS (Duplicate button, etc.)
+   ============================================================================ */
+
+.panel-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.panel-header__action-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Override IconButton ghost colors for dark panel context */
+.panel-header__icon-button.icon-button--ghost {
+  color: var(--sea-blue-20, #cfddf8);
+}
+
+.panel-header__icon-button.icon-button--ghost:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-header__icon-button.icon-button--ghost:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   TOOLTIP (shown on hover of action wrapper)
+   ============================================================================ */
+
+.panel-header__tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.panel-header__action-wrapper:hover .panel-header__tooltip {
+  opacity: 1;
+}

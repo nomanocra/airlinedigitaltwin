@@ -1,0 +1,109 @@
+/**
+ * Accordion Composite Styles
+ * A collapsible panel with corporate-styled header
+ */
+
+.accordion {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-xs, 3px);
+  border-left: 4px solid var(--text-corporate, #00205b);
+  background-color: var(--background-main, #ffffff);
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.accordion__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  background-color: var(--background-main, #ffffff);
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.accordion__header:hover {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+.accordion__header:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: -2px;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+/* S */
+.accordion--s .accordion__header {
+  height: 32px;
+  padding: 0 8px;
+}
+
+.accordion--s .accordion__title {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* L */
+.accordion--l .accordion__header {
+  height: 48px;
+  padding: 0 16px;
+}
+
+.accordion--l .accordion__title {
+  font-size: 18px;
+  line-height: 28px;
+}
+
+/* ============================================================================
+   TITLE
+   ============================================================================ */
+
+.accordion__title {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--text-corporate, #00205b);
+  text-align: left;
+}
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.accordion__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms ease-in-out;
+}
+
+.accordion--open .accordion__body {
+  grid-template-rows: 1fr;
+}
+
+.accordion__content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 0 16px;
+  overflow: hidden;
+  background-color: var(--background-main, #ffffff);
+  transition: padding 250ms ease-in-out;
+}
+
+.accordion--open .accordion__content {
+  padding: 16px;
+}

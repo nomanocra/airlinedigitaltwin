@@ -1,0 +1,106 @@
+/**
+ * StudyPage Layout
+ */
+
+.study-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--background-main, #ffffff);
+}
+
+/* Layout: LeftPanel + Main Content side by side */
+.study-page__layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ============================================================================
+   MAIN CONTENT AREA
+   ============================================================================ */
+
+.study-page__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+}
+
+.study-page__content {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
+.study-page__title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--text-corporate, #00205b);
+  margin: 0 0 32px 0;
+}
+
+/* Form row - horizontal layout for inputs */
+.study-page__form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.study-page__form-row > * {
+  width: 260px;
+  max-width: 260px;
+}
+
+/* ============================================================================
+   LEFT PANEL - SCENARIO STRUCTURE
+   ============================================================================ */
+
+.study-page__scenario {
+  margin-bottom: 4px;
+}
+
+.study-page__scenario-content {
+  padding-left: 8px;
+}
+
+/* Add Scenario button */
+.study-page__add-scenario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-transform: uppercase;
+  border-radius: var(--radius-xs, 3px);
+}
+
+.study-page__add-scenario:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================================
+   FLOATING STATUS BAR
+   ============================================================================ */
+
+.study-page__floating-status {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 10;
+}

@@ -1,0 +1,129 @@
+/**
+ * PanelGroup Component Styles
+ * Collapsible group header for dark corporate panels
+ */
+
+.panel-group {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-xs, 3px);
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 248px;
+}
+
+.panel-group:focus-visible {
+  outline: 2px solid var(--sea-blue-20, #cfddf8);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.panel-group--m {
+  height: 40px;
+  padding: 0 8px;
+}
+
+.panel-group--s {
+  height: 32px;
+  padding: 0 4px;
+}
+
+.panel-group--xs {
+  height: 24px;
+  padding: 0 4px;
+}
+
+/* ============================================================================
+   HOVER
+   ============================================================================ */
+
+.panel-group:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ============================================================================
+   ARROW ICON
+   ============================================================================ */
+
+.panel-group__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.panel-group--closed .panel-group__arrow {
+  transform: rotate(-90deg);
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.panel-group__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+/* Open: white label */
+.panel-group--open .panel-group__label {
+  color: #ffffff;
+}
+
+/* Closed: muted label */
+.panel-group--closed .panel-group__label {
+  color: var(--cool-grey-40, #b3bbc8);
+}
+
+/* Size-specific label typography */
+.panel-group--m .panel-group__label {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.panel-group--s .panel-group__label {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.panel-group--xs .panel-group__label {
+  font-size: 11px;
+  line-height: 16px;
+}
+
+/* ============================================================================
+   ACTIONS (visible on hover only)
+   ============================================================================ */
+
+.panel-group__actions {
+  display: none;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.panel-group:hover .panel-group__actions {
+  display: flex;
+}
+
+.panel-group__actions .icon-button--ghost {
+  color: var(--sea-blue-20, #cfddf8);
+}
+
+.panel-group__actions .icon-button--ghost:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-group__actions .icon-button--ghost:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.15);
+}

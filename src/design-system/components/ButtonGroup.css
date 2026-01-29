@@ -1,0 +1,47 @@
+/**
+ * ButtonGroup Component Styles
+ * Container styles only - buttons use Button.css and IconButton.css
+ */
+
+.button-group {
+  display: inline-flex;
+  padding: 4px;
+  background-color: var(--background-tertiary, #eff1f4);
+  border-radius: var(--radius-xs, 3px);
+  gap: 4px;
+}
+
+/* Horizontal layout (default) - buttons fit content */
+.button-group--horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Vertical layout - buttons fill width */
+.button-group--vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Button items inside group - override some default button styles */
+.button-group__item {
+  border-radius: var(--radius-xs, 3px);
+}
+
+/* In vertical layout, text buttons should fill the ButtonGroup width */
+.button-group--vertical .button-group__item:not(.button-group__item--icon-only) {
+  width: auto !important;
+  min-width: 100%;
+  justify-content: center;
+}
+
+/* Icon-only buttons in vertical layout keep their size */
+.button-group--vertical .button-group__item--icon-only {
+  align-self: stretch;
+}
+
+/* Disabled container */
+.button-group--disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}

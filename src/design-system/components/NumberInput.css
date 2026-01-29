@@ -1,0 +1,198 @@
+/**
+ * NumberInput Component Styles
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.number-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.number-input-label-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.number-input-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+}
+
+.number-input-optional {
+  font-weight: 400;
+  color: var(--text-secondary, #63728a);
+}
+
+.number-input-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-default, #063b9e);
+  cursor: pointer;
+}
+
+/* ============================================================================
+   INPUT WRAPPER
+   ============================================================================ */
+
+.number-input-wrapper {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-xs, 3px) var(--radius-xs, 3px) 0 0;
+  background-color: var(--background-secondary, #fafafa);
+  box-shadow: inset 0 -1px 0 0 var(--border-default, #919cb0);
+  box-sizing: border-box;
+}
+
+.number-input-wrapper:hover {
+  background-color: var(--background-tertiary, #f1f1f1);
+}
+
+.number-input-wrapper:focus-within {
+  background-color: var(--background-tertiary, #eff1f4);
+  box-shadow: inset 0 -1px 0 0 var(--primary-default, #063b9e);
+}
+
+/* ============================================================================
+   INPUT WRAPPER SIZES
+   ============================================================================ */
+
+.number-input-wrapper--xs {
+  height: 24px;
+}
+
+.number-input-wrapper--s {
+  height: 32px;
+}
+
+.number-input-wrapper--m {
+  height: 40px;
+}
+
+.number-input-wrapper--l {
+  height: 48px;
+}
+
+/* Smaller gap between label and input for XS/S sizes (per Figma) */
+.number-input-wrapper--xs + .number-input-legend,
+.number-input-wrapper--s + .number-input-legend {
+  margin-top: -4px;
+}
+
+/* ============================================================================
+   INPUT WRAPPER STATES
+   ============================================================================ */
+
+.number-input-wrapper--error {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-error-default, #e4002b);
+}
+
+.number-input-wrapper--error:hover,
+.number-input-wrapper--error:focus-within {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-error-default, #e4002b);
+}
+
+.number-input-wrapper--valid {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-success-default, #08875b);
+}
+
+.number-input-wrapper--valid:hover,
+.number-input-wrapper--valid:focus-within {
+  box-shadow: inset 0 -1px 0 0 var(--feedback-success-default, #08875b);
+}
+
+.number-input-wrapper--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+.number-input-wrapper--read-only {
+  background-color: var(--background-secondary, #fafafa);
+  box-shadow: inset 0 -1px 0 0 var(--border-moderate, #d4d4d4);
+  cursor: default;
+}
+
+.number-input-wrapper--read-only:hover {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+.number-input-wrapper--read-only .number-input-field {
+  color: var(--text-secondary, #63728a);
+  cursor: default;
+}
+
+/* ============================================================================
+   STEPPER BUTTONS (uses IconButton Ghost)
+   ============================================================================ */
+
+.number-input-stepper {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   INPUT FIELD
+   ============================================================================ */
+
+.number-input-field {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  outline: none;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.number-input-field::-webkit-outer-spin-button,
+.number-input-field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-input-field::placeholder {
+  color: var(--text-secondary, #63728a);
+}
+
+/* ============================================================================
+   LEGEND
+   ============================================================================ */
+
+.number-input-legend {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-tertiary, #b3bbc8);
+}
+
+.number-input-container--error .number-input-legend {
+  color: var(--feedback-error-default, #e4002b);
+}
+
+.number-input-container--valid .number-input-legend {
+  color: var(--feedback-success-default, #08875b);
+}

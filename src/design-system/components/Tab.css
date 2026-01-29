@@ -1,0 +1,147 @@
+/**
+ * Tab Component Styles
+ * Utilise les tokens du design system
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  box-sizing: border-box;
+  position: relative;
+  color: var(--primary-default, var(--sea-blue-70, #063b9e));
+  border-radius: 0;
+}
+
+.tab:focus {
+  outline: none;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.tab--s {
+  height: 32px;
+  padding: 0 16px;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.tab--m {
+  height: 40px;
+  padding: 0 16px;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.tab--l {
+  height: 48px;
+  padding: 0 16px;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.tab--xl {
+  height: 56px;
+  padding: 0 16px;
+  gap: 12px;
+  font-size: 18px;
+  line-height: 32px;
+}
+
+/* ============================================================================
+   STATUS: Default vs Active
+   ============================================================================ */
+
+.tab--default {
+  font-weight: 400;
+}
+
+.tab--active {
+  font-weight: 700;
+  color: var(--primary-default, var(--sea-blue-70, #063b9e));
+}
+
+/* ============================================================================
+   VARIANT: Default (bottom border) vs Container (top border + bg)
+   ============================================================================ */
+
+/* Default variant with bottom border when active */
+.tab--default.tab--active {
+  border-bottom: 3px solid var(--primary-default, var(--sea-blue-70, #063b9e));
+}
+
+/* Container variant - Default status (not active) */
+.tab--container {
+  background-color: var(--background-tertiary, var(--cool-grey-10, #eff1f4));
+  border-bottom: 1px solid var(--text-tertiary, var(--cool-grey-60, #b3bbc8));
+}
+
+/* Container variant - Active status */
+.tab--container.tab--active {
+  background-color: var(--background-secondary, var(--warm-grey-10, #fafafa));
+  border-top: 3px solid var(--primary-default, var(--sea-blue-70, #063b9e));
+  border-bottom: none;
+}
+
+/* Container variant - Hover state (only for non-active tabs) */
+.tab--container:not(:disabled):not(.tab--active):hover,
+.tab--container.tab--hover:not(.tab--active) {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+/* ============================================================================
+   STATES: Hover and Disabled
+   ============================================================================ */
+
+.tab:not(:disabled):not(.tab--active):hover,
+.tab--hover:not(.tab--active) {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+.tab:disabled,
+.tab--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   ICONS
+   ============================================================================ */
+
+.tab__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tab__icon--left {
+  margin-right: 0;
+}
+
+.tab__icon--right {
+  margin-left: 0;
+}
+
+.tab__label {
+  white-space: nowrap;
+}

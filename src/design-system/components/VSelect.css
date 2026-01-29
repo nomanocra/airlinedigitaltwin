@@ -1,0 +1,401 @@
+/**
+ * VSelect Component Styles (Vanilla Select)
+ * Utilise les tokens du design system
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.vselect-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.vselect-label-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vselect-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary);
+}
+
+.vselect-optional {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.vselect-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-default);
+  cursor: pointer;
+  position: relative;
+}
+
+.vselect-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background-color: var(--background-inverse);
+  color: var(--text-negative);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  white-space: normal;
+  max-width: 250px;
+  width: max-content;
+  text-align: center;
+  border-radius: 4px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.vselect-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--background-inverse);
+}
+
+.vselect-info-icon:hover .vselect-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================================================
+   WRAPPER
+   ============================================================================ */
+
+.vselect-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* ============================================================================
+   TRIGGER (Main Select Button)
+   ============================================================================ */
+
+.vselect-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 0;
+  padding: 0 8px;
+  background-color: var(--background-secondary);
+  border-bottom: 1px solid var(--border-moderate);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.vselect-trigger:hover {
+  background-color: var(--primary-t-hover);
+  border-bottom-color: var(--border-moderate);
+}
+
+.vselect-trigger:focus {
+  outline: none;
+  border-bottom-color: var(--primary-default);
+  background-color: var(--primary-t-active);
+}
+
+.vselect-trigger--open {
+  border-bottom-color: var(--primary-default);
+  background-color: var(--primary-t-active);
+}
+
+.vselect-container--disabled .vselect-trigger {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.vselect-trigger--placeholder {
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   TRIGGER SIZES
+   ============================================================================ */
+
+.vselect-trigger--xs {
+  height: 24px;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0 8px;
+  gap: 4px;
+}
+
+.vselect-trigger--s {
+  height: 32px;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.vselect-trigger--m {
+  height: 40px;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.vselect-trigger--l {
+  height: 48px;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 0 16px;
+  gap: 8px;
+}
+
+/* ============================================================================
+   TRIGGER STATES
+   ============================================================================ */
+
+.vselect-trigger--error {
+  border-bottom-color: var(--feedback-error-default);
+}
+
+.vselect-trigger--error:hover,
+.vselect-trigger--error:focus {
+  border-bottom-color: var(--feedback-error-default);
+}
+
+.vselect-trigger--valid {
+  border-bottom-color: var(--feedback-success-default);
+}
+
+.vselect-trigger--valid:hover,
+.vselect-trigger--valid:focus {
+  border-bottom-color: var(--feedback-success-default);
+}
+
+/* Read-only state */
+.vselect-container--read-only .vselect-trigger {
+  background-color: transparent;
+  border-bottom-color: var(--border-minimal);
+  color: var(--text-main);
+  cursor: default;
+  pointer-events: none;
+}
+
+.vselect-container--read-only .vselect-icon--chevron {
+  display: none;
+}
+
+/* ============================================================================
+   VALUE
+   ============================================================================ */
+
+.vselect-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   ICONS
+   ============================================================================ */
+
+.vselect-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--primary-default);
+}
+
+.vselect-icon--left {
+  margin-right: 0;
+}
+
+.vselect-icon--chevron {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.vselect-trigger--open .vselect-icon--chevron {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   DROPDOWN
+   ============================================================================ */
+
+.vselect-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 0;
+  overflow: hidden;
+  background-color: var(--background-main);
+  border-radius: 0;
+  border: none;
+  box-shadow: 0px 3px 12px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: max-height 0.2s ease;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.vselect-dropdown--open {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+/* Custom scrollbar */
+.vselect-dropdown--open::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vselect-dropdown--open::-webkit-scrollbar-track {
+  background: var(--background-tertiary);
+  border-radius: var(--radius-xs, 3px);
+}
+
+.vselect-dropdown--open::-webkit-scrollbar-thumb {
+  background: var(--border-moderate);
+  border-radius: var(--radius-xs, 3px);
+}
+
+.vselect-dropdown--open::-webkit-scrollbar-thumb:hover {
+  background: var(--border-moderate);
+}
+
+/* ============================================================================
+   ITEM (Dropdown Options)
+   ============================================================================ */
+
+.vselect-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.vselect-item:hover {
+  background-color: var(--primary-t-hover);
+}
+
+.vselect-item--selected {
+  background-color: var(--primary-t-active);
+  font-weight: 700;
+}
+
+.vselect-item--selected:hover {
+  background-color: var(--primary-t-active);
+}
+
+/* ============================================================================
+   ITEM SIZES
+   ============================================================================ */
+
+.vselect-item--xs {
+  font-size: 12px;
+  line-height: 16px;
+  padding: 4px 8px;
+}
+
+.vselect-item--s {
+  font-size: 12px;
+  line-height: 16px;
+  padding: 6px 12px;
+}
+
+.vselect-item--m {
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px 12px;
+}
+
+.vselect-item--l {
+  font-size: 16px;
+  line-height: 24px;
+  padding: 10px 16px;
+}
+
+/* ============================================================================
+   ITEM TEXT & INDICATOR
+   ============================================================================ */
+
+.vselect-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vselect-item-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  color: var(--primary-default);
+}
+
+/* ============================================================================
+   LEGEND
+   ============================================================================ */
+
+.vselect-legend {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-secondary);
+}
+
+.vselect-container--error .vselect-legend {
+  color: var(--feedback-error-default);
+}
+
+.vselect-container--valid .vselect-legend {
+  color: var(--feedback-success-default);
+}

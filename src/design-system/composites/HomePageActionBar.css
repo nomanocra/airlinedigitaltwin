@@ -1,0 +1,54 @@
+/**
+ * HomePageActionBar Composite Styles
+ */
+
+.home-page-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 8px;
+  background-color: var(--background-main, #ffffff);
+  border-bottom: 1px solid var(--border-minimal, #e0e3e9);
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   TABS SECTION
+   ============================================================================ */
+
+.home-page-action-bar__tabs {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  gap: 0;
+}
+
+.home-page-action-bar__tabs .tab {
+  height: 40px;
+  min-width: 110px;
+}
+
+/* ============================================================================
+   ACTIONS SECTION
+   ============================================================================ */
+
+.home-page-action-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Sort Button - uppercase label */
+.home-page-action-bar__sort-button {
+  text-transform: uppercase;
+}
+
+/* Search Input - fixed width */
+.home-page-action-bar__search {
+  width: 240px;
+}
+
+.home-page-action-bar__search .text-input-wrapper {
+  height: 40px;
+}

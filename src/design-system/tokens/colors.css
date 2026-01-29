@@ -1,0 +1,213 @@
+/**
+ * Color CSS Variables
+ * Variables CSS basées sur les tokens de couleur
+ * Générées depuis Figma - AS Common UI Kit
+ */
+
+:root {
+  /* ============================================================================
+     PRIMITIVE COLORS
+     ============================================================================ */
+
+  /* Sea Blue */
+  --sea-blue-100: #011333;
+  --sea-blue-90: #00205b;
+  --sea-blue-80: #002d80;
+  --sea-blue-70: #063b9e;
+  --sea-blue-60: #255fcc;
+  --sea-blue-50: #638ee0;
+  --sea-blue-40: #86a8e9;
+  --sea-blue-30: #b3cbf8;
+  --sea-blue-20: #cfddf8;
+  --sea-blue-10: #e5ecf7;
+
+  /* Sky Blue */
+  --sky-blue-100: #004066;
+  --sky-blue-90: #005587;
+  --sky-blue-80: #0b78b8;
+  --sky-blue-70: #219ae1;
+  --sky-blue-60: #3cb7ff;
+  --sky-blue-50: #5fc3ff;
+  --sky-blue-40: #82d1ff;
+  --sky-blue-30: #a5deff;
+  --sky-blue-20: #c8eaff;
+  --sky-blue-10: #ebf8ff;
+
+  /* Cool Grey */
+  --cool-grey-100: #14171d;
+  --cool-grey-90: #282e3a;
+  --cool-grey-80: #3c4657;
+  --cool-grey-70: #505d74;
+  --cool-grey-60: #63728a;
+  --cool-grey-50: #919cb0;
+  --cool-grey-40: #b3bbc8;
+  --cool-grey-30: #ced5dd;
+  --cool-grey-20: #e0e3e9;
+  --cool-grey-10: #eff1f4;
+
+  /* Warm Grey */
+  --warm-grey-100: #1a1a1a;
+  --warm-grey-90: #333333;
+  --warm-grey-80: #585858;
+  --warm-grey-70: #828282;
+  --warm-grey-60: #a3a3a3;
+  --warm-grey-50: #c5c5c5;
+  --warm-grey-40: #d4d4d4;
+  --warm-grey-30: #e6e6e6;
+  --warm-grey-20: #f1f1f1;
+  --warm-grey-10: #fafafa;
+
+  /* Red */
+  --red-100: #6a0014;
+  --red-90: #92001c;
+  --red-80: #bb0023;
+  --red-70: #e4002b;
+  --red-60: #f23346;
+  --red-50: #f86471;
+  --red-40: #ff8998;
+  --red-30: #ffa2b0;
+  --red-20: #fdbac5;
+  --red-10: #fad1d8;
+
+  /* Green */
+  --green-100: #005e3e;
+  --green-90: #036e4a;
+  --green-80: #08875b;
+  --green-70: #18a272;
+  --green-60: #2cbc89;
+  --green-50: #2fd39a;
+  --green-40: #27e7a7;
+  --green-30: #5ef7c4;
+  --green-20: #9cfcda;
+  --green-10: #d1ffef;
+
+  /* Yellow */
+  --yellow-100: #554000;
+  --yellow-90: #775900;
+  --yellow-80: #a27900;
+  --yellow-70: #bb8e09;
+  --yellow-60: #ddab17;
+  --yellow-50: #ffc929;
+  --yellow-40: #ffd557;
+  --yellow-30: #ffe085;
+  --yellow-20: #ffecb3;
+  --yellow-10: #fff9e5;
+
+  /* White & Black */
+  --white: #ffffff;
+  --black: #000000;
+
+  /* ============================================================================
+     SEMANTIC COLORS
+     ============================================================================ */
+
+  /* Primary - Références Sea Blue */
+  --primary-default: var(--sea-blue-70);
+  --primary-hover: var(--sea-blue-60);
+  --primary-active: var(--sea-blue-80);
+  --primary-t-hover: rgba(0, 45, 128, 0.1);
+  --primary-t-active: rgba(0, 45, 128, 0.2);
+
+  /* Text - Références Cool Grey, White, Sea Blue */
+  --text-main: var(--cool-grey-100);
+  --text-secondary: var(--cool-grey-60);
+  --text-tertiary: var(--cool-grey-40);
+  --text-negative: var(--white);
+  --text-corporate: var(--sea-blue-90);
+
+  /* Background - Références White, Cool Grey */
+  --background-main: var(--white);
+  --background-secondary: var(--warm-grey-10);
+  --background-tertiary: var(--cool-grey-10);
+  --background-corporate: var(--sea-blue-90);
+
+  /* Border - Références Cool Grey, White */
+  --border-strong: var(--cool-grey-70);
+  --border-default: var(--cool-grey-50);
+  --border-moderate: var(--cool-grey-30);
+  --border-minimal: var(--cool-grey-10);
+  --border-white: var(--white);
+
+  /* Feedback Success - Références Green */
+  --feedback-success-default: var(--green-80);
+  --feedback-success-hover: var(--green-70);
+  --feedback-success-active: var(--green-90);
+  --feedback-success-background: var(--green-10);
+  --feedback-success-t-background: rgba(8, 135, 91, 0.1);
+
+  /* Feedback Error - Références Red */
+  --feedback-error-default: var(--red-70);
+  --feedback-error-hover: var(--red-60);
+  --feedback-error-active: var(--red-80);
+  --feedback-error-background: var(--red-10);
+  --feedback-error-t-background: rgba(228, 0, 43, 0.1);
+
+  /* Feedback Warning - Références Yellow */
+  --feedback-warning-default: var(--yellow-50);
+  --feedback-warning-hover: var(--yellow-40);
+  --feedback-warning-active: var(--yellow-60);
+  --feedback-warning-background: var(--yellow-10);
+  --feedback-warning-t-background: rgba(255, 201, 41, 0.1);
+
+  /* Background Inverse (for tooltips, etc.) */
+  --background-inverse: var(--cool-grey-100);
+}
+
+/*
+   ============================================================================
+   DARK MODE
+   ============================================================================ 
+*/
+
+html.dark {
+  /* Primary - Lighter blues for dark backgrounds */
+  --primary-default: #cfddf8;
+  --primary-hover: #b3cbf8;
+  --primary-active: #e5ecf7;
+  --primary-t-hover: rgba(179, 203, 248, 0.1);
+  --primary-t-active: rgba(179, 203, 248, 0.2);
+
+  /* Text - Inverted for dark backgrounds */
+  --text-main: #ffffff;
+  --text-secondary: #b3bbc8;
+  --text-tertiary: #505d74;
+  --text-negative: #14171d;
+  --text-corporate: #b3cbf8;
+
+  /* Background - Dark greys */
+  --background-main: #14171d;
+  --background-secondary: #282e3a;
+  --background-tertiary: #3c4657;
+  --background-corporate: #282e3a;
+  --background-input: rgba(145, 156, 176, 0.1);
+  --background-inverse: #ffffff;
+
+  /* Border - Adjusted for dark mode */
+  --border-strong: #ced5dd;
+  --border-default: #919cb0;
+  --border-moderate: #3c4657;
+  --border-minimal: #282e3a;
+  --border-white: #14171d;
+
+  /* Feedback Success - Lighter greens */
+  --feedback-success-default: #5ef7c4;
+  --feedback-success-hover: #27e7a7;
+  --feedback-success-active: #9cfcda;
+  --feedback-success-background: #005e3e;
+  --feedback-success-t-background: rgba(94, 247, 196, 0.1);
+
+  /* Feedback Error - Lighter reds */
+  --feedback-error-default: #ff8998;
+  --feedback-error-hover: #ffa2b0;
+  --feedback-error-active: #f86471;
+  --feedback-error-background: #6a0014;
+  --feedback-error-t-background: rgba(255, 137, 152, 0.1);
+
+  /* Feedback Warning - Same yellow base */
+  --feedback-warning-default: #ffc929;
+  --feedback-warning-hover: #ddab17;
+  --feedback-warning-active: #ffd557;
+  --feedback-warning-background: #554000;
+  --feedback-warning-t-background: rgba(255, 201, 41, 0.1);
+}
+

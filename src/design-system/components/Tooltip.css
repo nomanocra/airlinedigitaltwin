@@ -1,0 +1,33 @@
+/**
+ * Tooltip Component Styles (Radix UI)
+ */
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.tooltip-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  background-color: var(--background-main, #ffffff);
+  border-radius: var(--radius-xs, 3px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  white-space: nowrap;
+  z-index: 10000;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.24);
+}
+
+/* ============================================================================
+   ARROW
+   ============================================================================ */
+
+.tooltip-arrow {
+  fill: var(--background-main, #ffffff);
+  filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.12));
+}

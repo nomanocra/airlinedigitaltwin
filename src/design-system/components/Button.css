@@ -1,0 +1,207 @@
+/**
+ * Button Component Styles
+ * Utilise les tokens du design system
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-xs, 3px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.button:focus {
+  outline: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.button--xs {
+  height: 24px;
+  padding: 4px 8px;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.button--s {
+  height: 32px;
+  padding: 8px 12px;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.button--m {
+  height: 40px;
+  padding: 12px 16px;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.button--l {
+  height: 48px;
+  padding: 12px 16px;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.button--xl {
+  height: 56px;
+  padding: 12px 16px;
+  gap: 8px;
+  font-size: 18px;
+  line-height: 32px;
+}
+
+/* ============================================================================
+   VARIANT: DEFAULT (Solid)
+   ============================================================================ */
+
+.button--default {
+  background-color: var(--primary-default, #063b9e);
+  color: var(--text-negative, #ffffff);
+}
+
+.button--default:not(:disabled):hover {
+  background-color: var(--primary-hover, #255fcc);
+  cursor: pointer;
+}
+
+.button--default:not(:disabled):active {
+  background-color: var(--primary-active, #002d80);
+}
+
+.button--default:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   VARIANT: OUTLINED
+   ============================================================================ */
+
+.button--outlined {
+  background-color: transparent;
+  border: 1px solid var(--primary-default, #063b9e);
+  color: var(--primary-default, #063b9e);
+}
+
+.button--outlined:not(:disabled):hover {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+  border-color: var(--primary-default, #063b9e);
+  cursor: pointer;
+}
+
+.button--outlined:not(:disabled):active {
+  background-color: var(--primary-t-active, rgba(0, 45, 128, 0.2));
+  border-color: var(--primary-default, #063b9e);
+}
+
+.button--outlined:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   VARIANT: GHOST
+   ============================================================================ */
+
+.button--ghost {
+  background-color: transparent;
+  border: none;
+  color: var(--primary-default, #063b9e);
+}
+
+.button--ghost:not(:disabled):hover {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+  cursor: pointer;
+}
+
+.button--ghost:not(:disabled):active {
+  background-color: var(--primary-t-active, rgba(0, 45, 128, 0.2));
+}
+
+.button--ghost:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   ICONS
+   ============================================================================ */
+
+.button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.button__icon--left {
+  margin-right: 0;
+}
+
+.button__icon--right {
+  margin-left: 0;
+}
+
+.button__label {
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   TOOLTIP
+   ============================================================================ */
+
+.button__tooltip {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-main, #ffffff);
+  color: var(--text-main, #14171d);
+  padding: 8px;
+  border-radius: var(--radius-xs, 3px);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  white-space: nowrap;
+  box-shadow: 0px 3px 12px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.button:hover .button__tooltip {
+  opacity: 1;
+}
+
+.button--disabled .button__tooltip,
+.button:disabled .button__tooltip {
+  display: none;
+}
+

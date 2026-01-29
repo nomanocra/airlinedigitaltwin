@@ -1,0 +1,282 @@
+/**
+ * PanelButton Component Styles
+ * Navigation button for dark side panels with expanded/collapsed modes
+ */
+
+.panel-button {
+  all: unset;
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: var(--radius-xs, 3px);
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  box-sizing: border-box;
+  color: #ffffff;
+}
+
+.panel-button:focus-visible {
+  outline: 2px solid var(--sea-blue-20, #cfddf8);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   SIZES - Expanded (panel open)
+   ============================================================================ */
+
+.panel-button--open.panel-button--m {
+  height: 40px;
+  padding: 8px 16px;
+  gap: 12px;
+  width: 248px;
+}
+
+.panel-button--open.panel-button--s {
+  height: 32px;
+  padding: 8px 12px;
+  gap: 8px;
+  width: 248px;
+}
+
+.panel-button--open.panel-button--xs {
+  height: 24px;
+  padding: 8px;
+  gap: 8px;
+  width: 248px;
+}
+
+/* ============================================================================
+   SIZES - Collapsed (icon-only)
+   ============================================================================ */
+
+.panel-button--collapsed.panel-button--m {
+  height: 40px;
+  width: 40px;
+  padding: 8px 16px;
+  justify-content: center;
+}
+
+.panel-button--collapsed.panel-button--s {
+  height: 32px;
+  width: 32px;
+  padding: 8px 16px;
+  justify-content: center;
+}
+
+.panel-button--collapsed.panel-button--xs {
+  height: 24px;
+  width: 24px;
+  padding: 8px 16px;
+  justify-content: center;
+}
+
+/* ============================================================================
+   VARIANT: DEFAULT
+   ============================================================================ */
+
+.panel-button--default {
+  background-color: transparent;
+}
+
+.panel-button--default:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.panel-button--default:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================================================
+   VARIANT: SELECTED
+   ============================================================================ */
+
+.panel-button--selected {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.panel-button--selected:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================================================
+   VARIANT: DISABLED
+   ============================================================================ */
+
+.panel-button--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   SELECTED INDICATOR (left border)
+   ============================================================================ */
+
+.panel-button__indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #ffffff;
+  border-radius: var(--radius-xs, 3px) 1px 1px var(--radius-xs, 3px);
+}
+
+/* ============================================================================
+   ICON
+   ============================================================================ */
+
+.panel-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.panel-button__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel-button--m .panel-button__label {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.panel-button--s .panel-button__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.panel-button--xs .panel-button__label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+/* ============================================================================
+   ERROR CHIP (expanded mode)
+   ============================================================================ */
+
+.panel-button__error-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: var(--feedback-error-default, #e4002b);
+  color: #ffffff;
+  border-radius: 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+}
+
+.panel-button--m .panel-button__error-chip,
+.panel-button--s .panel-button__error-chip {
+  padding: 2px 8px;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.panel-button--xs .panel-button__error-chip {
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+/* ============================================================================
+   WARNING ICON (expanded mode)
+   ============================================================================ */
+
+.panel-button__warning {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   BADGE WRAPPER (for tooltip on hover)
+   ============================================================================ */
+
+.panel-button__badge-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panel-button__badge-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.panel-button__badge-wrapper:hover .panel-button__badge-tooltip {
+  opacity: 1;
+}
+
+/* ============================================================================
+   ERROR DOT (collapsed mode)
+   ============================================================================ */
+
+.panel-button__error-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 16px;
+  background-color: var(--feedback-error-default, #e4002b);
+}
+
+/* ============================================================================
+   WARNING DOT (collapsed mode)
+   ============================================================================ */
+
+.panel-button__warning-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================================
+   TOOLTIP (collapsed mode, shown on hover)
+   ============================================================================ */
+
+.panel-button__tooltip {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 1000;
+}
+
+.panel-button--collapsed:hover .panel-button__tooltip {
+  opacity: 1;
+}
+
+.panel-button--disabled .panel-button__tooltip {
+  display: none;
+}

@@ -1,0 +1,153 @@
+/**
+ * VCheckbox Component Styles (Vanilla Checkbox)
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.vcheckbox-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.vcheckbox-container--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+.vcheckbox-container--read-only {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   HIDDEN NATIVE INPUT
+   ============================================================================ */
+
+.vcheckbox-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================================
+   CHECKBOX BOX
+   ============================================================================ */
+
+.vcheckbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-moderate);
+  border-radius: var(--radius-xs, 3px);
+  background-color: var(--background-main);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Sizes */
+.vcheckbox--s {
+  width: 16px;
+  height: 16px;
+}
+
+.vcheckbox--m {
+  width: 20px;
+  height: 20px;
+}
+
+.vcheckbox--l {
+  width: 24px;
+  height: 24px;
+}
+
+/* Hover state */
+.vcheckbox-container:not(.vcheckbox-container--disabled):not(.vcheckbox-container--read-only) .vcheckbox:hover {
+  border-color: var(--primary-default);
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+/* Focus state */
+.vcheckbox:focus-visible {
+  outline: 2px solid var(--primary-default);
+  outline-offset: 2px;
+}
+
+/* Checked state */
+.vcheckbox--checked {
+  background-color: var(--primary-default);
+  border-color: var(--primary-default);
+}
+
+.vcheckbox-container:not(.vcheckbox-container--disabled):not(.vcheckbox-container--read-only) .vcheckbox--checked:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* ============================================================================
+   INDICATOR (Check/Indeterminate Icon)
+   ============================================================================ */
+
+.vcheckbox-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-negative);
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.vcheckbox-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+
+.vcheckbox-container--disabled .vcheckbox-label {
+  cursor: default;
+}
+
+.vcheckbox-container--read-only .vcheckbox-label {
+  cursor: default;
+}
+
+/* ============================================================================
+   SIZE VARIATIONS FOR LABEL
+   ============================================================================ */
+
+.vcheckbox-container--s .vcheckbox-label {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.vcheckbox-container--m .vcheckbox-label {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.vcheckbox-container--l .vcheckbox-label {
+  font-size: 16px;
+  line-height: 24px;
+}

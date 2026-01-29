@@ -1,0 +1,38 @@
+/**
+ * PanelSectionTitle Component Styles
+ * Section title label for dark corporate panels
+ */
+
+.panel-section-title {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-top: 16px;
+}
+
+/* First section title should not have top padding */
+.panel-section-title:first-child {
+  padding-top: 0;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.panel-section-title--m {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.panel-section-title--s {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.panel-section-title--xs {
+  font-size: 10px;
+  line-height: 16px;
+}

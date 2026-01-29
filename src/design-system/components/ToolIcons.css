@@ -1,0 +1,31 @@
+/**
+ * ToolIcons Component Styles
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+.tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* Size is controlled via inline style prop (default: 60px) */
+}
+
+.tool-icon__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Mode variants */
+.tool-icon--light {
+  /* Light mode specific styles if needed */
+}
+
+.tool-icon--dark {
+  /* Dark mode specific styles if needed */
+}

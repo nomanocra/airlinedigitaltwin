@@ -1,0 +1,114 @@
+/**
+ * Spinner Component Styles
+ */
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Variant: Default (rotating icon)
+   ========================================================================== */
+
+.spinner--default {
+  animation: spinner-rotate 1s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Variant: Dots (sequential fade)
+   ========================================================================== */
+
+.spinner--dots {
+  position: relative;
+}
+
+.spinner__dot {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.25;
+  animation: spinner-dot-fade 1s ease-in-out infinite;
+}
+
+@keyframes spinner-dot-fade {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Variant: Arc (Material Design growing/shrinking)
+   ViewBox is fixed at 50×50, radius 20, circumference ≈ 125.66
+   ========================================================================== */
+
+.spinner--arc {
+  animation: spinner-arc-rotate 1.4s linear infinite;
+}
+
+.spinner__arc-svg {
+  display: block;
+}
+
+.spinner__arc-circle {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  animation: spinner-arc-dash 1.4s ease-in-out infinite;
+}
+
+@keyframes spinner-arc-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinner-arc-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124;
+  }
+}
+
+/* ==========================================================================
+   Variant: Progress (determinate arc 0%–100%)
+   ========================================================================== */
+
+.spinner--progress {
+  transform: rotate(-90deg);
+}
+
+.spinner__progress-svg {
+  display: block;
+}
+
+.spinner__progress-track {
+  opacity: 0.15;
+}
+
+.spinner__progress-fill {
+  transition: stroke-dashoffset 0.3s ease;
+}

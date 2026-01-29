@@ -1,0 +1,205 @@
+/**
+ * Toggle Component Styles (Radix UI Switch)
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css and @/design-system/typography.css */
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   TRACK (The pill-shaped background) - Radix Switch.Root
+   ============================================================================ */
+
+.toggle__track {
+  all: unset;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--primary-default, #063b9e);
+  border-radius: 999px;
+  background-color: var(--background-main, #ffffff);
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.toggle__track:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   THUMB (The circular knob) - Radix Switch.Thumb
+   ============================================================================ */
+
+.toggle__thumb {
+  display: block;
+  border-radius: 50%;
+  background-color: var(--primary-default, #063b9e);
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.toggle__label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ============================================================================
+   SIZES - Thumb: 12, 18, 24px | Border: 1px inside | Padding: S=2px, M=3px, L=4px
+   ============================================================================ */
+
+/* Size L - 64x32px track, 24px thumb, 4px padding */
+.toggle--l .toggle__track {
+  width: 64px;
+  height: 32px;
+  padding: 3px; /* 4px from outer - 1px border = 3px */
+}
+
+.toggle--l .toggle__thumb {
+  width: 24px;
+  height: 24px;
+}
+
+.toggle--l .toggle__thumb[data-state='checked'] {
+  transform: translateX(32px); /* 64 - 24 - 3*2 - 2 = 32px */
+}
+
+/* Size M - 48x24px track, 18px thumb, 3px padding */
+.toggle--m .toggle__track {
+  width: 48px;
+  height: 24px;
+  padding: 2px; /* 3px from outer - 1px border = 2px */
+}
+
+.toggle--m .toggle__thumb {
+  width: 18px;
+  height: 18px;
+}
+
+.toggle--m .toggle__thumb[data-state='checked'] {
+  transform: translateX(24px); /* 48 - 18 - 2*2 - 2 = 24px */
+}
+
+/* Size S - 32x16px track, 12px thumb, 2px padding */
+.toggle--s .toggle__track {
+  width: 32px;
+  height: 16px;
+  padding: 1px; /* 2px from outer - 1px border = 1px */
+}
+
+.toggle--s .toggle__thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.toggle--s .toggle__thumb[data-state='checked'] {
+  transform: translateX(16px); /* 32 - 12 - 1*2 - 2 = 16px */
+}
+
+/* ============================================================================
+   STATES - UNCHECKED
+   ============================================================================ */
+
+/* Default unchecked */
+.toggle__track[data-state='unchecked'] {
+  background-color: var(--background-main, #ffffff);
+}
+
+.toggle__thumb[data-state='unchecked'] {
+  background-color: var(--primary-default, #063b9e);
+}
+
+/* Hover unchecked */
+.toggle:not(.toggle--disabled) .toggle__track[data-state='unchecked']:hover {
+  background-color: var(--background-secondary, #f1f1f1);
+}
+
+/* ============================================================================
+   STATES - CHECKED
+   ============================================================================ */
+
+/* Default checked */
+.toggle__track[data-state='checked'] {
+  background-color: var(--primary-default, #063b9e);
+  border-color: var(--primary-default, #063b9e);
+}
+
+.toggle__thumb[data-state='checked'] {
+  background-color: var(--background-main, #ffffff);
+}
+
+/* Hover checked */
+.toggle:not(.toggle--disabled) .toggle__track[data-state='checked']:hover {
+  background-color: var(--primary-active, #002d80);
+  border-color: var(--primary-active, #002d80);
+}
+
+/* ============================================================================
+   DISABLED STATE
+   ============================================================================ */
+
+.toggle--disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.toggle--disabled .toggle__track {
+  cursor: default;
+  pointer-events: none;
+}
+
+.toggle--disabled .toggle__label {
+  cursor: default;
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+:root.dark .toggle__label {
+  color: var(--text-main, #ffffff);
+}
+
+:root.dark .toggle__track[data-state='unchecked'] {
+  background-color: var(--background-main, #1a1a1a);
+  border-color: var(--primary-default, #255fcc);
+}
+
+:root.dark .toggle__thumb[data-state='unchecked'] {
+  background-color: var(--primary-default, #255fcc);
+}
+
+:root.dark .toggle:not(.toggle--disabled) .toggle__track[data-state='unchecked']:hover {
+  background-color: var(--background-secondary, #2a2a2a);
+}
+
+:root.dark .toggle__track[data-state='checked'] {
+  background-color: var(--primary-default, #255fcc);
+  border-color: var(--primary-default, #255fcc);
+}
+
+:root.dark .toggle__thumb[data-state='checked'] {
+  background-color: var(--background-main, #1a1a1a);
+}
+
+:root.dark .toggle:not(.toggle--disabled) .toggle__track[data-state='checked']:hover {
+  background-color: var(--primary-hover, #3d7ae0);
+  border-color: var(--primary-hover, #3d7ae0);
+}

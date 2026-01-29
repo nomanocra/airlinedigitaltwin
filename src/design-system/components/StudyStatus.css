@@ -1,0 +1,49 @@
+/**
+ * StudyStatus Component Styles
+ */
+
+.study-status {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Icon container */
+.study-status__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Label */
+.study-status__label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* State-specific colors */
+.study-status--computed .study-status__label {
+  color: var(--primary-default, #063b9e);
+}
+
+.study-status--computing .study-status__label {
+  color: var(--text-secondary, #63728a);
+}
+
+.study-status--failed .study-status__label {
+  color: var(--feedback-error-default, #e4002b);
+}
+
+.study-status--draft .study-status__label {
+  color: var(--text-secondary, #63728a);
+}
+
+.study-status--warning .study-status__label {
+  color: var(--feedback-warning-default, #ffc929);
+}

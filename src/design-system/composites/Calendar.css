@@ -1,0 +1,278 @@
+/**
+ * Calendar Component Styles
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.calendar-trigger-wrapper {
+  width: 100%;
+}
+
+/* ============================================================================
+   POPOVER
+   ============================================================================ */
+
+.calendar-popover {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-main, #ffffff);
+  box-shadow: 0px 3px 12px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  z-index: 1000;
+  overflow: hidden;
+  min-width: 308px;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.calendar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+  background-color: var(--primary-active, #002d80);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.calendar-header-year {
+  all: unset;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-moderate, #919cb0);
+  cursor: pointer;
+}
+
+.calendar-header-year:hover {
+  text-decoration: underline;
+}
+
+.calendar-header-date {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 40px;
+  color: var(--text-negative, #ffffff);
+}
+
+/* ============================================================================
+   BODY
+   ============================================================================ */
+
+.calendar-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  padding-bottom: 24px;
+}
+
+/* ============================================================================
+   NAVIGATION
+   ============================================================================ */
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 45px;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.calendar-nav-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+}
+
+/* ============================================================================
+   DAY HEADERS
+   ============================================================================ */
+
+.calendar-day-headers {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  padding: 3px 16px;
+  box-sizing: border-box;
+  background-color: var(--background-main, #ffffff);
+  overflow: hidden;
+}
+
+.calendar-day-header {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-moderate, #919cb0);
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+
+/* ============================================================================
+   DAY GRID
+   ============================================================================ */
+
+.calendar-day-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background-color: var(--background-main, #ffffff);
+}
+
+.calendar-day-row {
+  display: flex;
+  gap: 4px;
+}
+
+.calendar-day {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-xs, 3px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-strong, #63728a);
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.calendar-day:hover:not(.calendar-day--selected):not(.calendar-day--disabled):not(.calendar-day--empty) {
+  background-color: var(--primary-t-hover, rgba(6, 59, 158, 0.1));
+}
+
+.calendar-day--selected {
+  background-color: var(--primary-default, #063b9e);
+  color: var(--text-negative, #ffffff);
+}
+
+.calendar-day--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+.calendar-day--empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   MONTH GRID
+   ============================================================================ */
+
+.calendar-month-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background-color: var(--background-main, #ffffff);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.calendar-month-row {
+  display: flex;
+  gap: 4px;
+}
+
+.calendar-month-cell {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius-xs, 3px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-strong, #63728a);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.calendar-month-cell:hover:not(.calendar-month-cell--selected):not(.calendar-month-cell--disabled) {
+  background-color: var(--primary-t-hover, rgba(6, 59, 158, 0.1));
+}
+
+.calendar-month-cell--selected {
+  background-color: var(--primary-default, #063b9e);
+  color: var(--text-negative, #ffffff);
+}
+
+.calendar-month-cell--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   YEARS LIST
+   ============================================================================ */
+
+.calendar-years-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: 323px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 20px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.calendar-year {
+  all: unset;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  cursor: pointer;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.calendar-year:hover:not(.calendar-year--selected) {
+  color: var(--primary-hover, #255fcc);
+}
+
+.calendar-year--selected {
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--primary-default, #063b9e);
+}

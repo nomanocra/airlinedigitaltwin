@@ -1,0 +1,128 @@
+/**
+ * Modal Component Styles
+ * Uses design system tokens from colors.css and typography.css
+ */
+
+/* Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+/* Modal Container */
+.modal {
+  background-color: var(--background-main, var(--white, #ffffff));
+  border-radius: var(--radius-xs, 3px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  position: relative;
+  /* Default size - can be overridden via className */
+  width: 471px;
+  max-width: calc(100vw - 48px);
+}
+
+/* Header */
+.modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+/* Title - Uses label-bold-l token styles */
+.modal__title {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 32px;
+  color: var(--text-corporate, var(--sea-blue-90, #00205b));
+  margin: 0;
+  padding: 0;
+}
+
+.modal__close-button {
+  flex-shrink: 0;
+}
+
+/* Content */
+.modal__content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  color: var(--text-main, var(--cool-grey-100, #14171d));
+}
+
+/* Footer */
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Animation */
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-slide-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-overlay {
+  animation: modal-fade-in 0.2s ease-out;
+}
+
+.modal {
+  animation: modal-slide-in 0.2s ease-out;
+}
+
+/* Focus visible for accessibility */
+.modal:focus-visible {
+  outline: 2px solid var(--primary-default, var(--sea-blue-70, #063b9e));
+  outline-offset: 2px;
+}
+
+/* Dark mode support - Uses tokens defined in colors.css */
+html.dark .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+html.dark .modal {
+  background-color: var(--background-main);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .modal__title {
+  color: var(--text-corporate);
+}
+
+html.dark .modal__content {
+  color: var(--text-main);
+}

@@ -1,0 +1,449 @@
+/**
+ * LandingPage Template Styles
+ *
+ * Based on Figma design: Airline Digital Twin - Landing Page
+ * Full-width landing page with hero, tool catalog, contact form, and footer.
+ */
+
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-secondary, #fafafa);
+}
+
+/* ============================================================================
+   NAVBAR (sticky)
+   ============================================================================ */
+
+.landing-page .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   HERO SECTION
+   ============================================================================ */
+
+.landing-page__hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 388px;
+  padding: 80px 100px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.landing-page__hero-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 32, 91, 0.9);
+}
+
+.landing-page__hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  max-width: 800px;
+}
+
+.landing-page__hero-title {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 56px;
+  color: var(--text-negative, #ffffff);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.landing-page__hero-subtitle {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 32px;
+  color: var(--text-negative, #ffffff);
+}
+
+.landing-page__hero-description {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 24px;
+  color: #e0e3e9;
+  max-width: 660px;
+}
+
+.landing-page__hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+
+  /* Force dark-mode tokens so buttons always render in dark style */
+  --primary-default: #cfddf8;
+  --primary-hover: #b3cbf8;
+  --primary-active: #e5ecf7;
+  --primary-t-hover: rgba(207, 221, 248, 0.1);
+  --primary-t-active: rgba(207, 221, 248, 0.2);
+  --text-negative: #14171d;
+}
+
+/* ============================================================================
+   MAIN CONTENT
+   ============================================================================ */
+
+.landing-page__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* ============================================================================
+   FAVOURITE SECTION
+   ============================================================================ */
+
+.landing-page__favourites {
+  width: 100%;
+  max-width: 1400px;
+  padding: 40px 100px 0;
+  box-sizing: border-box;
+}
+
+.landing-page__section-title {
+  margin: 0 0 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-corporate, #00205b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.landing-page__favourites-container {
+  background-color: var(--background-tertiary, #eff1f4);
+  border-radius: var(--radius-xs, 3px);
+  padding: 16px;
+}
+
+.landing-page__favourites-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ============================================================================
+   OUR TOOLS SECTION
+   ============================================================================ */
+
+.landing-page__tools {
+  width: 100%;
+  max-width: 1400px;
+  padding: 40px 100px;
+  box-sizing: border-box;
+}
+
+/* Chip filter bar */
+.landing-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+/* Tool category */
+.landing-page__category {
+  margin-bottom: 32px;
+}
+
+.landing-page__category:last-child {
+  margin-bottom: 0;
+}
+
+.landing-page__category-title {
+  margin: 0 0 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-corporate, #00205b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.landing-page__category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ============================================================================
+   TILE WRAPPER (with dropdown menu)
+   ============================================================================ */
+
+.landing-page__tile-wrapper {
+  position: relative;
+}
+
+.landing-page__tile-wrapper .tool-tile {
+  /* Remove built-in more options button since we handle it externally */
+}
+
+.landing-page__tile-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 1;
+}
+
+.landing-page__tile-wrapper:hover .landing-page__tile-menu,
+.landing-page__tile-menu:focus-within {
+  opacity: 1;
+}
+
+/* ============================================================================
+   CONTACT US SECTION
+   ============================================================================ */
+
+.landing-page__contact {
+  width: 100%;
+  background-color: var(--text-corporate, #00205b);
+  padding: 100px 80px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+
+  /* Force dark-mode tokens for DS components */
+  --text-secondary: #ffffff;
+  --primary-default: #cfddf8;
+  --primary-t-hover: rgba(207, 221, 248, 0.08);
+  --primary-t-active: rgba(207, 221, 248, 0.16);
+}
+
+.landing-page__contact-inner {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.landing-page__contact-title {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 40px;
+  color: var(--background-tertiary, #eff1f4);
+  text-align: center;
+}
+
+.landing-page__contact-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.landing-page__contact-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.landing-page__contact-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
+  color: #ffffff;
+}
+
+/* Textarea styled to match DS TextInput (bottom border, rounded top corners) */
+.landing-page__contact-textarea {
+  min-height: 135px;
+  padding: 8px;
+  border: none;
+  border-radius: var(--radius-xs, 3px) var(--radius-xs, 3px) 0 0;
+  background-color: var(--background-secondary, #fafafa);
+  box-shadow: inset 0 -1px 0 0 var(--border-default, #919cb0);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--text-main, #14171d);
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+  width: 100%;
+}
+
+.landing-page__contact-textarea:focus {
+  box-shadow: inset 0 -1px 0 0 var(--primary-default, #063b9e);
+  background-color: var(--background-tertiary, #eff1f4);
+}
+
+.landing-page__contact-textarea::placeholder {
+  color: #63728a;
+}
+
+/* Restore placeholder colors inside dark contact section
+   (--text-secondary is overridden to white for labels) */
+.landing-page__contact .text-input-field::placeholder {
+  color: #63728a;
+}
+
+.landing-page__contact .select-trigger[data-placeholder] {
+  color: #63728a;
+}
+
+.landing-page__contact .select-trigger[data-state='open'] {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+/* Contact section button — full width, dark-on-dark styling */
+.landing-page__contact-button {
+  width: 100%;
+}
+
+.landing-page__contact .button {
+  width: 100%;
+  border-color: #cfddf8;
+  color: #cfddf8;
+}
+
+.landing-page__contact .button:not(:disabled):hover {
+  background-color: rgba(207, 221, 248, 0.1);
+}
+
+.landing-page__contact .button:not(:disabled):active {
+  background-color: rgba(207, 221, 248, 0.2);
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.landing-page__footer {
+  width: 100%;
+  background-color: var(--text-corporate, #00205b);
+  padding: 16px 32px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  flex-shrink: 0;
+}
+
+.landing-page__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.landing-page__footer-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-negative, #ffffff);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.landing-page__footer-link:hover {
+  opacity: 0.8;
+}
+
+.landing-page__footer-copyright {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-negative, #ffffff);
+}
+
+.landing-page__footer-logo svg {
+  display: block;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .landing-page__hero {
+    padding: 60px 40px;
+    min-height: 320px;
+  }
+
+  .landing-page__favourites,
+  .landing-page__tools {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .landing-page__contact {
+    padding: 60px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-page__hero {
+    padding: 40px 24px;
+    min-height: 280px;
+  }
+
+  .landing-page__hero-title {
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  .landing-page__hero-subtitle {
+    font-size: 18px;
+    line-height: 28px;
+  }
+
+  .landing-page__hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .landing-page__favourites,
+  .landing-page__tools {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .landing-page__contact {
+    padding: 40px 24px;
+  }
+
+  .landing-page__contact-row {
+    flex-direction: column;
+  }
+
+  .landing-page__footer {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 24px;
+  }
+}

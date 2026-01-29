@@ -1,0 +1,117 @@
+/**
+ * StudyRow Component Styles
+ */
+
+.study-row {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  width: 100%;
+  border-bottom: 1px solid var(--border-minimal, #eff1f4);
+  transition: background-color 150ms ease;
+  position: relative;
+}
+
+/* Hover state */
+.study-row:hover {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+/* Selected state */
+.study-row--selected {
+  background-color: var(--primary-t-active, rgba(0, 45, 128, 0.2));
+}
+
+/* Failed state */
+.study-row--failed {
+  background-color: var(--feedback-error-t-background, rgba(228, 0, 43, 0.1));
+}
+
+/* Warning state */
+.study-row--warning {
+  background-color: var(--feedback-warning-t-background, rgba(255, 201, 41, 0.1));
+}
+
+/* Clickable row */
+.study-row[role="button"] {
+  cursor: pointer;
+}
+
+.study-row[role="button"]:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: -2px;
+}
+
+/* ============================================================================
+   CELLS
+   ============================================================================ */
+
+.study-row__cell {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Checkbox column */
+.study-row__cell--checkbox {
+  flex-shrink: 0;
+  width: 48px;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Status column */
+.study-row__cell--status {
+  flex-shrink: 0;
+  width: 80px;
+  justify-content: center;
+  padding: 8px 4px;
+}
+
+/* Data columns - grow to fill space */
+.study-row__cell--left {
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.study-row__cell--center {
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.study-row__cell--right {
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Actions column */
+.study-row__cell--actions {
+  flex-shrink: 0;
+  width: 48px;
+  justify-content: center;
+  padding: 0;
+}
+
+/* ============================================================================
+   MORE OPTIONS BUTTON
+   ============================================================================ */
+
+.study-row__more-button {
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.study-row:hover .study-row__more-button {
+  opacity: 1;
+}

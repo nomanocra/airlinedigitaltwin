@@ -1,0 +1,235 @@
+/**
+ * Chip Component Styles
+ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 1000px;
+  background-color: var(--background-tertiary, #eff1f4);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: var(--primary-default, #063b9e);
+  box-sizing: border-box;
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.chip--xs {
+  height: 20px;
+  padding: 0 8px;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.chip--s {
+  height: 24px;
+  padding: 0 8px;
+  gap: 4px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.chip--m {
+  height: 32px;
+  padding: 0 12px;
+  gap: 8px;
+  font-size: 18px;
+  line-height: 32px;
+}
+
+.chip--l {
+  height: 40px;
+  padding: 0 16px;
+  gap: 8px;
+  font-size: 20px;
+  line-height: 32px;
+}
+
+.chip--xl {
+  height: 48px;
+  padding: 0 20px;
+  gap: 8px;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+/* ============================================================================
+   TYPE: SELECTABLE
+   ============================================================================ */
+
+.chip--selectable {
+  cursor: pointer;
+}
+
+.chip--selectable:not(.chip--disabled):not(.chip--active):hover {
+  background-color: var(--background-tertiary, #eff1f4);
+  box-shadow: inset 0 0 0 1000px rgba(0, 45, 128, 0.1);
+}
+
+/* ============================================================================
+   TYPE: READONLY
+   ============================================================================ */
+
+.chip--readonly {
+  cursor: default;
+  color: var(--text-main, #14171d);
+}
+
+/* ============================================================================
+   TYPE: REMOVABLE
+   ============================================================================ */
+
+.chip--removable {
+  cursor: pointer;
+}
+
+.chip--removable.chip--xs {
+  padding: 0 2px 0 8px;
+}
+
+.chip--removable.chip--s {
+  padding: 0 2px 0 8px;
+}
+
+.chip--removable.chip--m {
+  padding: 0 4px 0 12px;
+}
+
+.chip--removable.chip--l {
+  padding: 0 4px 0 16px;
+}
+
+.chip--removable.chip--xl {
+  padding: 0 4px 0 20px;
+}
+
+.chip--removable:not(.chip--disabled):not(.chip--active):hover {
+  background-color: var(--background-tertiary, #eff1f4);
+  box-shadow: inset 0 0 0 1000px rgba(0, 45, 128, 0.1);
+}
+
+/* ============================================================================
+   ACTIVE STATE
+   ============================================================================ */
+
+.chip--active {
+  background-color: var(--primary-default, #063b9e);
+  color: var(--text-negative, #ffffff);
+}
+
+.chip--active:not(.chip--disabled):hover {
+  background-color: var(--primary-hover, #255fcc);
+}
+
+/* ============================================================================
+   DISABLED STATE
+   ============================================================================ */
+
+.chip--disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   ICON
+   ============================================================================ */
+
+.chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.chip__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================================
+   REMOVE BUTTON
+   ============================================================================ */
+
+.chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--primary-default, #063b9e);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s ease;
+}
+
+.chip__remove:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+.chip__remove:not(:disabled):hover {
+  background-color: var(--primary-hover, #255fcc);
+}
+
+.chip__remove:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Remove button sizes */
+.chip--xs .chip__remove {
+  width: 16px;
+  height: 16px;
+}
+
+.chip--s .chip__remove {
+  width: 20px;
+  height: 20px;
+}
+
+.chip--m .chip__remove {
+  width: 24px;
+  height: 24px;
+}
+
+.chip--l .chip__remove {
+  width: 32px;
+  height: 32px;
+}
+
+.chip--xl .chip__remove {
+  width: 40px;
+  height: 40px;
+}
+
+/* Active state remove button */
+.chip--active .chip__remove {
+  background-color: var(--text-negative, #ffffff);
+}
+
+.chip--active .chip__remove .icon {
+  color: var(--primary-default, #063b9e) !important;
+}
+
+.chip--active .chip__remove:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}

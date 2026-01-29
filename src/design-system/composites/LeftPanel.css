@@ -1,0 +1,44 @@
+/**
+ * LeftPanel Composite Styles
+ * Full-height side panel with corporate background, header, scrollable content, and optional footer
+ */
+
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 280px;
+  background-color: var(--background-corporate, #00205b);
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.left-panel__header {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   BODY (scrollable content area)
+   ============================================================================ */
+
+.left-panel__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--spacing-m, 16px);
+  overflow-y: auto;
+}
+
+/* ============================================================================
+   FOOTER (optional, with top border separator)
+   ============================================================================ */
+
+.left-panel__footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}

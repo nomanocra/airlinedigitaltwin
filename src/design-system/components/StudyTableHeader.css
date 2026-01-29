@@ -1,0 +1,73 @@
+/**
+ * StudyTableHeader Component Styles
+ */
+
+.study-table-header {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  width: 100%;
+  background-color: var(--background-tertiary, #eff1f4);
+  border-bottom: 1px solid var(--border-minimal, #eff1f4);
+}
+
+/* ============================================================================
+   CELLS
+   ============================================================================ */
+
+.study-table-header__cell {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Checkbox column */
+.study-table-header__cell--checkbox {
+  flex-shrink: 0;
+  width: 48px;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Status column */
+.study-table-header__cell--status {
+  flex-shrink: 0;
+  width: 80px;
+  justify-content: center;
+  padding: 8px 4px;
+}
+
+/* Data columns - grow to fill space */
+.study-table-header__cell--left {
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.study-table-header__cell--center {
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.study-table-header__cell--right {
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Actions column */
+.study-table-header__cell--actions {
+  flex-shrink: 0;
+  width: 48px;
+  justify-content: center;
+  padding: 0;
+}

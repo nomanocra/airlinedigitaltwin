@@ -1,0 +1,143 @@
+/**
+ * IconButton Component Styles
+ * Uses design system tokens
+ */
+
+/* Tokens are exported from the package root */
+/* Users should import: @/design-system/colors.css */
+
+.icon-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: var(--radius-xs, 3px);
+}
+
+.icon-button:focus {
+  outline: none;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--primary-default, #063b9e);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   SIZES
+   ============================================================================ */
+
+.icon-button--xs {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-button--s {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-button--m {
+  width: 40px;
+  height: 40px;
+}
+
+.icon-button--l {
+  width: 48px;
+  height: 48px;
+}
+
+.icon-button--xl {
+  width: 56px;
+  height: 56px;
+}
+
+/* ============================================================================
+   VARIANT: Default (filled)
+   ============================================================================ */
+
+.icon-button--default {
+  background-color: var(--primary-default, var(--sea-blue-70, #063b9e));
+}
+
+.icon-button--default:not(:disabled):hover,
+.icon-button--default.icon-button--hover {
+  background-color: var(--primary-hover, #255fcc);
+}
+
+.icon-button--default.icon-button--active {
+  background-color: var(--primary-active, #002d80);
+}
+
+/* ============================================================================
+   VARIANT: Outlined
+   ============================================================================ */
+
+.icon-button--outlined {
+  background-color: transparent;
+  border: 1px solid var(--primary-default, var(--sea-blue-70, #063b9e));
+  color: var(--primary-default, var(--sea-blue-70, #063b9e));
+}
+
+.icon-button--outlined:not(:disabled):hover,
+.icon-button--outlined.icon-button--hover {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+.icon-button--outlined.icon-button--active {
+  background-color: var(--primary-t-active, rgba(0, 45, 128, 0.2));
+}
+
+/* ============================================================================
+   VARIANT: Ghost
+   ============================================================================ */
+
+.icon-button--ghost {
+  background-color: transparent;
+  color: var(--primary-default, var(--sea-blue-70, #063b9e));
+}
+
+.icon-button--ghost:not(:disabled):hover,
+.icon-button--ghost.icon-button--hover {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+.icon-button--ghost.icon-button--active {
+  background-color: var(--primary-t-active, rgba(0, 45, 128, 0.2));
+}
+
+/* ============================================================================
+   STATE: Disabled
+   ============================================================================ */
+
+.icon-button:disabled,
+.icon-button--disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   TOOLTIP
+   ============================================================================ */
+
+.icon-button__tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.icon-button:not(:disabled):hover .icon-button__tooltip {
+  opacity: 1;
+}
