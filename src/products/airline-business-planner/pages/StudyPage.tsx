@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFavicon } from '@/hooks/useFavicon';
 import { AppHeader } from '@/design-system/composites/AppHeader';
@@ -12,14 +12,17 @@ import { Button } from '@/design-system/components/Button';
 import { NumberInput } from '@/design-system/components/NumberInput';
 import { Icon } from '@/design-system/components/Icon';
 import { Calendar } from '@/design-system/composites/Calendar';
+import { Tab } from '@/design-system/components/Tab';
+import { Checkbox } from '@/design-system/components/Checkbox';
+import { TextInput } from '@/design-system/components/TextInput';
 import './StudyPage.css';
 
 // Assumption items configuration
 const ASSUMPTION_ITEMS = [
   { id: 'period', label: 'Period', icon: 'calendar_month' },
-  { id: 'fleet', label: 'Fleet', icon: 'flight' },
+  { id: 'fleet', label: 'Fleet', icon: 'AIR_fleet' },
   { id: 'network', label: 'Network', icon: 'share' },
-  { id: 'load-factor', label: 'Load factor', icon: 'hail' },
+  { id: 'load-factor', label: 'Load factor', icon: 'airline_seat_recline_extra' },
   { id: 'operational-cost', label: 'Operational Cost', icon: 'trending_down' },
   { id: 'revenue', label: 'Revenue', icon: 'trending_up' },
   { id: 'financial', label: 'Financial', icon: 'account_balance' },
@@ -67,6 +70,40 @@ export default function StudyPage() {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [operatingDays, setOperatingDays] = useState<number>(0);
   const [startupDuration, setStartupDuration] = useState<number>(0);
+
+  // Fleet sub-tab state
+  const [fleetTab, setFleetTab] = useState<'fleet' | 'ownership' | 'crew'>('fleet');
+  const [fleetSearchValue, setFleetSearchValue] = useState('');
+
+  // Fleet data (empty for now)
+  const fleetEntries: never[] = [];
+  const hasAircraft = fleetEntries.length > 0;
+
+  // Study lifecycle: draft → computing → computed
+  const [studyStatus, setStudyStatus] = useState<'draft' | 'computing' | 'computed'>('draft');
+  const computeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Reset to draft when inputs change after computed
+  useEffect(() => {
+    if (studyStatus === 'computed') {
+      setStudyStatus('draft');
+    }
+  }, [startDate, endDate, operatingDays, startupDuration]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (computeTimerRef.current) clearTimeout(computeTimerRef.current);
+    };
+  }, []);
+
+  const handleCompute = useCallback(() => {
+    setStudyStatus('computing');
+    computeTimerRef.current = setTimeout(() => {
+      setStudyStatus('computed');
+      computeTimerRef.current = null;
+    }, 10000);
+  }, []);
 
   // Toggle scenario open/closed
   const toggleScenario = (id: number) => {
@@ -134,6 +171,9 @@ export default function StudyPage() {
       if (operatingDays <= 0) errors++;
       if (startupDuration <= 0) errors++;
       return errors;
+    }
+    if (itemId === 'fleet') {
+      return fleetEntries.length === 0 ? 1 : 0;
     }
     return 0;
   };
@@ -226,7 +266,7 @@ export default function StudyPage() {
                       const isSelected =
                         selectedItem.scenarioId === scenario.id &&
                         selectedItem.itemId === item.id;
-                      const isDisabled = item.id !== 'period' && periodErrors > 0;
+                      const isDisabled = item.id !== 'period' && item.id !== 'fleet' && periodErrors > 0;
                       return (
                         <PanelButton
                           key={item.id}
@@ -260,7 +300,7 @@ export default function StudyPage() {
                       const isSelected =
                         selectedItem.scenarioId === scenario.id &&
                         selectedItem.itemId === item.id;
-                      const outputsDisabled = totalErrors > 0;
+                      const outputsDisabled = studyStatus !== 'computed';
                       return (
                         <PanelButton
                           key={item.id}
@@ -297,80 +337,227 @@ export default function StudyPage() {
 
         {/* Main Content */}
         <div className="study-page__main">
-          <div className="study-page__content">
-            <h1 className="study-page__title">Simulation Period</h1>
+          {/* Period content */}
+          {selectedItem.itemId === 'period' && (
+            <div className="study-page__content">
+              <h1 className="study-page__title">Simulation Period</h1>
 
-            <div className="study-page__form-row">
-              <Calendar
-                label="Start Date"
-                placeholder="Select a month"
-                mode="month"
-                value={startDate}
-                onChange={setStartDate}
-                state={!startDate ? 'Error' : 'Default'}
-                showLegend={!startDate}
-                legend="Required"
-              />
-              <Calendar
-                label="End Date"
-                placeholder="Select a month"
-                mode="month"
-                value={endDate}
-                onChange={setEndDate}
-                state={!endDate ? 'Error' : 'Default'}
-                showLegend={!endDate}
-                legend="Required"
-              />
-              <NumberInput
-                label="Av. A/C Operating Days per Year"
-                placeholder="Enter a value"
-                value={operatingDays}
-                onChange={(v) => setOperatingDays(Math.max(0, v))}
-                size="M"
-                min={0}
-                state={operatingDays <= 0 ? 'Error' : 'Default'}
-                showLegend={operatingDays <= 0}
-                legend="Value must be greater than 0"
-              />
-              <NumberInput
-                label="Startup Period Duration (months)"
-                placeholder="Enter a value"
-                value={startupDuration}
-                onChange={(v) => setStartupDuration(Math.max(0, v))}
-                size="M"
-                min={0}
-                state={startupDuration <= 0 ? 'Error' : 'Default'}
-                showLegend={startupDuration <= 0}
-                legend="Value must be greater than 0"
-                showInfo
-                infoText="Period from company inception down to 1st commercial flight"
-              />
+              <div className="study-page__form-row">
+                <Calendar
+                  label="Start Date"
+                  placeholder="Select a month"
+                  mode="month"
+                  value={startDate}
+                  onChange={setStartDate}
+                  state={!startDate ? 'Error' : 'Default'}
+                  showLegend={!startDate}
+                  legend="Required"
+                />
+                <Calendar
+                  label="End Date"
+                  placeholder="Select a month"
+                  mode="month"
+                  value={endDate}
+                  onChange={setEndDate}
+                  state={!endDate ? 'Error' : 'Default'}
+                  showLegend={!endDate}
+                  legend="Required"
+                />
+                <NumberInput
+                  label="Av. A/C Operating Days per Year"
+                  placeholder="Enter a value"
+                  value={operatingDays}
+                  onChange={(v) => setOperatingDays(Math.max(0, v))}
+                  size="M"
+                  min={0}
+                  state={operatingDays <= 0 ? 'Error' : 'Default'}
+                  showLegend={operatingDays <= 0}
+                  legend="Value must be greater than 0"
+                />
+                <NumberInput
+                  label="Startup Period Duration (months)"
+                  placeholder="Enter a value"
+                  value={startupDuration}
+                  onChange={(v) => setStartupDuration(Math.max(0, v))}
+                  size="M"
+                  min={0}
+                  state={startupDuration <= 0 ? 'Error' : 'Default'}
+                  showLegend={startupDuration <= 0}
+                  legend="Value must be greater than 0"
+                  showInfo
+                  infoText="Period from company inception down to 1st commercial flight"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Floating Status Bar */}
-          <StudyStatusBar
-            status={totalErrors > 0 ? 'NotReady' : 'Ready'}
-            title={
-              totalErrors > 0
-                ? `${totalErrors} Input${totalErrors > 1 ? 's' : ''} missing`
-                : 'All inputs filled'
-            }
-            description={
-              totalErrors > 0
-                ? 'Please fill missing inputs to compute the study.'
-                : 'Ready to compute the study.'
-            }
-            actions={
-              <Button
-                label="COMPUTE STUDY"
-                variant="Default"
-                size="M"
-                disabled={totalErrors > 0}
-              />
-            }
-            className="study-page__floating-status"
-          />
+          {/* Fleet content */}
+          {selectedItem.itemId === 'fleet' && (
+            <div className="study-page__fleet">
+              {/* Fleet sub-tabs */}
+              <div className="study-page__fleet-tabs">
+                <Tab
+                  label="Fleet"
+                  size="M"
+                  status={fleetTab === 'fleet' ? 'Active' : 'Default'}
+                  onClick={() => setFleetTab('fleet')}
+                />
+                <Tab
+                  label="Ownership"
+                  size="M"
+                  status={hasAircraft && fleetTab === 'ownership' ? 'Active' : 'Default'}
+                  disabled={!hasAircraft}
+                  onClick={() => { if (hasAircraft) setFleetTab('ownership'); }}
+                />
+                <Tab
+                  label="Crew Configuration"
+                  size="M"
+                  status={hasAircraft && fleetTab === 'crew' ? 'Active' : 'Default'}
+                  disabled={!hasAircraft}
+                  onClick={() => { if (hasAircraft) setFleetTab('crew'); }}
+                />
+              </div>
+
+              {/* Fleet tab content */}
+              {fleetTab === 'fleet' && (
+                <div className="study-page__fleet-content">
+                  {/* Title bar */}
+                  <div className="study-page__fleet-title-bar">
+                    <h2 className="study-page__fleet-title">Fleet</h2>
+                    <div className="study-page__fleet-title-right">
+                      <span className="study-page__fleet-entry-count">
+                        {fleetEntries.length} Entries
+                      </span>
+                      <TextInput
+                        placeholder="Search"
+                        size="S"
+                        showLeftIcon
+                        leftIcon="search"
+                        showLabel={false}
+                        value={fleetSearchValue}
+                        onChange={(e) => setFleetSearchValue(e.target.value)}
+                        className="study-page__fleet-search"
+                      />
+                    </div>
+                    <div className="study-page__fleet-actions">
+                      <IconButton
+                        icon="add"
+                        size="S"
+                        variant="Outlined"
+                        alt="Add Aircraft"
+                        onClick={() => console.log('Add aircraft')}
+                      />
+                      <Button
+                        label=""
+                        leftIcon="download"
+                        rightIcon="arrow_drop_down"
+                        variant="Outlined"
+                        size="S"
+                        onClick={() => console.log('Import fleet')}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="study-page__fleet-table">
+                    {/* Table header */}
+                    <div className="study-page__fleet-table-header">
+                      <div className="study-page__fleet-col study-page__fleet-col--checkbox">
+                        <Checkbox size="S" showLabel={false} state="Disabled" />
+                      </div>
+                      <div className="study-page__fleet-col study-page__fleet-col--flex">
+                        <span className="study-page__fleet-col-label">A/C Type</span>
+                      </div>
+                      <div className="study-page__fleet-col study-page__fleet-col--flex">
+                        <span className="study-page__fleet-col-label">Engine</span>
+                      </div>
+                      <div className="study-page__fleet-col study-page__fleet-col--flex">
+                        <span className="study-page__fleet-col-label">Layout</span>
+                      </div>
+                      <div className="study-page__fleet-col study-page__fleet-col--fixed">
+                        <span className="study-page__fleet-col-label">Number of AC</span>
+                      </div>
+                      <div className="study-page__fleet-col study-page__fleet-col--fixed">
+                        <span className="study-page__fleet-col-label">Enter in Service</span>
+                      </div>
+                    </div>
+
+                    {/* Table body — empty state */}
+                    <div className="study-page__fleet-table-body">
+                      {fleetEntries.length === 0 && (
+                        <div className="study-page__fleet-empty">
+                          <div className="study-page__fleet-empty-icon">
+                            <Icon name="inventory_2" size={96} color="var(--text-secondary, #919cb0)" />
+                          </div>
+                          <div className="study-page__fleet-empty-text">
+                            <h3 className="study-page__fleet-empty-title">Your Fleet is empty</h3>
+                            <p className="study-page__fleet-empty-description">
+                              Please add flights or import a fleet
+                            </p>
+                          </div>
+                          <div className="study-page__fleet-empty-actions">
+                            <Button
+                              label="ADD AIRCRAFT"
+                              leftIcon="add"
+                              variant="Outlined"
+                              size="M"
+                              onClick={() => console.log('Add aircraft')}
+                            />
+                            <Button
+                              label="IMPORT FLEET"
+                              leftIcon="download"
+                              variant="Default"
+                              size="M"
+                              onClick={() => console.log('Import fleet')}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Floating Status Bar — hidden when computed */}
+          {studyStatus !== 'computed' && (
+            <StudyStatusBar
+              status={
+                studyStatus === 'computing'
+                  ? 'Computing'
+                  : totalErrors > 0
+                    ? 'NotReady'
+                    : 'Ready'
+              }
+              title={
+                studyStatus === 'computing'
+                  ? 'Computing study…'
+                  : totalErrors > 0
+                    ? `${totalErrors} Input${totalErrors > 1 ? 's' : ''} missing`
+                    : 'All inputs filled'
+              }
+              description={
+                studyStatus === 'computing'
+                  ? 'Please wait while the study is being computed.'
+                  : totalErrors > 0
+                    ? 'Please fill missing inputs to compute the study.'
+                    : 'Ready to compute the study.'
+              }
+              actions={
+                studyStatus !== 'computing' ? (
+                  <Button
+                    label="COMPUTE STUDY"
+                    variant="Default"
+                    size="M"
+                    disabled={totalErrors > 0}
+                    onClick={handleCompute}
+                  />
+                ) : undefined
+              }
+              className="study-page__floating-status"
+            />
+          )}
         </div>
       </div>
     </div>

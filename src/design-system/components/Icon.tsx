@@ -76,6 +76,16 @@ import listIcon from '../assets/svg/icons/list.svg?raw';
 import downloadIcon from '../assets/svg/icons/download.svg?raw';
 import visibilityIcon from '../assets/svg/icons/visibility.svg?raw';
 import cancelIcon from '../assets/svg/icons/cancel.svg?raw';
+import accountBalanceIcon from '../assets/svg/icons/account_balance.svg?raw';
+import airlineSeatReclineExtraIcon from '../assets/svg/icons/airline_seat_recline_extra.svg?raw';
+import balanceIcon from '../assets/svg/icons/balance.svg?raw';
+import calendarMonthIcon from '../assets/svg/icons/calendar_month.svg?raw';
+import groupsIcon from '../assets/svg/icons/groups.svg?raw';
+import monetizationOnIcon from '../assets/svg/icons/monetization_on.svg?raw';
+import shareIcon from '../assets/svg/icons/share.svg?raw';
+import speedIcon from '../assets/svg/icons/speed.svg?raw';
+import trendingDownIcon from '../assets/svg/icons/trending_down.svg?raw';
+import trendingUpIcon from '../assets/svg/icons/trending_up.svg?raw';
 
 // Build iconMap from imported icons
 const iconMap: Record<string, string> = {
@@ -156,6 +166,16 @@ const iconMap: Record<string, string> = {
   'download': downloadIcon,
   'visibility': visibilityIcon,
   'cancel': cancelIcon,
+  'account_balance': accountBalanceIcon,
+  'airline_seat_recline_extra': airlineSeatReclineExtraIcon,
+  'balance': balanceIcon,
+  'calendar_month': calendarMonthIcon,
+  'groups': groupsIcon,
+  'monetization_on': monetizationOnIcon,
+  'share': shareIcon,
+  'speed': speedIcon,
+  'trending_down': trendingDownIcon,
+  'trending_up': trendingUpIcon,
 };
 
 export const availableIcons = [
@@ -189,8 +209,10 @@ export const availableIcons = [
   'AIR_tail',
   'arrow_back',
   'arrow_downward',
+  'account_balance',
   'account_circle',
   'add',
+  'airline_seat_recline_extra',
   'apps',
   'check',
   'check_box',
@@ -213,6 +235,7 @@ export const availableIcons = [
   'keyboard_arrow_up',
   'light_mode',
   'menu',
+  'monetization_on',
   'more_horiz',
   'navigate_before',
   'navigate_next',
@@ -222,20 +245,27 @@ export const availableIcons = [
   'remove',
   'search',
   'settings',
+  'share',
+  'speed',
   'warning',
   'error',
   'broken_image',
   'autorenew',
+  'balance',
+  'calendar_month',
   'folder',
   'folder_open',
   'star',
   'star_border',
   'forum',
+  'groups',
   'description',
   'list',
   'download',
   'visibility',
   'cancel',
+  'trending_down',
+  'trending_up',
 ] as const;
 
 export type IconName = typeof availableIcons[number];
@@ -274,6 +304,12 @@ export function Icon({ name, size = 24, className = '', color }: IconProps) {
     .replace(/fill="(?!none")[^"]*"/g, 'fill="currentColor"')
     .replace(/stroke="(?!none")[^"]*"/g, 'stroke="currentColor"')
     .replace(/<svg/, `<svg width="${iconSize}" height="${iconSize}"`);
+
+  // If the root <svg> has no fill attribute, add fill="currentColor" so paths without
+  // explicit fill inherit it (SVG default fill is black, not currentColor)
+  if (!/^<svg[^>]*fill="/.test(processedSvg)) {
+    processedSvg = processedSvg.replace(/<svg/, '<svg fill="currentColor"');
+  }
 
   return (
     <span

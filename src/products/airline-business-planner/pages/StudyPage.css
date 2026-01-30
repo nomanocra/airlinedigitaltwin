@@ -94,6 +94,190 @@
 }
 
 /* ============================================================================
+   FLEET TAB
+   ============================================================================ */
+
+.study-page__fleet {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.study-page__fleet-tabs {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.study-page__fleet-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 8px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* Title bar */
+.study-page__fleet-title-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.study-page__fleet-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 32px;
+  color: var(--text-corporate, #00205b);
+  margin: 0;
+}
+
+.study-page__fleet-title-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.study-page__fleet-entry-count {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+  white-space: nowrap;
+}
+
+.study-page__fleet-search {
+  width: 224px;
+}
+
+.study-page__fleet-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Table */
+.study-page__fleet-table {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--radius-xs, 3px);
+  overflow: hidden;
+}
+
+.study-page__fleet-table-header {
+  display: flex;
+  align-items: stretch;
+  height: 40px;
+  background-color: var(--surface-component-on-background-minimal, #eff1f4);
+  border-bottom: 1px solid var(--border-default, #919cb0);
+  border-radius: var(--radius-xs, 3px) var(--radius-xs, 3px) 0 0;
+  flex-shrink: 0;
+}
+
+.study-page__fleet-col {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.study-page__fleet-col--checkbox {
+  width: 48px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.study-page__fleet-col--flex {
+  flex: 1;
+  min-width: 0;
+}
+
+.study-page__fleet-col--fixed {
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.study-page__fleet-col-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-main, #14171d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Table body */
+.study-page__fleet-table-body {
+  flex: 1;
+  min-height: 0;
+  background-color: var(--surface-minimal, #fafafa);
+  border-radius: 0 0 3px 3px;
+  overflow-y: auto;
+}
+
+/* Empty state */
+.study-page__fleet-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  height: 100%;
+}
+
+.study-page__fleet-empty-icon {
+  width: 112px;
+  height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.study-page__fleet-empty-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.study-page__fleet-empty-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 40px;
+  color: var(--text-main, #14171d);
+  margin: 0;
+}
+
+.study-page__fleet-empty-description {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-main, #14171d);
+  margin: 0;
+}
+
+.study-page__fleet-empty-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================================================
    FLOATING STATUS BAR
    ============================================================================ */
 
