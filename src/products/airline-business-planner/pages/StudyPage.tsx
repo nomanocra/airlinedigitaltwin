@@ -266,7 +266,7 @@ export default function StudyPage() {
                       const isSelected =
                         selectedItem.scenarioId === scenario.id &&
                         selectedItem.itemId === item.id;
-                      const isDisabled = item.id !== 'period' && item.id !== 'fleet' && periodErrors > 0;
+                      const isDisabled = item.id !== 'period' && periodErrors > 0;
                       return (
                         <PanelButton
                           key={item.id}
