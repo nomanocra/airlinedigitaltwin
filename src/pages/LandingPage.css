@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: center;
   min-height: 388px;
-  padding: 80px 100px;
+  padding: 80px 80px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -111,6 +111,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 32px;
+  padding: 80px 0;
   width: 100%;
 }
 
@@ -121,25 +123,32 @@
 .landing-page__favourites {
   width: 100%;
   max-width: 1400px;
-  padding: 40px 100px 0;
+  padding: 0 80px;
   box-sizing: border-box;
+}
+
+.landing-page__favourites-title {
+  margin: 0 0 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-secondary, #63728a);
 }
 
 .landing-page__section-title {
   margin: 0 0 16px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 24px;
+  line-height: 40px;
   color: var(--text-corporate, #00205b);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .landing-page__favourites-container {
   background-color: var(--background-tertiary, #eff1f4);
   border-radius: var(--radius-xs, 3px);
-  padding: 16px;
+  padding: 8px;
 }
 
 .landing-page__favourites-grid {
@@ -155,8 +164,26 @@
 .landing-page__tools {
   width: 100%;
   max-width: 1400px;
-  padding: 40px 100px;
+  padding: 0 80px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.landing-page__tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.landing-page__tools-header .landing-page__section-title {
+  margin-bottom: 0;
+}
+
+.landing-page__tools-header .text-input-container {
+  width: 240px;
+  flex-shrink: 0;
 }
 
 /* Chip filter bar */
@@ -164,27 +191,21 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 32px;
 }
 
 /* Tool category */
 .landing-page__category {
-  margin-bottom: 32px;
-}
-
-.landing-page__category:last-child {
   margin-bottom: 0;
 }
 
 .landing-page__category-title {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 20px;
   color: var(--text-corporate, #00205b);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .landing-page__category-grid {

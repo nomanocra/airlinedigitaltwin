@@ -7,6 +7,7 @@ import { IconButton } from '@/design-system/components/IconButton';
 import { Chip } from '@/design-system/components/Chip';
 import { TextInput } from '@/design-system/components/TextInput';
 import { Select } from '@/design-system/components/Select';
+import { Modal } from '@/design-system/composites/Modal';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -270,9 +271,13 @@ export default function LandingPage() {
     localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
   }, [favorites]);
 
-  const filteredTools = activeCategory === 'All'
+  // Tool search
+  const [toolSearch, setToolSearch] = useState('');
+
+  const filteredTools = (activeCategory === 'All'
     ? ALL_TOOLS
-    : ALL_TOOLS.filter((t) => t.filter === activeCategory);
+    : ALL_TOOLS.filter((t) => t.filter === activeCategory)
+  ).filter((t) => t.title.toLowerCase().includes(toolSearch.toLowerCase()));
 
   // Group filtered tools by section
   const toolsBySection = TOOL_SECTIONS.map((section) => ({
@@ -293,10 +298,18 @@ export default function LandingPage() {
     );
   };
 
+  // Modal for unavailable tools
+  const [unavailableModal, setUnavailableModal] = useState<{ open: boolean; title: string }>({
+    open: false,
+    title: '',
+  });
+
   const handleToolClick = (title: string) => {
     const route = TOOL_ROUTES[title];
     if (route) {
       window.open(route, '_blank');
+    } else {
+      setUnavailableModal({ open: true, title });
     }
   };
 
@@ -365,7 +378,7 @@ export default function LandingPage() {
         {/* Favourite Tools */}
         {favouriteTools.length > 0 && (
           <section className="landing-page__favourites">
-            <h2 className="landing-page__section-title">Your Favourite</h2>
+            <h2 className="landing-page__favourites-title">Favorite</h2>
             <div className="landing-page__favourites-container">
               <div className="landing-page__favourites-grid">
                 {favouriteTools.map((tool) => (
@@ -425,7 +438,18 @@ export default function LandingPage() {
 
         {/* Our Tools */}
         <section className="landing-page__tools">
-          <h2 className="landing-page__section-title">Our Tools</h2>
+          <div className="landing-page__tools-header">
+            <h2 className="landing-page__section-title">OUR TOOLS</h2>
+            <TextInput
+              placeholder="Search"
+              size="S"
+              showLeftIcon
+              leftIcon="search"
+              showLabel={false}
+              value={toolSearch}
+              onChange={(e) => setToolSearch(e.target.value)}
+            />
+          </div>
 
           {/* Category Chip Filters */}
           <div className="landing-page__filters">
@@ -433,7 +457,7 @@ export default function LandingPage() {
               <Chip
                 key={cat}
                 label={cat}
-                size="S"
+                size="XS"
                 type="Selectable"
                 active={activeCategory === cat}
                 onClick={() => setActiveCategory(cat)}
@@ -560,6 +584,23 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Unavailable tool modal */}
+      <Modal
+        isOpen={unavailableModal.open}
+        onClose={() => setUnavailableModal({ open: false, title: '' })}
+        title="Tool Unavailable"
+        footer={
+          <Button
+            label="OK"
+            variant="Default"
+            size="M"
+            onClick={() => setUnavailableModal({ open: false, title: '' })}
+          />
+        }
+      >
+        <p><strong>{unavailableModal.title}</strong> is not available in this prototype yet.</p>
+      </Modal>
     </div>
   );
 }

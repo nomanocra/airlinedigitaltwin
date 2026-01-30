@@ -255,7 +255,7 @@ function StudyDropdownContent({ status }: { status: StudyStatusState }) {
           <DropdownMenuItem icon="content_copy" onSelect={() => console.log('Duplicate Study')}>
             Duplicate Study
           </DropdownMenuItem>
-          <DropdownMenuItem icon="delete" onSelect={() => console.log('Delete Study')}>
+          <DropdownMenuItem icon="delete" destructive onSelect={() => console.log('Delete Study')}>
             Delete Study
           </DropdownMenuItem>
         </>
@@ -269,7 +269,7 @@ function StudyDropdownContent({ status }: { status: StudyStatusState }) {
           <DropdownMenuItem icon="content_copy" onSelect={() => console.log('Duplicate Study')}>
             Duplicate Study
           </DropdownMenuItem>
-          <DropdownMenuItem icon="delete" onSelect={() => console.log('Delete Study')}>
+          <DropdownMenuItem icon="delete" destructive onSelect={() => console.log('Delete Study')}>
             Delete Study
           </DropdownMenuItem>
         </>
@@ -284,7 +284,7 @@ function StudyDropdownContent({ status }: { status: StudyStatusState }) {
           <DropdownMenuItem icon="content_copy" onSelect={() => console.log('Duplicate Study')}>
             Duplicate Study
           </DropdownMenuItem>
-          <DropdownMenuItem icon="delete" onSelect={() => console.log('Delete Study')}>
+          <DropdownMenuItem icon="delete" destructive onSelect={() => console.log('Delete Study')}>
             Delete Study
           </DropdownMenuItem>
         </>
@@ -301,7 +301,7 @@ function StudyDropdownContent({ status }: { status: StudyStatusState }) {
           <DropdownMenuItem icon="cancel" onSelect={() => console.log('Cancel Computation')}>
             Cancel Computation
           </DropdownMenuItem>
-          <DropdownMenuItem icon="delete" onSelect={() => console.log('Delete Study')}>
+          <DropdownMenuItem icon="delete" destructive onSelect={() => console.log('Delete Study')}>
             Delete Study
           </DropdownMenuItem>
         </>
@@ -416,7 +416,9 @@ export default function HomePage() {
     }
 
     setIsCreateModalOpen(false);
-    navigate(`study/${studyId}`);
+    navigate(`study/${studyId}`, {
+      state: { studyName: data.name, workspaceName: data.workspaceName },
+    });
   };
 
   const handleTabChange = (tab: HomePageTab) => {

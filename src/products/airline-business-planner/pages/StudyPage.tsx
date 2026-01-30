@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useFavicon } from '@/hooks/useFavicon';
 import { AppHeader } from '@/design-system/composites/AppHeader';
 import { LeftPanel } from '@/design-system/composites/LeftPanel';
@@ -47,6 +47,10 @@ interface Scenario {
 export default function StudyPage() {
   const navigate = useNavigate();
   const { studyId } = useParams();
+  const location = useLocation();
+  const locationState = location.state as { studyName?: string; workspaceName?: string } | null;
+  const studyName = locationState?.studyName || 'Study Name';
+  const workspaceName = locationState?.workspaceName || 'Workspace Name';
 
   useFavicon('airline-business-planner');
 
@@ -208,9 +212,9 @@ export default function StudyPage() {
         <LeftPanel
           header={
             <PanelHeader
-              workspaceName="Workspace Name"
-              studyName="Study Name"
-              onBackHome={() => navigate('/')}
+              workspaceName={workspaceName}
+              studyName={studyName}
+              onBackHome={() => navigate('/airline-business-planner')}
               onStudyNameClick={() => console.log('Edit study name')}
               onDuplicate={() => console.log('Duplicate study')}
             />
@@ -244,6 +248,8 @@ export default function StudyPage() {
                       size="XS"
                       variant="Ghost"
                       alt="Delete Scenario"
+                      state={scenarios.length <= 1 ? 'Disabled' : 'Default'}
+                      style={{ color: scenarios.length > 1 ? 'var(--status-error, #da1e28)' : undefined }}
                       onClick={() => deleteScenario(scenario.id)}
                     />
                   </>
