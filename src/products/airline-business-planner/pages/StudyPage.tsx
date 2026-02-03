@@ -15,6 +15,7 @@ import { Calendar } from '@/design-system/composites/Calendar';
 import { Tab } from '@/design-system/components/Tab';
 import { Checkbox } from '@/design-system/components/Checkbox';
 import { TextInput } from '@/design-system/components/TextInput';
+import { AddAircraftModal, type FleetEntry } from '../components/AddAircraftModal';
 import './StudyPage.css';
 
 // Assumption items configuration
@@ -79,9 +80,23 @@ export default function StudyPage() {
   const [fleetTab, setFleetTab] = useState<'fleet' | 'ownership' | 'crew'>('fleet');
   const [fleetSearchValue, setFleetSearchValue] = useState('');
 
-  // Fleet data (empty for now)
-  const fleetEntries: never[] = [];
+  // Fleet data
+  const [fleetEntries, setFleetEntries] = useState<FleetEntry[]>([]);
+  const [isAddAircraftModalOpen, setIsAddAircraftModalOpen] = useState(false);
   const hasAircraft = fleetEntries.length > 0;
+
+  // Filter fleet entries by search
+  const filteredFleetEntries = fleetSearchValue.trim()
+    ? fleetEntries.filter((entry) =>
+        [entry.aircraftType, entry.engine, entry.layout]
+          .some((field) => field.toLowerCase().includes(fleetSearchValue.toLowerCase()))
+      )
+    : fleetEntries;
+
+  // Add aircraft handler
+  const handleAddAircraft = (aircraft: FleetEntry) => {
+    setFleetEntries((prev) => [...prev, aircraft]);
+  };
 
   // Study lifecycle: draft → computing → computed
   const [studyStatus, setStudyStatus] = useState<'draft' | 'computing' | 'computed'>('draft');
@@ -432,7 +447,7 @@ export default function StudyPage() {
                     <h2 className="study-page__fleet-title">Fleet</h2>
                     <div className="study-page__fleet-title-right">
                       <span className="study-page__fleet-entry-count">
-                        {fleetEntries.length} Entries
+                        {filteredFleetEntries.length} Entries
                       </span>
                       <TextInput
                         placeholder="Search"
@@ -451,7 +466,7 @@ export default function StudyPage() {
                         size="S"
                         variant="Outlined"
                         alt="Add Aircraft"
-                        onClick={() => console.log('Add aircraft')}
+                        onClick={() => setIsAddAircraftModalOpen(true)}
                       />
                       <Button
                         label=""
@@ -488,9 +503,9 @@ export default function StudyPage() {
                       </div>
                     </div>
 
-                    {/* Table body — empty state */}
+                    {/* Table body */}
                     <div className="study-page__fleet-table-body">
-                      {fleetEntries.length === 0 && (
+                      {filteredFleetEntries.length === 0 && fleetEntries.length === 0 && (
                         <div className="study-page__fleet-empty">
                           <div className="study-page__fleet-empty-icon">
                             <Icon name="inventory_2" size={96} color="var(--text-secondary, #919cb0)" />
@@ -507,7 +522,7 @@ export default function StudyPage() {
                               leftIcon="add"
                               variant="Outlined"
                               size="M"
-                              onClick={() => console.log('Add aircraft')}
+                              onClick={() => setIsAddAircraftModalOpen(true)}
                             />
                             <Button
                               label="IMPORT FLEET"
@@ -519,6 +534,50 @@ export default function StudyPage() {
                           </div>
                         </div>
                       )}
+                      {filteredFleetEntries.length === 0 && fleetEntries.length > 0 && (
+                        <div className="study-page__fleet-no-results">
+                          No results found for "{fleetSearchValue}"
+                        </div>
+                      )}
+                      {filteredFleetEntries.map((entry) => (
+                        <div key={entry.id} className="study-page__fleet-table-row">
+                          <div className="study-page__fleet-col study-page__fleet-col--checkbox">
+                            <Checkbox size="S" showLabel={false} />
+                          </div>
+                          <div className="study-page__fleet-col study-page__fleet-col--flex">
+                            <span>{entry.aircraftType}</span>
+                          </div>
+                          <div className="study-page__fleet-col study-page__fleet-col--flex">
+                            <span>{entry.engine}</span>
+                          </div>
+                          <div className="study-page__fleet-col study-page__fleet-col--flex">
+                            <span>{entry.layout}</span>
+                          </div>
+                          <div className="study-page__fleet-col study-page__fleet-col--fixed">
+                            <NumberInput
+                              value={entry.numberOfAircraft}
+                              onChange={(value) => {
+                                setFleetEntries((prev) =>
+                                  prev.map((e) =>
+                                    e.id === entry.id ? { ...e, numberOfAircraft: Math.max(1, value) } : e
+                                  )
+                                );
+                              }}
+                              size="S"
+                              min={1}
+                              showLabel={false}
+                            />
+                          </div>
+                          <div className="study-page__fleet-col study-page__fleet-col--fixed">
+                            <span>
+                              {entry.enterInService.toLocaleDateString('en-US', {
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -566,6 +625,13 @@ export default function StudyPage() {
           )}
         </div>
       </div>
+
+      {/* Add Aircraft Modal */}
+      <AddAircraftModal
+        isOpen={isAddAircraftModalOpen}
+        onClose={() => setIsAddAircraftModalOpen(false)}
+        onAddAircraft={handleAddAircraft}
+      />
     </div>
   );
 }

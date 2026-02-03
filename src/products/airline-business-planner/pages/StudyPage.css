@@ -277,6 +277,48 @@
   gap: 8px;
 }
 
+/* No results state */
+.study-page__fleet-no-results {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+}
+
+/* Table row */
+.study-page__fleet-table-row {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border-bottom: 1px solid var(--border-minimal, #eff1f4);
+  background-color: var(--background-main, #ffffff);
+  transition: background-color 150ms ease;
+}
+
+.study-page__fleet-table-row:hover {
+  background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
+}
+
+.study-page__fleet-table-row span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.study-page__fleet-table-row .number-input-container {
+  width: 80px;
+}
+
 /* ============================================================================
    FLOATING STATUS BAR
    ============================================================================ */

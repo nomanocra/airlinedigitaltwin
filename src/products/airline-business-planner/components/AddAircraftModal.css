@@ -1,0 +1,22 @@
+/**
+ * AddAircraftModal Styles
+ */
+
+.add-aircraft-modal {
+  width: 1000px;
+  max-width: 90vw;
+  height: 600px;
+  max-height: 80vh;
+}
+
+.add-aircraft-modal .modal__content {
+  padding: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.add-aircraft-modal .aircraft-selector {
+  height: 100%;
+  border: none;
+  border-radius: 0;
+}
