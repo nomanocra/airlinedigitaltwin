@@ -536,6 +536,9 @@ export default function HomePage() {
                       { key: 'createdBy', value: study.createdBy, width: '140px' },
                       { key: 'lastModification', value: study.lastModification, width: '140px' },
                     ]}
+                    onClick={() => navigate(`study/${study.id}`, {
+                      state: { studyName: study.name, workspaceName: workspace.title },
+                    })}
                   />
                   <div className="home-page__study-menu">
                     <DropdownMenu>
