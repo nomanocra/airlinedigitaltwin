@@ -1546,7 +1546,7 @@ export default function StudyPage() {
                         suppressRowClickSelection={true}
                         onSelectionChanged={onSelectionChanged}
                         getRowId={(params) => params.data.id}
-                        domLayout="autoHeight"
+
                         noRowsOverlayComponent={() => (
                           <div className="study-page__fleet-no-results">
                             No results found for "{fleetSearchValue}"
@@ -1584,7 +1584,7 @@ export default function StudyPage() {
                       rowData={fleetWithCostOps}
                       columnDefs={costOperationsColDefs}
                       getRowId={(params) => params.data.id}
-                      domLayout="autoHeight"
+
                     />
                   </div>
                 </div>
@@ -1607,7 +1607,7 @@ export default function StudyPage() {
                       rowData={fleetWithCostOwnership}
                       columnDefs={costOwnershipColDefs}
                       getRowId={(params) => params.data.id}
-                      domLayout="autoHeight"
+
                     />
                   </div>
                 </div>
@@ -1630,7 +1630,7 @@ export default function StudyPage() {
                       rowData={fleetWithCrewConfig}
                       columnDefs={crewConfigColDefs}
                       getRowId={(params) => params.data.id}
-                      domLayout="autoHeight"
+
                     />
                   </div>
                 </div>
@@ -1750,7 +1750,7 @@ export default function StudyPage() {
                         suppressRowClickSelection={true}
                         onSelectionChanged={onRouteSelectionChanged}
                         getRowId={(params) => params.data.id}
-                        domLayout="autoHeight"
+
                       />
                     )}
                   </div>
@@ -1803,7 +1803,7 @@ export default function StudyPage() {
                       rowData={routePricingData}
                       columnDefs={pricingColDefs}
                       getRowId={(params) => params.data.routeId}
-                      domLayout="autoHeight"
+
                     />
                   </div>
                 </div>
@@ -1826,7 +1826,7 @@ export default function StudyPage() {
                       rowData={fleetPlanData}
                       columnDefs={fleetPlanColDefs}
                       getRowId={(params) => params.data.routeId}
-                      domLayout="autoHeight"
+
                     />
                   </div>
                 </div>
@@ -1849,7 +1849,7 @@ export default function StudyPage() {
                       rowData={frequenciesRowData}
                       columnDefs={frequenciesColDefs}
                       getRowId={(params) => params.data.routeId}
-                      domLayout="autoHeight"
+
                     />
                   </div>
                 </div>
