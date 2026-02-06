@@ -223,7 +223,7 @@ export default function StudyPage() {
   // Fleet data - pre-fill if studyData exists
   const [fleetEntries, setFleetEntries] = useState<FleetEntry[]>(() => {
     if (studyData?.fleet) {
-      return studyData.fleet.map(f => ({
+      return studyData.fleet.map((f, index) => ({
         id: f.id,
         aircraftType: f.aircraftType,
         engine: f.engine,
@@ -231,7 +231,7 @@ export default function StudyPage() {
         numberOfAircraft: f.numberOfAircraft,
         enterInService: new Date(f.enterInService),
         retirement: f.retirement ? new Date(f.retirement) : undefined,
-        ownership: 'Leased' as const,
+        ownership: (index % 2 === 0 ? 'Owned' : 'Leased') as const,
       }));
     }
     return [];
@@ -409,7 +409,7 @@ export default function StudyPage() {
         field: key,
         headerName: current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         flex: 1,
-        minWidth: 80,
+        minWidth: 100,
       });
       current.setMonth(current.getMonth() + 1);
     }
@@ -473,6 +473,7 @@ export default function StudyPage() {
               style={{
                 left: `${leftPct}%`,
                 width: `${widthPct}%`,
+                opacity: data.ownership === 'Leased' ? 0.5 : undefined,
               }}
             />
           </TooltipTrigger>

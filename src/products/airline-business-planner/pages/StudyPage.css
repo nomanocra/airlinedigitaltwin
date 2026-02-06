@@ -343,6 +343,10 @@
    GANTT CHART
    ============================================================================ */
 
+.study-page__gantt-grid {
+  --ag-row-height: 32px;
+}
+
 .study-page__gantt-grid .ag-cell {
   display: flex;
   align-items: center;
