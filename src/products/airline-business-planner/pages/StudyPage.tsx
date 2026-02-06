@@ -504,9 +504,9 @@ export default function StudyPage() {
 
   // Gantt column definitions
   const ganttColDefs = useMemo<ColDef[]>(() => [
-    { field: 'aircraftType', headerName: 'A/C Type', width: 120, pinned: 'left' },
-    { field: 'engine', headerName: 'Engine', width: 100, pinned: 'left' },
-    { field: 'layout', headerName: 'Layout', width: 80, pinned: 'left' },
+    { field: 'aircraftType', headerName: 'A/C Type', width: 120 },
+    { field: 'engine', headerName: 'Engine', width: 100 },
+    { field: 'layout', headerName: 'Layout', width: 80 },
     {
       field: 'timeline',
       headerName: ganttTimelineHeader,
@@ -1336,7 +1336,7 @@ export default function StudyPage() {
         </LeftPanel>
 
         {/* Main Content */}
-        <div className="study-page__main">
+        <div className={`study-page__main${studyStatus === 'computed' ? ' study-page__main--computed' : ''}`}>
           {/* Period content */}
           {selectedItem.itemId === 'period' && (
             <div className="study-page__content">
@@ -1559,7 +1559,6 @@ export default function StudyPage() {
                         rowData={ganttRows}
                         columnDefs={ganttColDefs}
                         getRowId={(params) => params.data.id}
-                        domLayout="autoHeight"
                         suppressRowClickSelection={true}
                       />
                     )}

@@ -118,7 +118,12 @@
   gap: 8px;
   padding: 16px;
   padding-bottom: 72px; /* Space for floating status bar */
-  overflow: hidden;
+  overflow-y: auto;
+}
+
+.study-page__main--computed .study-page__fleet-content,
+.study-page__main--computed .study-page__content {
+  padding-bottom: 16px;
 }
 
 /* Title bar */
@@ -343,6 +348,12 @@
   align-items: center;
 }
 
+.study-page__gantt-grid .ag-pinned-left-header,
+.study-page__gantt-grid .ag-pinned-left-cols-container {
+  border-right: none;
+}
+
+
 .gantt-timeline-cell {
   position: relative;
   width: 100%;
@@ -374,7 +385,7 @@
 .gantt-tooltip__type {
   font-weight: 700;
   font-size: 13px;
-  color: var(--text-main, #14171d);
+  color: var(--text-corporate, #00205b);
 }
 
 .gantt-tooltip__row {
