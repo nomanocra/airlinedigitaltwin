@@ -196,3 +196,43 @@
 .number-input-container--valid .number-input-legend {
   color: var(--feedback-success-default, #08875b);
 }
+
+/* ============================================================================
+   STEPPER VARIANT (buttons stacked on right, appear on hover)
+   ============================================================================ */
+
+.number-input-field--left {
+  text-align: left;
+  padding-left: 12px;
+}
+
+/* Stepper button group (stacked vertically on right) */
+.number-input-stepper-group {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+/* Show stepper buttons on hover */
+.number-input-wrapper:hover .number-input-stepper-group,
+.number-input-wrapper:focus-within .number-input-stepper-group {
+  opacity: 1;
+}
+
+/* IconButton overrides for stepper variant */
+.number-input-stepper-group .number-input-stepper-btn {
+  border-radius: 0;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+.number-input-stepper-group .number-input-stepper-btn:first-child {
+  border-top-right-radius: var(--radius-xs, 3px);
+}
+
+.number-input-stepper-group .number-input-stepper-btn:last-child {
+  border-bottom-right-radius: var(--radius-xs, 3px);
+}

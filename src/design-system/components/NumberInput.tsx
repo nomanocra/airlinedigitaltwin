@@ -7,6 +7,7 @@ import './NumberInput.css';
 
 export type NumberInputSize = 'XS' | 'S' | 'M' | 'L';
 export type NumberInputState = 'Default' | 'Error' | 'Valid';
+export type NumberInputVariant = 'Stepper';
 
 export interface NumberInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onChange'> {
@@ -28,6 +29,10 @@ export interface NumberInputProps
    * @default 'Default'
    */
   state?: NumberInputState;
+  /**
+   * Visual variant - 'Stepper' puts up/down buttons on right side
+   */
+  variant?: NumberInputVariant;
   /**
    * Show the label
    * @default true
@@ -103,6 +108,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       placeholder = '0',
       size = 'M',
       state = 'Default',
+      variant,
       showLabel = true,
       showLegend = false,
       showOptional = false,
@@ -176,6 +182,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     const inputWrapperClasses = [
       'number-input-wrapper',
       `number-input-wrapper--${size.toLowerCase()}`,
+      variant === 'Stepper' && 'number-input-wrapper--stepper',
       isError && 'number-input-wrapper--error',
       isValid && 'number-input-wrapper--valid',
       isDisabled && 'number-input-wrapper--disabled',
@@ -211,8 +218,8 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
         {/* Input wrapper */}
         <div className={inputWrapperClasses}>
-          {/* Decrement button */}
-          {!isReadOnly && (
+          {/* Decrement button (left side) - only for default variant */}
+          {!isReadOnly && variant !== 'Stepper' && (
             <IconButton
               icon="remove"
               size={size}
@@ -229,7 +236,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             ref={ref}
             type="text"
             inputMode="numeric"
-            className="number-input-field"
+            className={`number-input-field${variant === 'Stepper' ? ' number-input-field--left' : ''}`}
             placeholder={placeholder}
             value={value !== undefined ? String(value) : ''}
             onChange={handleInputChange}
@@ -240,8 +247,34 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             {...inputProps}
           />
 
-          {/* Increment button */}
-          {!isReadOnly && (
+          {/* Stepper variant: stacked buttons on right (appear on hover) */}
+          {!isReadOnly && variant === 'Stepper' && (
+            <div className="number-input-stepper-group">
+              <IconButton
+                icon="keyboard_arrow_up"
+                size={size}
+                variant="Default"
+                onClick={handleIncrement}
+                disabled={isDisabled || !canIncrement}
+                aria-label="Increase value"
+                tabIndex={-1}
+                className="number-input-stepper-btn"
+              />
+              <IconButton
+                icon="keyboard_arrow_down"
+                size={size}
+                variant="Default"
+                onClick={handleDecrement}
+                disabled={isDisabled || !canDecrement}
+                aria-label="Decrease value"
+                tabIndex={-1}
+                className="number-input-stepper-btn"
+              />
+            </div>
+          )}
+
+          {/* Increment button (right side) - only for default variant */}
+          {!isReadOnly && variant !== 'Stepper' && (
             <IconButton
               icon="add"
               size={size}

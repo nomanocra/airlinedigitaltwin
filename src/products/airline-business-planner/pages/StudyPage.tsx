@@ -313,6 +313,7 @@ export default function StudyPage() {
           size="S"
           min={1}
           showLabel={false}
+          variant="Stepper"
         />
       </div>
     );
@@ -542,6 +543,7 @@ export default function StudyPage() {
             size="S"
             min={min}
             showLabel={false}
+            variant="Stepper"
           />
         </div>
       );
@@ -810,6 +812,7 @@ export default function StudyPage() {
           size="S"
           min={0}
           showLabel={false}
+          variant="Stepper"
         />
       </div>
     );
@@ -831,17 +834,25 @@ export default function StudyPage() {
     { field: 'marketYield', headerName: 'Market Yield ($/pax km)', flex: 1.2, minWidth: 120, cellRenderer: MarketYieldCellRenderer },
     { field: 'discountStrategy', headerName: 'Discount Strategy', flex: 1.2, minWidth: 130, cellRenderer: DiscountStrategyCellRenderer },
     { field: 'yield', headerName: 'Yield', flex: 1, minWidth: 100, cellRenderer: (props: ICellRendererParams) => {
-      const marketYield = props.data?.marketYield || 0;
-      const discount = discountForNormalFares || 0;
-      const yieldValue = marketYield * (1 - discount / 100);
+      const handleChange = (newValue: number) => {
+        // Round to 3 decimal places to avoid JS floating point errors
+        const rounded = Math.round(newValue * 1000) / 1000;
+        props.node.setDataValue('yield', rounded);
+        setRoutePricingData((prev) =>
+          prev.map((p) => p.routeId === props.data.routeId ? { ...p, yield: rounded } : p)
+        );
+      };
+
       return (
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
           <NumberInput
-            value={Number(yieldValue.toFixed(3))}
-            onChange={() => {}}
+            value={props.data?.yield ?? 0}
+            onChange={handleChange}
             size="S"
+            min={0}
+            step={0.1}
             showLabel={false}
-            state="Read-only"
+            variant="Stepper"
           />
         </div>
       );
@@ -952,6 +963,7 @@ export default function StudyPage() {
             size="S"
             min={0}
             showLabel={false}
+            variant="Stepper"
           />
         </div>
       );
