@@ -341,6 +341,28 @@
 }
 
 /* ============================================================================
+   FREQUENCIES GRID - Compact padding and smaller font
+   ============================================================================ */
+
+.study-page__frequencies-grid {
+  --ag-font-size: 12px;
+}
+
+.study-page__frequencies-grid .ag-header-cell {
+  padding: 0 4px !important;
+  font-size: 12px;
+}
+
+.study-page__frequencies-grid .ag-cell {
+  padding: 0 4px !important;
+  font-size: 12px;
+}
+
+.study-page__frequencies-grid .number-input-field {
+  font-size: 12px;
+}
+
+/* ============================================================================
    GANTT CHART
    ============================================================================ */
 
@@ -399,4 +421,134 @@
   gap: 6px;
   font-size: 12px;
   color: var(--text-secondary, #63728a);
+}
+
+/* ============================================================================
+   ASSUMPTION PAGES — SHARED STYLES
+   ============================================================================ */
+
+/* Section wrapper */
+.study-page__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Section title row (title + info icon) */
+.study-page__section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.study-page__section-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-corporate, #00205b);
+  margin: 0;
+}
+
+.study-page__section-info-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary, #63728a);
+  cursor: help;
+}
+
+/* Wrapping flex grid for NumberInput fields */
+.study-page__form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.study-page__form-grid > * {
+  width: 160px;
+}
+
+.study-page__form-grid--wide > * {
+  width: 220px;
+}
+
+/* Sub-tabs within sections (using ButtonGroup) */
+.study-page__sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Read-only calculated field placeholder */
+.study-page__readonly-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 160px;
+}
+
+.study-page__readonly-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-secondary, #63728a);
+}
+
+.study-page__readonly-value {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-main, #14171d);
+  background-color: var(--surface-component-on-background-minimal, #eff1f4);
+  border-radius: var(--radius-xs, 3px);
+  border: 1px solid var(--border-default, #919cb0);
+}
+
+/* Row group label in Working Capital table */
+.study-page__row-group-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-corporate, #00205b);
+  text-transform: uppercase;
+  background-color: var(--surface-component-on-background-minimal, #eff1f4);
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+/* Stacked form layout (vertical) */
+.study-page__form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 320px;
+}
+
+/* Section separator */
+.study-page__section + .study-page__section {
+  margin-top: 24px;
+}
+
+/* Assumption page content - scrollable with padding */
+.study-page__assumption-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 24px;
+  padding: 16px;
+  padding-bottom: 72px;
+  overflow-y: auto;
+}
+
+.study-page__main--computed .study-page__assumption-content {
+  padding-bottom: 16px;
 }
