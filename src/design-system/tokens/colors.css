@@ -128,6 +128,9 @@
   --border-minimal: var(--cool-grey-10);
   --border-white: var(--white);
 
+  /* Shadow */
+  --shadow-1: 0 0 3px 0 rgba(0, 0, 0, 0.10);
+
   /* Feedback Success - Références Green */
   --feedback-success-default: var(--green-80);
   --feedback-success-hover: var(--green-70);
@@ -188,6 +191,9 @@ html.dark {
   --border-moderate: #3c4657;
   --border-minimal: #282e3a;
   --border-white: #14171d;
+
+  /* Shadow */
+  --shadow-1: 0 0 3px 0 rgba(255, 255, 255, 0.15);
 
   /* Feedback Success - Lighter greens */
   --feedback-success-default: #5ef7c4;

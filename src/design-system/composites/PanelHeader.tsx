@@ -25,6 +25,11 @@ export interface PanelHeaderProps {
    */
   onStudyNameClick?: () => void;
   /**
+   * Whether to show the duplicate button
+   * @default true
+   */
+  showDuplicateButton?: boolean;
+  /**
    * Callback when the duplicate button is clicked
    */
   onDuplicate?: () => void;
@@ -70,6 +75,7 @@ export function PanelHeader({
   studyName,
   studyNameLines = 1,
   onStudyNameClick,
+  showDuplicateButton = true,
   onDuplicate,
   onBackHome,
   backgroundImage,
@@ -114,15 +120,17 @@ export function PanelHeader({
               onClick={onStudyNameClick}
             />
             <div className="panel-header__actions">
-              <IconButton
-                icon="content_copy"
-                size="S"
-                variant="Ghost"
-                onClick={onDuplicate}
-                alt="Duplicate Study"
-                tooltip="Duplicate Study"
-                className="panel-header__icon-button"
-              />
+              {showDuplicateButton && (
+                <IconButton
+                  icon="content_copy"
+                  size="S"
+                  variant="Ghost"
+                  onClick={onDuplicate}
+                  alt="Duplicate Study"
+                  tooltip="Duplicate Study"
+                  className="panel-header__icon-button"
+                />
+              )}
               {actions}
             </div>
           </div>

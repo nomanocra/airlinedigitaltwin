@@ -2,11 +2,12 @@
  * AddAircraftModal Styles
  */
 
+/* Step 1 - Select Aircraft */
 .add-aircraft-modal {
-  width: 1000px;
-  max-width: 90vw;
-  height: 600px;
-  max-height: 80vh;
+  width: 1200px;
+  max-width: 95vw;
+  height: 700px;
+  max-height: 90vh;
 }
 
 .add-aircraft-modal .modal__content {
@@ -19,4 +20,84 @@
   height: 100%;
   border: none;
   border-radius: 0;
+}
+
+/* Step 2 - Enter In Service */
+.add-aircraft-modal--step2 {
+  width: auto;
+  max-width: 90vw;
+  height: auto;
+  max-height: 80vh;
+}
+
+.add-aircraft-modal--step2 .modal__content {
+  padding: 0;
+  overflow: visible;
+}
+
+.enter-service-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 24px;
+}
+
+/* Selected AC Section */
+.enter-service-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.enter-service-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+}
+
+.enter-service-selected-ac {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: var(--background-tertiary, #eff1f4);
+  border-radius: 3px;
+}
+
+.enter-service-selected-ac > div {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.enter-service-ac-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.enter-service-ac-item span {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--primary-default, #063b9e);
+}
+
+.enter-service-ac-item svg {
+  color: var(--primary-default, #063b9e);
+}
+
+/* Form Fields */
+.enter-service-form {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.enter-service-form > * {
+  flex: 1;
+  min-width: 0;
 }

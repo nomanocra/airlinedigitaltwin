@@ -8,11 +8,9 @@ Ce projet sert à créer des maquettes interactives (prototypes) pour les produi
 
 Toutes les interfaces doivent être construites avec les composants du **AS Design System** disponible sur `http://localhost:3000/`.
 
-### Commandes CLI
+### Commandes CLI (le cli est installé en local)
 
 ```bash
-# Initialiser le design system dans un projet
-npx @as-design-system/cli init
 
 # Ajouter un composant
 asds add button
@@ -30,12 +28,14 @@ asds update
 ### Composants disponibles
 
 **Tokens :**
+
 - Colors
 - Icons
 - Size & Radius
 - Text Styles
 
 **Basics :**
+
 - Accordion
 - Avatar
 - Button
@@ -55,6 +55,7 @@ asds update
 - Tooltip
 
 **AS Generics :**
+
 - AircraftSelector
 - AppHeader
 - StudyStatusBar
@@ -62,6 +63,7 @@ asds update
 - ToolTile
 
 **Home Components :**
+
 - HomePageActionBar
 - ProductBanner
 - StudyRow
@@ -70,6 +72,7 @@ asds update
 - Workspace
 
 **Panel Components :**
+
 - LeftPanel
 - PanelButton
 - PanelGroup
@@ -78,6 +81,7 @@ asds update
 - PanelStudyName
 
 **Templates :**
+
 - HomePage
 - LandingPage
 
@@ -88,15 +92,15 @@ Consulter la documentation du design system (`http://localhost:3000/`) pour voir
 #### Import des composants
 
 ```tsx
-import { Button } from '@/design-system/components/Button'
-import { Icon } from '@/design-system/components/Icon'
+import { Button } from '@/design-system/components/Button';
+import { Icon } from '@/design-system/components/Icon';
 
 function MyComponent() {
   return (
     <Button variant="primary" size="m" leftIcon="add">
       Add Item
     </Button>
-  )
+  );
 }
 ```
 
@@ -112,11 +116,11 @@ function MyComponent() {
 
 ```tsx
 // TypeScript Constants
-import { colors } from '@/design-system/tokens/colors'
+import { colors } from '@/design-system/tokens/colors';
 
 const MyComponent = () => (
   <div style={{ color: colors.primary.default }}>Content</div>
-)
+);
 ```
 
 #### Utilisation des Text Styles
@@ -129,7 +133,7 @@ function MyComponent() {
       <p className="body-large">This is body text</p>
       <span className="legend-bold">Legend text</span>
     </div>
-  )
+  );
 }
 ```
 

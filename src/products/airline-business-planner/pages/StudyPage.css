@@ -117,6 +117,7 @@
   min-height: 0;
   gap: 8px;
   padding: 16px;
+  padding-bottom: 72px; /* Space for floating status bar */
   overflow: hidden;
 }
 
@@ -128,6 +129,12 @@
   justify-content: space-between;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.study-page__fleet-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .study-page__fleet-title {
@@ -146,16 +153,33 @@
 }
 
 .study-page__fleet-entry-count {
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--text-secondary, #63728a);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
 .study-page__fleet-search {
   width: 224px;
+}
+
+.study-page__fleet-selection-count {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.study-page__fleet-action-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-default);
+  flex-shrink: 0;
+}
+
+.study-page__fleet-delete-btn.icon-button--outlined:not(:disabled) {
+  border-color: var(--feedback-error-default);
+  color: var(--feedback-error-default);
+}
+
+.study-page__fleet-delete-btn.icon-button--outlined:not(:disabled):hover {
+  background-color: var(--feedback-error-t-background);
 }
 
 .study-page__fleet-actions {
@@ -219,6 +243,7 @@
 
 /* Table body */
 .study-page__fleet-table-body {
+  position: relative;
   flex: 1;
   min-height: 0;
   background-color: var(--surface-minimal, #fafafa);
@@ -226,55 +251,14 @@
   overflow-y: auto;
 }
 
-/* Empty state */
+/* Empty state - absolute center positioning */
 .study-page__fleet-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 24px;
-  height: 100%;
-}
-
-.study-page__fleet-empty-icon {
-  width: 112px;
-  height: 112px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.study-page__fleet-empty-text {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-.study-page__fleet-empty-title {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 40px;
-  color: var(--text-main, #14171d);
-  margin: 0;
-}
-
-.study-page__fleet-empty-description {
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  color: var(--text-main, #14171d);
-  margin: 0;
-}
-
-.study-page__fleet-empty-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: 90%;
 }
 
 /* No results state */
@@ -304,7 +288,7 @@
   background-color: var(--primary-t-hover, rgba(0, 45, 128, 0.1));
 }
 
-.study-page__fleet-table-row span {
+.study-page__fleet-table-row > .study-page__fleet-col > span {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 13px;
@@ -329,4 +313,74 @@
   left: 8px;
   right: 8px;
   z-index: 10;
+}
+
+/* ============================================================================
+   NETWORK SECTION
+   ============================================================================ */
+
+.study-page__network {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Pricing discount row - above the title bar */
+.study-page__pricing-discount-row {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+/* ============================================================================
+   GANTT CHART
+   ============================================================================ */
+
+.study-page__gantt-grid .ag-cell {
+  display: flex;
+  align-items: center;
+}
+
+.gantt-timeline-cell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.gantt-bar {
+  position: absolute;
+  height: 24px;
+  border-radius: 3px;
+  background-color: var(--primary-default);
+  transition: opacity 150ms ease;
+}
+
+.gantt-bar:hover {
+  opacity: 0.85;
+}
+
+/* Gantt Tooltip */
+.gantt-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.gantt-tooltip__type {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-main, #14171d);
+}
+
+.gantt-tooltip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary, #63728a);
 }

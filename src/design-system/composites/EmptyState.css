@@ -1,0 +1,143 @@
+/**
+ * EmptyState Component Styles
+ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+/* Icon container */
+.empty-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary, #8e99ab);
+}
+
+.empty-state__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Content section */
+.empty-state__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Title */
+.empty-state__title {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: var(--text-main, #14171d);
+}
+
+/* Description */
+.empty-state__description {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  color: var(--text-secondary, #63728a);
+}
+
+/* Actions / Footer */
+.empty-state__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Size M (default) */
+.empty-state--m {
+  gap: var(--gap-m, 16px);
+  padding: var(--spacing-l, 24px);
+}
+
+.empty-state--m .empty-state__icon {
+  width: 112px;
+  height: 112px;
+}
+
+.empty-state--m .empty-state__content {
+  gap: var(--gap-s, 8px);
+}
+
+.empty-state--m .empty-state__title {
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.empty-state--m .empty-state__description {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.empty-state--m .empty-state__actions {
+  gap: var(--gap-xs, 8px);
+}
+
+/* Size S */
+.empty-state--s {
+  gap: var(--gap-s, 12px);
+  padding: var(--spacing-m, 16px);
+}
+
+.empty-state--s .empty-state__icon {
+  width: 64px;
+  height: 64px;
+}
+
+.empty-state--s .empty-state__content {
+  gap: var(--gap-xs, 4px);
+}
+
+.empty-state--s .empty-state__title {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.empty-state--s .empty-state__description {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.empty-state--s .empty-state__actions {
+  gap: var(--gap-xs, 8px);
+}
+
+/* Size XS */
+.empty-state--xs {
+  gap: var(--gap-xs, 8px);
+  padding: var(--spacing-s, 12px);
+}
+
+.empty-state--xs .empty-state__icon {
+  width: 48px;
+  height: 48px;
+}
+
+.empty-state--xs .empty-state__content {
+  gap: 2px;
+}
+
+.empty-state--xs .empty-state__title {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.empty-state--xs .empty-state__description {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.empty-state--xs .empty-state__actions {
+  gap: var(--gap-xxs, 4px);
+}

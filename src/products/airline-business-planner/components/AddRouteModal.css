@@ -1,0 +1,28 @@
+/**
+ * AddRouteModal Styles
+ */
+
+.add-route-modal {
+  width: 600px;
+  max-width: 95vw;
+}
+
+.add-route-modal .modal__content {
+  padding: 0;
+}
+
+.add-route-content {
+  padding: 0 24px 24px;
+}
+
+.add-route-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 500px) {
+  .add-route-form {
+    grid-template-columns: 1fr;
+  }
+}

@@ -537,7 +537,43 @@ export default function HomePage() {
                       { key: 'lastModification', value: study.lastModification, width: '140px' },
                     ]}
                     onClick={() => navigate(`study/${study.id}`, {
-                      state: { studyName: study.name, workspaceName: workspace.title },
+                      state: {
+                        studyName: study.name,
+                        workspaceName: workspace.title,
+                        studyData: {
+                          status: study.status,
+                          startDate: study.startDate,
+                          endDate: study.endDate,
+                          fleet: (() => {
+                            const baseDate = new Date(study.startDate);
+                            const addMonths = (date: Date, months: number) => {
+                              const d = new Date(date);
+                              d.setMonth(d.getMonth() + months);
+                              return d.toISOString();
+                            };
+                            const addYear = (date: Date) => {
+                              const d = new Date(date);
+                              d.setFullYear(d.getFullYear() + 1);
+                              return d.toISOString();
+                            };
+                            return [
+                              // A321neo - 4 aircraft, staggered entry
+                              { id: `${study.id}-1`, aircraftType: 'A321neo', engine: 'CFM LEAP-1A', layout: 'Y220', numberOfAircraft: 4, enterInService: addMonths(baseDate, 0) },
+                              // A320-200 - 3 aircraft, entry at month 2
+                              { id: `${study.id}-2`, aircraftType: 'A320-200', engine: 'CFM56-5A', layout: 'F12 Y138', numberOfAircraft: 3, enterInService: addMonths(baseDate, 2) },
+                              // A319 - 4 aircraft, entry at month 5
+                              { id: `${study.id}-3`, aircraftType: 'A319', engine: 'CFM56-5B', layout: 'Y144', numberOfAircraft: 4, enterInService: addMonths(baseDate, 5) },
+                              // B737-800 - 3 aircraft, entry at month 8, retirement 1 year later
+                              { id: `${study.id}-4`, aircraftType: 'B737-800', engine: 'CFM56-7B', layout: 'Y189', numberOfAircraft: 3, enterInService: addMonths(baseDate, 8), retirement: addYear(new Date(addMonths(baseDate, 8))) },
+                            ];
+                          })(),
+                          routes: [
+                            { id: `${study.id}-r1`, origin: 'CDG', destination: 'LHR', startDate: new Date(study.startDate).toISOString(), endDate: new Date(study.endDate).toISOString() },
+                            { id: `${study.id}-r2`, origin: 'CDG', destination: 'BCN', startDate: new Date(study.startDate).toISOString(), endDate: new Date(study.endDate).toISOString() },
+                            { id: `${study.id}-r3`, origin: 'LHR', destination: 'JFK', startDate: new Date(study.startDate).toISOString(), endDate: new Date(study.endDate).toISOString() },
+                          ],
+                        },
+                      },
                     })}
                   />
                   <div className="home-page__study-menu">
