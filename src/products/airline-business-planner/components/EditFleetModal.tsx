@@ -28,8 +28,8 @@ interface EditFleetModalProps {
   simulationEndDate?: Date;
 }
 
-function getUniformValue<T>(entries: FleetEntryForEdit[], getter: (e: FleetEntryForEdit) => T): T | undefined {
-  if (entries.length === 0) return undefined;
+function checkUniformValue<T>(entries: FleetEntryForEdit[], getter: (e: FleetEntryForEdit) => T): { isUniform: boolean; value: T | undefined } {
+  if (entries.length === 0) return { isUniform: false, value: undefined };
   const firstValue = getter(entries[0]);
   const allSame = entries.every((entry) => {
     const val = getter(entry);
@@ -38,7 +38,7 @@ function getUniformValue<T>(entries: FleetEntryForEdit[], getter: (e: FleetEntry
     }
     return val === firstValue;
   });
-  return allSame ? firstValue : undefined;
+  return { isUniform: allSame, value: allSame ? firstValue : undefined };
 }
 
 export function EditFleetModal({
@@ -50,20 +50,20 @@ export function EditFleetModal({
   simulationEndDate,
 }: EditFleetModalProps) {
   // Determine if values are uniform across selection
-  const uniformNumberOfAircraft = useMemo(
-    () => getUniformValue(selectedEntries, (e) => e.numberOfAircraft),
+  const numberOfAircraftCheck = useMemo(
+    () => checkUniformValue(selectedEntries, (e) => e.numberOfAircraft),
     [selectedEntries]
   );
-  const uniformEnterInService = useMemo(
-    () => getUniformValue(selectedEntries, (e) => e.enterInService),
+  const enterInServiceCheck = useMemo(
+    () => checkUniformValue(selectedEntries, (e) => e.enterInService),
     [selectedEntries]
   );
-  const uniformRetirement = useMemo(
-    () => getUniformValue(selectedEntries, (e) => e.retirement),
+  const retirementCheck = useMemo(
+    () => checkUniformValue(selectedEntries, (e) => e.retirement),
     [selectedEntries]
   );
-  const uniformOwnership = useMemo(
-    () => getUniformValue(selectedEntries, (e) => e.ownership),
+  const ownershipCheck = useMemo(
+    () => checkUniformValue(selectedEntries, (e) => e.ownership),
     [selectedEntries]
   );
 
@@ -82,16 +82,16 @@ export function EditFleetModal({
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setNumberOfAircraft(uniformNumberOfAircraft);
-      setEnterInService(uniformEnterInService);
-      setRetirement(uniformRetirement);
-      setOwnership(uniformOwnership ?? '');
+      setNumberOfAircraft(numberOfAircraftCheck.value);
+      setEnterInService(enterInServiceCheck.value);
+      setRetirement(retirementCheck.value);
+      setOwnership(ownershipCheck.value ?? '');
       setNumberOfAircraftModified(false);
       setEnterInServiceModified(false);
       setRetirementModified(false);
       setOwnershipModified(false);
     }
-  }, [isOpen, uniformNumberOfAircraft, uniformEnterInService, uniformRetirement, uniformOwnership]);
+  }, [isOpen, numberOfAircraftCheck, enterInServiceCheck, retirementCheck, ownershipCheck]);
 
   const handleSave = () => {
     const updates: Partial<Omit<FleetEntryForEdit, 'id'>> = {};
@@ -153,11 +153,11 @@ export function EditFleetModal({
             }}
             min={1}
             size="M"
-            placeholder={uniformNumberOfAircraft === undefined ? 'Multiple values' : '1'}
+            placeholder={!numberOfAircraftCheck.isUniform ? 'Multiple values' : '1'}
           />
           <Calendar
             label="Enter in Service"
-            placeholder={uniformEnterInService === undefined ? 'Multiple values' : 'Select a month'}
+            placeholder={!enterInServiceCheck.isUniform ? 'Multiple values' : 'Select a month'}
             mode="month"
             value={enterInService}
             onChange={(val) => {
@@ -170,7 +170,7 @@ export function EditFleetModal({
           />
           <Calendar
             label="Retirement"
-            placeholder={uniformRetirement === undefined ? 'Multiple values' : 'Select a month'}
+            placeholder={!retirementCheck.isUniform ? 'Multiple values' : 'Select a month'}
             mode="month"
             value={retirement}
             onChange={(val) => {
@@ -184,7 +184,7 @@ export function EditFleetModal({
           />
           <Select
             label="Ownership"
-            placeholder={uniformOwnership === undefined ? 'Multiple values' : 'Select...'}
+            placeholder={!ownershipCheck.isUniform ? 'Multiple values' : 'Select...'}
             options={OWNERSHIP_OPTIONS}
             value={ownership}
             onValueChange={(val) => {
