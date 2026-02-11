@@ -557,3 +557,19 @@
   width: 20px;
   height: 20px;
 }
+
+.study-page__tab-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.study-page__tab-wrapper--error::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--error-default, #d32f2f);
+}

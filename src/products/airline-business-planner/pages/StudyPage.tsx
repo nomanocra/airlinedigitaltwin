@@ -407,6 +407,7 @@ export default function StudyPage() {
   const handleDeleteSelected = () => {
     setFleetEntries((prev) => prev.filter((e) => !selectedAircraftIds.has(e.id)));
     setSelectedAircraftIds(new Set());
+    fleetGridApiRef.current?.deselectAll();
   };
 
   // Duplicate selected aircraft
@@ -418,6 +419,7 @@ export default function StudyPage() {
     }));
     setFleetEntries((prev) => [...prev, ...duplicates]);
     setSelectedAircraftIds(new Set());
+    fleetGridApiRef.current?.deselectAll();
   };
 
   // AG Grid: Custom cell renderer for NumberInput
@@ -536,7 +538,7 @@ export default function StudyPage() {
         field: key,
         headerName: current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         flex: 1,
-        minWidth: 72,
+        minWidth: 100,
       });
       current.setMonth(current.getMonth() + 1);
     }
@@ -1018,7 +1020,8 @@ export default function StudyPage() {
   const createNumberCellRenderer = (
     dataKey: string,
     setter: React.Dispatch<React.SetStateAction<any[]>>,
-    min = 0
+    min = 0,
+    options?: { errorWhenZero?: boolean }
   ) => {
     return (props: ICellRendererParams) => {
       const handleChange = (newValue: number) => {
@@ -1030,15 +1033,19 @@ export default function StudyPage() {
         );
       };
 
+      const value = props.value ?? 0;
+      const hasError = options?.errorWhenZero && value === 0;
+
       return (
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
           <NumberInput
-            value={props.value ?? 0}
+            value={value}
             onChange={handleChange}
             size="S"
             min={min}
             showLabel={false}
             variant="Stepper"
+            state={hasError ? 'Error' : 'Default'}
           />
         </div>
       );
@@ -1046,13 +1053,13 @@ export default function StudyPage() {
   };
 
   // Cost Operations cell renderers
-  const GroundHandlingCellRenderer = createNumberCellRenderer('groundHandlingCharge', setCostOperationsData);
-  const FuelAgeingCellRenderer = createNumberCellRenderer('fuelAgeingFactor', setCostOperationsData);
+  const GroundHandlingCellRenderer = createNumberCellRenderer('groundHandlingCharge', setCostOperationsData, 0, { errorWhenZero: true });
+  const FuelAgeingCellRenderer = createNumberCellRenderer('fuelAgeingFactor', setCostOperationsData, 0, { errorWhenZero: true });
 
   // Cost Ownership cell renderers
-  const MonthlyLeaseCellRenderer = createNumberCellRenderer('monthlyLeaseRate', setCostOwnershipData);
-  const AcValueCellRenderer = createNumberCellRenderer('acValueUponAcquisition', setCostOwnershipData);
-  const SparesProvisioningCellRenderer = createNumberCellRenderer('sparesProvisioningPerFamily', setCostOwnershipData);
+  const MonthlyLeaseCellRenderer = createNumberCellRenderer('monthlyLeaseRate', setCostOwnershipData, 0, { errorWhenZero: true });
+  const AcValueCellRenderer = createNumberCellRenderer('acValueUponAcquisition', setCostOwnershipData, 0, { errorWhenZero: true });
+  const SparesProvisioningCellRenderer = createNumberCellRenderer('sparesProvisioningPerFamily', setCostOwnershipData, 0, { errorWhenZero: true });
 
   // Monthly Insurance is calculated: acValueUponAcquisition * 0.01 / 12
   const MonthlyInsuranceCellRenderer = (props: ICellRendererParams) => {
@@ -1181,7 +1188,8 @@ export default function StudyPage() {
   const [selectedRouteIds, setSelectedRouteIds] = useState<Set<string>>(new Set());
 
   // Routes selection handlers
-  const onRouteSelectionChanged = useCallback((event: { api: { getSelectedRows: () => RouteEntry[] } }) => {
+  const onRouteSelectionChanged = useCallback((event: { api: { getSelectedRows: () => RouteEntry[]; deselectAll: () => void } }) => {
+    routesGridApiRef.current = event.api;
     const selectedRows = event.api.getSelectedRows();
     setSelectedRouteIds(new Set(selectedRows.map((row) => row.id)));
   }, []);
@@ -1194,17 +1202,7 @@ export default function StudyPage() {
     setFleetPlanData((prev) => prev.filter((f) => !selectedRouteIds.has(f.routeId)));
     setRouteFrequencyData((prev) => prev.filter((f) => !selectedRouteIds.has(f.routeId)));
     setSelectedRouteIds(new Set());
-  };
-
-  // Duplicate selected routes
-  const handleDuplicateSelectedRoutes = () => {
-    const selectedEntries = routeEntries.filter((r) => selectedRouteIds.has(r.id));
-    const duplicates = selectedEntries.map((entry) => ({
-      ...entry,
-      id: `${entry.id}-copy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    }));
-    setRouteEntries((prev) => [...prev, ...duplicates]);
-    setSelectedRouteIds(new Set());
+    routesGridApiRef.current?.deselectAll();
   };
 
   // Route cell renderers (only for dates now)
@@ -1258,7 +1256,7 @@ export default function StudyPage() {
 
   // Routes column definitions
   const routesColDefs = useMemo<ColDef[]>(() => [
-    { headerCheckboxSelection: true, checkboxSelection: true, width: 48, maxWidth: 48, suppressMovable: true, resizable: false },
+    { headerCheckboxSelection: true, checkboxSelection: true, width: 48, maxWidth: 48, suppressMovable: true, resizable: false, cellClass: 'ag-checkbox-cell', headerClass: 'ag-checkbox-header' },
     { field: 'origin', headerName: 'Origin', flex: 1, minWidth: 100 },
     { field: 'destination', headerName: 'Destination', flex: 1, minWidth: 100 },
     { field: 'startDate', headerName: 'Start Date', flex: 1, minWidth: 130, cellRenderer: RouteStartDateCellRenderer },
@@ -1299,15 +1297,17 @@ export default function StudyPage() {
       );
     };
 
+    const value = props.value ?? 0;
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
         <NumberInput
-          value={props.value ?? 0}
+          value={value}
           onChange={handleChange}
           size="S"
           min={0}
           showLabel={false}
           variant="Stepper"
+          state={value === 0 ? 'Error' : 'Default'}
         />
       </div>
     );
@@ -1338,16 +1338,18 @@ export default function StudyPage() {
         );
       };
 
+      const value = props.data?.yield ?? 0;
       return (
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
           <NumberInput
-            value={props.data?.yield ?? 0}
+            value={value}
             onChange={handleChange}
             size="S"
             min={0}
             step={0.1}
             showLabel={false}
             variant="Stepper"
+            state={value === 0 ? 'Error' : 'Default'}
           />
         </div>
       );
@@ -1383,6 +1385,7 @@ export default function StudyPage() {
           options={options}
           size="S"
           showLabel={false}
+          state={displayValue === 'none' ? 'Error' : 'Default'}
         />
       </div>
     );
@@ -1465,6 +1468,9 @@ export default function StudyPage() {
       );
     };
 
+    // Check if any frequency in this row is > 0
+    const hasAnyFrequency = allMonthKeys.some(mk => (props.data?.[mk] ?? 0) > 0);
+
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
         <NumberInput
@@ -1474,6 +1480,7 @@ export default function StudyPage() {
           min={0}
           showLabel={false}
           variant="Stepper"
+          state={!hasAnyFrequency ? 'Error' : 'Default'}
         />
       </div>
     );
@@ -1506,6 +1513,7 @@ export default function StudyPage() {
 
     const monthCols = generateMonthColumns(startDate, endDate).map(col => ({
       ...col,
+      minWidth: 72,
       cellRenderer: FrequencyCellRenderer,
       cellRendererParams: {
         monthKey: col.field,
@@ -1551,7 +1559,7 @@ export default function StudyPage() {
 
   // AG Grid: Column definitions
   const fleetColDefs = useMemo<ColDef[]>(() => [
-    { headerCheckboxSelection: true, checkboxSelection: true, width: 48, maxWidth: 48, suppressMovable: true, resizable: false },
+    { headerCheckboxSelection: true, checkboxSelection: true, width: 48, maxWidth: 48, suppressMovable: true, resizable: false, cellClass: 'ag-checkbox-cell', headerClass: 'ag-checkbox-header' },
     { field: 'aircraftType', headerName: 'A/C Type', flex: 1, minWidth: 100 },
     { field: 'engine', headerName: 'Engine', flex: 1, minWidth: 90 },
     { field: 'layout', headerName: 'Layout', flex: 1, minWidth: 80 },
@@ -1581,7 +1589,8 @@ export default function StudyPage() {
   ], []);
 
   // AG Grid: Handle selection change
-  const onSelectionChanged = useCallback((event: { api: { getSelectedRows: () => FleetEntry[] } }) => {
+  const onSelectionChanged = useCallback((event: { api: { getSelectedRows: () => FleetEntry[]; deselectAll: () => void } }) => {
+    fleetGridApiRef.current = event.api;
     const selectedRows = event.api.getSelectedRows();
     setSelectedAircraftIds(new Set(selectedRows.map((row) => row.id)));
   }, []);
@@ -1598,6 +1607,8 @@ export default function StudyPage() {
   };
   const [studyStatus, setStudyStatus] = useState<'draft' | 'computing' | 'computed'>(getInitialStatus);
   const computeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fleetGridApiRef = useRef<{ deselectAll: () => void } | null>(null);
+  const routesGridApiRef = useRef<{ deselectAll: () => void } | null>(null);
 
   // Track if it's the first render (to avoid resetting status on mount)
   const isFirstRender = useRef(true);
@@ -1686,6 +1697,36 @@ export default function StudyPage() {
   };
 
   // Error count per assumption item
+  // Fleet sub-tab error counts
+  const costOpsErrors = useMemo(() => {
+    if (!hasAircraft) return 0;
+    return costOperationsData.filter(c => c.groundHandlingCharge === 0 || c.fuelAgeingFactor === 0).length;
+  }, [costOperationsData, hasAircraft]);
+
+  const costOwnershipErrors = useMemo(() => {
+    if (!hasAircraft) return 0;
+    return costOwnershipData.filter(c => c.monthlyLeaseRate === 0 || c.acValueUponAcquisition === 0 || c.sparesProvisioningPerFamily === 0).length;
+  }, [costOwnershipData, hasAircraft]);
+
+  // Network sub-tab error counts
+  const pricingErrors = useMemo(() => {
+    if (!hasRoutes) return 0;
+    return routePricingData.filter(p => p.marketYield === 0 || p.yield === 0).length;
+  }, [routePricingData, hasRoutes]);
+
+  const fleetPlanErrors = useMemo(() => {
+    if (!hasRoutes || !hasAircraft) return 0;
+    return fleetPlanData.filter(f => !f.allocatedAircraftId).length;
+  }, [fleetPlanData, hasRoutes, hasAircraft]);
+
+  const frequencyErrors = useMemo(() => {
+    if (!hasRoutes) return 0;
+    return routeFrequencyData.filter(f => {
+      const values = Object.values(f.frequencies);
+      return values.length === 0 || values.every(v => v === 0);
+    }).length;
+  }, [routeFrequencyData, hasRoutes]);
+
   const getErrorCount = (itemId: string) => {
     if (itemId === 'period') {
       let errors = 0;
@@ -1696,10 +1737,12 @@ export default function StudyPage() {
       return errors;
     }
     if (itemId === 'fleet') {
-      return fleetEntries.length === 0 ? 1 : 0;
+      if (fleetEntries.length === 0) return 1;
+      return costOpsErrors + costOwnershipErrors;
     }
     if (itemId === 'network') {
-      return routeEntries.length === 0 ? 1 : 0;
+      if (routeEntries.length === 0) return 1;
+      return pricingErrors + fleetPlanErrors + frequencyErrors;
     }
     return 0;
   };
@@ -1924,26 +1967,32 @@ export default function StudyPage() {
             <div className="study-page__fleet">
               {/* Fleet sub-tabs */}
               <div className="study-page__fleet-tabs">
-                <Tab
-                  label="Fleet"
-                  size="M"
-                  status={fleetTab === 'fleet' ? 'Active' : 'Default'}
-                  onClick={() => setFleetTab('fleet')}
-                />
-                <Tab
-                  label="Cost Operations"
-                  size="M"
-                  status={hasAircraft && fleetTab === 'cost-operations' ? 'Active' : 'Default'}
-                  disabled={!hasAircraft}
-                  onClick={() => { if (hasAircraft) setFleetTab('cost-operations'); }}
-                />
-                <Tab
-                  label="Cost Ownership"
-                  size="M"
-                  status={hasAircraft && fleetTab === 'cost-ownership' ? 'Active' : 'Default'}
+                <div className={`study-page__tab-wrapper${!hasAircraft ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Fleet"
+                    size="M"
+                    status={fleetTab === 'fleet' ? 'Active' : 'Default'}
+                    onClick={() => setFleetTab('fleet')}
+                  />
+                </div>
+                <div className={`study-page__tab-wrapper${costOpsErrors > 0 ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Cost Operations"
+                    size="M"
+                    status={hasAircraft && fleetTab === 'cost-operations' ? 'Active' : 'Default'}
+                    disabled={!hasAircraft}
+                    onClick={() => { if (hasAircraft) setFleetTab('cost-operations'); }}
+                  />
+                </div>
+                <div className={`study-page__tab-wrapper${costOwnershipErrors > 0 ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Cost Ownership"
+                    size="M"
+                    status={hasAircraft && fleetTab === 'cost-ownership' ? 'Active' : 'Default'}
                   disabled={!hasAircraft}
                   onClick={() => { if (hasAircraft) setFleetTab('cost-ownership'); }}
-                />
+                  />
+                </div>
                 <Tab
                   label="Crew Configuration"
                   size="M"
@@ -2192,33 +2241,41 @@ export default function StudyPage() {
             <div className="study-page__network">
               {/* Network sub-tabs */}
               <div className="study-page__fleet-tabs">
-                <Tab
-                  label="Routes"
-                  size="M"
-                  status={networkTab === 'routes' ? 'Active' : 'Default'}
-                  onClick={() => setNetworkTab('routes')}
-                />
-                <Tab
-                  label="Pricing"
-                  size="M"
-                  status={hasRoutes && networkTab === 'pricing' ? 'Active' : 'Default'}
-                  disabled={!hasRoutes}
-                  onClick={() => { if (hasRoutes) setNetworkTab('pricing'); }}
-                />
-                <Tab
-                  label="Fleet Plan"
-                  size="M"
-                  status={hasRoutes && hasAircraft && networkTab === 'fleet-plan' ? 'Active' : 'Default'}
-                  disabled={!hasRoutes || !hasAircraft}
-                  onClick={() => { if (hasRoutes && hasAircraft) setNetworkTab('fleet-plan'); }}
-                />
-                <Tab
-                  label="Frequencies"
-                  size="M"
-                  status={hasRoutes && networkTab === 'frequencies' ? 'Active' : 'Default'}
-                  disabled={!hasRoutes}
-                  onClick={() => { if (hasRoutes) setNetworkTab('frequencies'); }}
-                />
+                <div className={`study-page__tab-wrapper${!hasRoutes ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Routes"
+                    size="M"
+                    status={networkTab === 'routes' ? 'Active' : 'Default'}
+                    onClick={() => setNetworkTab('routes')}
+                  />
+                </div>
+                <div className={`study-page__tab-wrapper${pricingErrors > 0 ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Pricing"
+                    size="M"
+                    status={hasRoutes && networkTab === 'pricing' ? 'Active' : 'Default'}
+                    disabled={!hasRoutes}
+                    onClick={() => { if (hasRoutes) setNetworkTab('pricing'); }}
+                  />
+                </div>
+                <div className={`study-page__tab-wrapper${fleetPlanErrors > 0 ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Fleet Plan"
+                    size="M"
+                    status={hasRoutes && hasAircraft && networkTab === 'fleet-plan' ? 'Active' : 'Default'}
+                    disabled={!hasRoutes || !hasAircraft}
+                    onClick={() => { if (hasRoutes && hasAircraft) setNetworkTab('fleet-plan'); }}
+                  />
+                </div>
+                <div className={`study-page__tab-wrapper${frequencyErrors > 0 ? ' study-page__tab-wrapper--error' : ''}`}>
+                  <Tab
+                    label="Frequencies"
+                    size="M"
+                    status={hasRoutes && networkTab === 'frequencies' ? 'Active' : 'Default'}
+                    disabled={!hasRoutes}
+                    onClick={() => { if (hasRoutes) setNetworkTab('frequencies'); }}
+                  />
+                </div>
               </div>
 
               {/* Routes tab content */}
@@ -2243,13 +2300,6 @@ export default function StudyPage() {
                             variant="Outlined"
                             alt="Edit"
                             onClick={() => console.log('Edit selected routes')}
-                          />
-                          <IconButton
-                            icon="content_copy"
-                            size="S"
-                            variant="Outlined"
-                            alt="Duplicate"
-                            onClick={handleDuplicateSelectedRoutes}
                           />
                           <IconButton
                             icon="delete"
