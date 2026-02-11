@@ -1,0 +1,19 @@
+.import-airline-fleet-modal {
+  width: 480px;
+}
+
+.import-airline-fleet-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.import-airline-fleet-modal__row {
+  display: flex;
+  gap: 16px;
+}
+
+.import-airline-fleet-modal__row > * {
+  flex: 1;
+}

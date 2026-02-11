@@ -20,7 +20,16 @@ import { Select } from '@/design-system/components/Select';
 import { EmptyState } from '@/design-system/composites/EmptyState';
 import { ButtonGroup } from '@/design-system/components/ButtonGroup';
 import { Tooltip, TooltipTrigger, TooltipContent, SimpleTooltip } from '@/design-system/components/Tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/design-system/components/DropdownMenu';
 import { AddAircraftModal, type FleetEntry } from '../components/AddAircraftModal';
+import { ImportAirlineFleetModal } from '../components/ImportAirlineFleetModal';
+import { ImportAirlineNetworkModal } from '../components/ImportAirlineNetworkModal';
 import { AddRouteModal } from '../components/AddRouteModal';
 import '@/design-system/tokens/ag-grid-theme.css';
 import './StudyPage.css';
@@ -231,6 +240,7 @@ export default function StudyPage() {
   const [fleetPlanData, setFleetPlanData] = useState<FleetPlanEntry[]>([]);
   const [routeFrequencyData, setRouteFrequencyData] = useState<RouteFrequencyEntry[]>([]);
   const [isAddRouteModalOpen, setIsAddRouteModalOpen] = useState(false);
+  const [isImportAirlineNetworkModalOpen, setIsImportAirlineNetworkModalOpen] = useState(false);
   const [discountForNormalFares, setDiscountForNormalFares] = useState<number>(0);
 
   // ========== LOAD FACTOR STATE ==========
@@ -342,6 +352,7 @@ export default function StudyPage() {
     return [];
   });
   const [isAddAircraftModalOpen, setIsAddAircraftModalOpen] = useState(false);
+  const [isImportAirlineFleetModalOpen, setIsImportAirlineFleetModalOpen] = useState(false);
   const [selectedAircraftIds, setSelectedAircraftIds] = useState<Set<string>>(new Set());
   const hasAircraft = fleetEntries.length > 0;
 
@@ -380,6 +391,16 @@ export default function StudyPage() {
   // Add aircraft handler
   const handleAddAircraft = (aircraft: FleetEntry) => {
     setFleetEntries((prev) => [...prev, aircraft]);
+  };
+
+  // Import fleet from airline
+  const handleImportAirlineFleet = (entries: FleetEntry[]) => {
+    setFleetEntries((prev) => [...prev, ...entries]);
+  };
+
+  // Import network from airline
+  const handleImportAirlineNetwork = (entries: RouteEntry[]) => {
+    setRouteEntries((prev) => [...prev, ...entries]);
   };
 
   // Delete selected aircraft
@@ -1120,7 +1141,7 @@ export default function StudyPage() {
         captainPerCrew: 1,
         firstOfficerPerCrew: 1,
         cabinManagerPerCrew: 1,
-        cabinAttendantPerCrew: 2
+        cabinAttendantPerCrew: 1
       }),
     })), [fleetEntries, crewConfigData]
   );
@@ -1148,7 +1169,7 @@ export default function StudyPage() {
       const existingIds = new Set(prev.map(c => c.id));
       const newEntries = fleetEntries
         .filter(e => !existingIds.has(e.id))
-        .map(e => ({ id: e.id, captainPerCrew: 1, firstOfficerPerCrew: 1, cabinManagerPerCrew: 1, cabinAttendantPerCrew: 2 }));
+        .map(e => ({ id: e.id, captainPerCrew: 1, firstOfficerPerCrew: 1, cabinManagerPerCrew: 1, cabinAttendantPerCrew: 1 }));
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
   }, [fleetEntries]);
@@ -2002,14 +2023,36 @@ export default function StudyPage() {
                         alt="Add Aircraft"
                         onClick={() => setIsAddAircraftModalOpen(true)}
                       />
-                      <Button
-                        label=""
-                        leftIcon="download"
-                        rightIcon="arrow_drop_down"
-                        variant="Outlined"
-                        size="S"
-                        onClick={() => console.log('Import fleet')}
-                      />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button
+                            label=""
+                            leftIcon="system_update_alt"
+                            rightIcon="dropdown"
+                            variant="Outlined"
+                            size="S"
+                            className="study-page__import-fleet-btn"
+                          />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem icon="system_update_alt" onSelect={() => setIsImportAirlineFleetModalOpen(true)}>
+                            Import from an Airline
+                          </DropdownMenuItem>
+                          <DropdownMenuItem icon="drive_file_move" disabled>
+                            Load from an other Study
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem icon="upload" disabled>
+                            Upload from CSV
+                          </DropdownMenuItem>
+                          <DropdownMenuItem icon="download" disabled>
+                            Download as CSV
+                          </DropdownMenuItem>
+                          <DropdownMenuItem icon="download" disabled>
+                            Download an empty CSV Template
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
 
@@ -2035,7 +2078,7 @@ export default function StudyPage() {
                                 leftIcon="download"
                                 variant="Default"
                                 size="M"
-                                onClick={() => console.log('Import fleet')}
+                                onClick={() => setIsImportAirlineFleetModalOpen(true)}
                               />
                             </>
                           }
@@ -2226,6 +2269,36 @@ export default function StudyPage() {
                         alt="Add Route"
                         onClick={() => setIsAddRouteModalOpen(true)}
                       />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button
+                            label=""
+                            leftIcon="system_update_alt"
+                            rightIcon="dropdown"
+                            variant="Outlined"
+                            size="S"
+                            className="study-page__import-fleet-btn"
+                          />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem icon="system_update_alt" onSelect={() => setIsImportAirlineNetworkModalOpen(true)}>
+                            Import from an Airline
+                          </DropdownMenuItem>
+                          <DropdownMenuItem icon="drive_file_move" disabled>
+                            Load from an other Study
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem icon="upload" disabled>
+                            Upload from CSV
+                          </DropdownMenuItem>
+                          <DropdownMenuItem icon="download" disabled>
+                            Download as CSV
+                          </DropdownMenuItem>
+                          <DropdownMenuItem icon="download" disabled>
+                            Download an empty CSV Template
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                   <div className="study-page__fleet-table">
@@ -2236,13 +2309,22 @@ export default function StudyPage() {
                           title="No routes defined"
                           description="Add routes to define your network"
                           actions={
-                            <Button
-                              label="ADD ROUTE"
-                              leftIcon="add"
-                              variant="Outlined"
-                              size="M"
-                              onClick={() => setIsAddRouteModalOpen(true)}
-                            />
+                            <>
+                              <Button
+                                label="ADD ROUTE"
+                                leftIcon="add"
+                                variant="Outlined"
+                                size="M"
+                                onClick={() => setIsAddRouteModalOpen(true)}
+                              />
+                              <Button
+                                label="IMPORT NETWORK"
+                                leftIcon="system_update_alt"
+                                variant="Outlined"
+                                size="M"
+                                onClick={() => setIsImportAirlineNetworkModalOpen(true)}
+                              />
+                            </>
                           }
                           className="study-page__fleet-empty"
                         />
@@ -2954,6 +3036,24 @@ export default function StudyPage() {
         onAddRoute={handleAddRoute}
         simulationStartDate={startDate}
         simulationEndDate={endDate}
+      />
+
+      {/* Import Airline Fleet Modal */}
+      <ImportAirlineFleetModal
+        isOpen={isImportAirlineFleetModalOpen}
+        onClose={() => setIsImportAirlineFleetModalOpen(false)}
+        onImportFleet={handleImportAirlineFleet}
+        periodStartDate={startDate}
+        periodEndDate={endDate}
+      />
+
+      {/* Import Airline Network Modal */}
+      <ImportAirlineNetworkModal
+        isOpen={isImportAirlineNetworkModalOpen}
+        onClose={() => setIsImportAirlineNetworkModalOpen(false)}
+        onImportNetwork={handleImportAirlineNetwork}
+        periodStartDate={startDate}
+        periodEndDate={endDate}
       />
     </div>
   );

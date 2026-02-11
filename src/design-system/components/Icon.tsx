@@ -50,7 +50,9 @@ import darkModeIcon from '../assets/svg/icons/dark_mode.svg?raw';
 import deleteIcon from '../assets/svg/icons/delete.svg?raw';
 import descriptionIcon from '../assets/svg/icons/description.svg?raw';
 import downloadIcon from '../assets/svg/icons/download.svg?raw';
+import driveFileMoveIcon from '../assets/svg/icons/drive_file_move.svg?raw';
 import dropdownIcon from '../assets/svg/icons/dropdown.svg?raw';
+import saveAltIcon from '../assets/svg/icons/save_alt.svg?raw';
 import editIcon from '../assets/svg/icons/edit.svg?raw';
 import emojiEmotionsIcon from '../assets/svg/icons/emoji_emotions.svg?raw';
 import errorIcon from '../assets/svg/icons/error.svg?raw';
@@ -84,6 +86,7 @@ import shareIcon from '../assets/svg/icons/share.svg?raw';
 import speedIcon from '../assets/svg/icons/speed.svg?raw';
 import starIcon from '../assets/svg/icons/star.svg?raw';
 import starBorderIcon from '../assets/svg/icons/star_border.svg?raw';
+import systemUpdateAltIcon from '../assets/svg/icons/system_update_alt.svg?raw';
 import tableChartIcon from '../assets/svg/icons/table_chart.svg?raw';
 import trendingDownIcon from '../assets/svg/icons/trending_down.svg?raw';
 import trendingUpIcon from '../assets/svg/icons/trending_up.svg?raw';
@@ -144,6 +147,7 @@ const iconMap: Record<string, string> = {
   'delete': deleteIcon,
   'description': descriptionIcon,
   'download': downloadIcon,
+  'drive_file_move': driveFileMoveIcon,
   'dropdown': dropdownIcon,
   'edit': editIcon,
   'emoji_emotions': emojiEmotionsIcon,
@@ -173,11 +177,13 @@ const iconMap: Record<string, string> = {
   'play': playIcon,
   'remove': removeIcon,
   'search': searchIcon,
+  'save_alt': saveAltIcon,
   'settings': settingsIcon,
   'share': shareIcon,
   'speed': speedIcon,
   'star': starIcon,
   'star_border': starBorderIcon,
+  'system_update_alt': systemUpdateAltIcon,
   'table_chart': tableChartIcon,
   'trending_down': trendingDownIcon,
   'trending_up': trendingUpIcon,
@@ -238,6 +244,7 @@ export const availableIcons = [
   'delete',
   'description',
   'download',
+  'drive_file_move',
   'dropdown',
   'edit',
   'emoji_emotions',
@@ -267,11 +274,13 @@ export const availableIcons = [
   'play',
   'remove',
   'search',
+  'save_alt',
   'settings',
   'share',
   'speed',
   'star',
   'star_border',
+  'system_update_alt',
   'table_chart',
   'trending_down',
   'trending_up',

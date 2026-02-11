@@ -108,10 +108,6 @@
   padding-left: 16px;
 }
 
-.as-ag-grid .ag-header-cell:last-child {
-  padding-right: 16px;
-}
-
 .as-ag-grid .ag-header-cell-text {
   overflow: hidden;
   display: -webkit-box;
@@ -203,10 +199,6 @@
 
 .as-ag-grid .ag-cell:first-child {
   padding-left: 16px;
-}
-
-.as-ag-grid .ag-cell:last-child {
-  padding-right: 16px;
 }
 
 .as-ag-grid .ag-cell,

@@ -552,3 +552,8 @@
 .study-page__main--computed .study-page__assumption-content {
   padding-bottom: 16px;
 }
+
+.study-page__import-fleet-btn .icon svg {
+  width: 20px;
+  height: 20px;
+}
