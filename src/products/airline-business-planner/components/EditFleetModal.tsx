@@ -170,7 +170,7 @@ export function EditFleetModal({
           />
           <Calendar
             label="Retirement"
-            placeholder={!retirementCheck.isUniform ? 'Multiple values' : 'Select a month'}
+            placeholder={!retirementCheck.isUniform ? 'Multiple values' : (retirementCheck.value === undefined ? 'None' : 'Select a month')}
             mode="month"
             value={retirement}
             onChange={(val) => {
