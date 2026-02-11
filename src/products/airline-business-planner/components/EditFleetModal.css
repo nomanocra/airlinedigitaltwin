@@ -1,0 +1,13 @@
+.edit-fleet-modal {
+  width: 400px;
+}
+
+.edit-fleet-content {
+  padding: 8px 0;
+}
+
+.edit-fleet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

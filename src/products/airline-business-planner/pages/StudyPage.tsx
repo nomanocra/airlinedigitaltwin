@@ -28,6 +28,8 @@ import {
   DropdownMenuSeparator,
 } from '@/design-system/components/DropdownMenu';
 import { AddAircraftModal, type FleetEntry } from '../components/AddAircraftModal';
+import { EditFleetModal, type FleetEntryForEdit } from '../components/EditFleetModal';
+import { EditRouteModal, type RouteEntryForEdit } from '../components/EditRouteModal';
 import { ImportAirlineFleetModal } from '../components/ImportAirlineFleetModal';
 import { ImportAirlineNetworkModal } from '../components/ImportAirlineNetworkModal';
 import { AddRouteModal } from '../components/AddRouteModal';
@@ -240,6 +242,7 @@ export default function StudyPage() {
   const [fleetPlanData, setFleetPlanData] = useState<FleetPlanEntry[]>([]);
   const [routeFrequencyData, setRouteFrequencyData] = useState<RouteFrequencyEntry[]>([]);
   const [isAddRouteModalOpen, setIsAddRouteModalOpen] = useState(false);
+  const [isEditRouteModalOpen, setIsEditRouteModalOpen] = useState(false);
   const [isImportAirlineNetworkModalOpen, setIsImportAirlineNetworkModalOpen] = useState(false);
   const [discountForNormalFares, setDiscountForNormalFares] = useState<number>(0);
 
@@ -352,6 +355,7 @@ export default function StudyPage() {
     return [];
   });
   const [isAddAircraftModalOpen, setIsAddAircraftModalOpen] = useState(false);
+  const [isEditFleetModalOpen, setIsEditFleetModalOpen] = useState(false);
   const [isImportAirlineFleetModalOpen, setIsImportAirlineFleetModalOpen] = useState(false);
   const [selectedAircraftIds, setSelectedAircraftIds] = useState<Set<string>>(new Set());
   const hasAircraft = fleetEntries.length > 0;
@@ -418,6 +422,26 @@ export default function StudyPage() {
       id: `${entry.id}-copy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     }));
     setFleetEntries((prev) => [...prev, ...duplicates]);
+    setSelectedAircraftIds(new Set());
+    fleetGridApiRef.current?.deselectAll();
+  };
+
+  // Edit selected aircraft
+  const handleEditFleet = (updates: Partial<Omit<FleetEntryForEdit, 'id'>>) => {
+    setFleetEntries((prev) =>
+      prev.map((e) => {
+        if (selectedAircraftIds.has(e.id)) {
+          return {
+            ...e,
+            ...(updates.numberOfAircraft !== undefined && { numberOfAircraft: updates.numberOfAircraft }),
+            ...(updates.enterInService !== undefined && { enterInService: updates.enterInService }),
+            ...(updates.retirement !== undefined && { retirement: updates.retirement }),
+            ...(updates.ownership !== undefined && { ownership: updates.ownership }),
+          };
+        }
+        return e;
+      })
+    );
     setSelectedAircraftIds(new Set());
     fleetGridApiRef.current?.deselectAll();
   };
@@ -1155,12 +1179,17 @@ export default function StudyPage() {
 
   // Initialize cost/crew data when fleet entries change
   // Using functional updates to avoid stale closures in React strict mode
+  const isComputedStudy = studyData?.status === 'Computed';
   useEffect(() => {
     setCostOperationsData(prev => {
       const existingIds = new Set(prev.map(c => c.id));
       const newEntries = fleetEntries
         .filter(e => !existingIds.has(e.id))
-        .map(e => ({ id: e.id, groundHandlingCharge: 0, fuelAgeingFactor: 0 }));
+        .map(e => ({
+          id: e.id,
+          groundHandlingCharge: isComputedStudy ? 850 : 0,
+          fuelAgeingFactor: isComputedStudy ? 2.5 : 0,
+        }));
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
 
@@ -1168,7 +1197,12 @@ export default function StudyPage() {
       const existingIds = new Set(prev.map(c => c.id));
       const newEntries = fleetEntries
         .filter(e => !existingIds.has(e.id))
-        .map(e => ({ id: e.id, monthlyLeaseRate: 0, acValueUponAcquisition: 0, sparesProvisioningPerFamily: 0 }));
+        .map(e => ({
+          id: e.id,
+          monthlyLeaseRate: isComputedStudy ? 380000 : 0,
+          acValueUponAcquisition: isComputedStudy ? 110000000 : 0,
+          sparesProvisioningPerFamily: isComputedStudy ? 2500000 : 0,
+        }));
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
 
@@ -1176,7 +1210,13 @@ export default function StudyPage() {
       const existingIds = new Set(prev.map(c => c.id));
       const newEntries = fleetEntries
         .filter(e => !existingIds.has(e.id))
-        .map(e => ({ id: e.id, captainPerCrew: 1, firstOfficerPerCrew: 1, cabinManagerPerCrew: 1, cabinAttendantPerCrew: 1 }));
+        .map(e => ({
+          id: e.id,
+          captainPerCrew: isComputedStudy ? 2 : 1,
+          firstOfficerPerCrew: isComputedStudy ? 2 : 1,
+          cabinManagerPerCrew: isComputedStudy ? 2 : 1,
+          cabinAttendantPerCrew: isComputedStudy ? 4 : 1,
+        }));
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
   }, [fleetEntries]);
@@ -1201,6 +1241,24 @@ export default function StudyPage() {
     setRoutePricingData((prev) => prev.filter((p) => !selectedRouteIds.has(p.routeId)));
     setFleetPlanData((prev) => prev.filter((f) => !selectedRouteIds.has(f.routeId)));
     setRouteFrequencyData((prev) => prev.filter((f) => !selectedRouteIds.has(f.routeId)));
+    setSelectedRouteIds(new Set());
+    routesGridApiRef.current?.deselectAll();
+  };
+
+  // Edit selected routes
+  const handleEditRoutes = (updates: Partial<Omit<RouteEntryForEdit, 'id'>>) => {
+    setRouteEntries((prev) =>
+      prev.map((r) => {
+        if (selectedRouteIds.has(r.id)) {
+          return {
+            ...r,
+            ...(updates.startDate !== undefined && { startDate: updates.startDate }),
+            ...(updates.endDate !== undefined && { endDate: updates.endDate }),
+          };
+        }
+        return r;
+      })
+    );
     setSelectedRouteIds(new Set());
     routesGridApiRef.current?.deselectAll();
   };
@@ -1531,7 +1589,13 @@ export default function StudyPage() {
       const existingIds = new Set(prev.map(p => p.routeId));
       const newEntries = routeEntries
         .filter(r => !existingIds.has(r.id))
-        .map(r => ({ routeId: r.id, marketYield: 0, discountStrategy: 'None', yield: 0, fare: 0 }));
+        .map(r => ({
+          routeId: r.id,
+          marketYield: isComputedStudy ? 0.08 : 0,
+          discountStrategy: 'None',
+          yield: isComputedStudy ? 0.07 : 0,
+          fare: 0,
+        }));
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
 
@@ -1539,7 +1603,12 @@ export default function StudyPage() {
       const existingIds = new Set(prev.map(f => f.routeId));
       const newEntries = routeEntries
         .filter(r => !existingIds.has(r.id))
-        .map(r => ({ routeId: r.id, allocatedAircraftId: null }));
+        .map((r, index) => ({
+          routeId: r.id,
+          allocatedAircraftId: isComputedStudy && fleetEntries.length > 0
+            ? fleetEntries[index % fleetEntries.length].id
+            : null,
+        }));
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
 
@@ -1547,7 +1616,20 @@ export default function StudyPage() {
       const existingIds = new Set(prev.map(f => f.routeId));
       const newEntries = routeEntries
         .filter(r => !existingIds.has(r.id))
-        .map(r => ({ routeId: r.id, frequencies: {} }));
+        .map(r => {
+          if (isComputedStudy && startDate && endDate) {
+            const freqs: Record<string, number> = {};
+            const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+            const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+            while (current <= end) {
+              const key = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
+              freqs[key] = 14;
+              current.setMonth(current.getMonth() + 1);
+            }
+            return { routeId: r.id, frequencies: freqs };
+          }
+          return { routeId: r.id, frequencies: {} };
+        });
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
   }, [routeEntries]);
@@ -2045,7 +2127,7 @@ export default function StudyPage() {
                             size="S"
                             variant="Outlined"
                             alt="Edit"
-                            onClick={() => console.log('Edit selected')}
+                            onClick={() => setIsEditFleetModalOpen(true)}
                           />
                           <IconButton
                             icon="content_copy"
@@ -2299,7 +2381,7 @@ export default function StudyPage() {
                             size="S"
                             variant="Outlined"
                             alt="Edit"
-                            onClick={() => console.log('Edit selected routes')}
+                            onClick={() => setIsEditRouteModalOpen(true)}
                           />
                           <IconButton
                             icon="delete"
@@ -3104,6 +3186,26 @@ export default function StudyPage() {
         onImportNetwork={handleImportAirlineNetwork}
         periodStartDate={startDate}
         periodEndDate={endDate}
+      />
+
+      {/* Edit Fleet Modal */}
+      <EditFleetModal
+        isOpen={isEditFleetModalOpen}
+        onClose={() => setIsEditFleetModalOpen(false)}
+        onSave={handleEditFleet}
+        selectedEntries={fleetEntries.filter((e) => selectedAircraftIds.has(e.id))}
+        simulationStartDate={startDate}
+        simulationEndDate={endDate}
+      />
+
+      {/* Edit Route Modal */}
+      <EditRouteModal
+        isOpen={isEditRouteModalOpen}
+        onClose={() => setIsEditRouteModalOpen(false)}
+        onSave={handleEditRoutes}
+        selectedEntries={routeEntries.filter((r) => selectedRouteIds.has(r.id))}
+        simulationStartDate={startDate}
+        simulationEndDate={endDate}
       />
     </div>
   );
