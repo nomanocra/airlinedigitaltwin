@@ -32,6 +32,7 @@ import { EditFleetModal, type FleetEntryForEdit } from '../components/EditFleetM
 import { EditRouteModal, type RouteEntryForEdit } from '../components/EditRouteModal';
 import { ImportAirlineFleetModal } from '../components/ImportAirlineFleetModal';
 import { ImportAirlineNetworkModal } from '../components/ImportAirlineNetworkModal';
+import { NetworkSummary } from '../components/NetworkSummary';
 import { AddRouteModal } from '../components/AddRouteModal';
 import '@/design-system/tokens/ag-grid-theme.css';
 import './StudyPage.css';
@@ -42,7 +43,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 // Fleet sub-tab types
 type FleetTabType = 'fleet' | 'cost-operations' | 'cost-ownership' | 'crew';
 type FleetViewMode = 'table' | 'gantt';
-type NetworkTabType = 'routes' | 'pricing' | 'fleet-plan' | 'frequencies';
+type NetworkTabType = 'routes' | 'pricing' | 'fleet-plan' | 'frequencies' | 'summary';
 
 // Load Factor tab types
 type LoadFactorTabType = 'general' | 'per-route';
@@ -1809,6 +1810,8 @@ export default function StudyPage() {
     }).length;
   }, [routeFrequencyData, hasRoutes]);
 
+  const networkAllInputsFilled = hasRoutes && pricingErrors === 0 && fleetPlanErrors === 0 && frequencyErrors === 0;
+
   const getErrorCount = (itemId: string) => {
     if (itemId === 'period') {
       let errors = 0;
@@ -2358,6 +2361,13 @@ export default function StudyPage() {
                     onClick={() => { if (hasRoutes) setNetworkTab('frequencies'); }}
                   />
                 </div>
+                <Tab
+                  label="Summary"
+                  size="M"
+                  status={networkTab === 'summary' ? 'Active' : 'Default'}
+                  disabled={!networkAllInputsFilled}
+                  onClick={() => { if (networkAllInputsFilled) setNetworkTab('summary'); }}
+                />
               </div>
 
               {/* Routes tab content */}
@@ -2571,6 +2581,17 @@ export default function StudyPage() {
                       getRowId={(params) => params.data.routeId}
                     />
                   </div>
+                </div>
+              )}
+
+              {networkTab === 'summary' && (
+                <div className="study-page__fleet-content">
+                  <NetworkSummary
+                    routeEntries={routeEntries}
+                    fleetEntries={fleetEntries}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
                 </div>
               )}
             </div>

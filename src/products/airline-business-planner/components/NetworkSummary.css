@@ -1,0 +1,85 @@
+.network-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+/* KPI cards */
+.network-summary__kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.network-summary__kpi-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border: 1px solid var(--border-default, #ccd4e0);
+  border-radius: 8px;
+  background: var(--background-main, #fff);
+}
+
+.network-summary__kpi-label {
+  color: var(--text-main, #1a1a2e);
+}
+
+.network-summary__kpi-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--primary-default, #063b9e);
+  line-height: 1;
+}
+
+/* Sections */
+.network-summary__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.network-summary__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.network-summary__section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main, #1a1a2e);
+  margin: 0;
+}
+
+.network-summary__section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.network-summary__filter-label {
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+}
+
+/* Map */
+.network-summary__map-container {
+  border: 1px solid var(--border-default, #ccd4e0);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--background-light, #f0f4fa);
+}
+
+.network-summary__map-container svg {
+  display: block;
+}
+
+/* Chart */
+.network-summary__chart-container {
+  border: 1px solid var(--border-default, #ccd4e0);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--background-main, #fff);
+}

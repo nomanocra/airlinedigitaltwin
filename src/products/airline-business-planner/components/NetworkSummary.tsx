@@ -1,0 +1,275 @@
+import { useMemo, useState } from 'react';
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  Line,
+  Marker,
+} from 'react-simple-maps';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { Select } from '@/design-system/components/Select';
+import { IconButton } from '@/design-system/components/IconButton';
+import './NetworkSummary.css';
+
+const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+
+// Airport coordinates (lat, lng)
+const AIRPORT_COORDS: Record<string, [number, number]> = {
+  AMS: [52.3086, 4.7639],
+  ATL: [33.6407, -84.4277],
+  BCN: [41.2974, 2.0833],
+  BKK: [13.6900, 100.7501],
+  BOM: [19.0896, 72.8656],
+  BOS: [42.3656, -71.0096],
+  CDG: [49.0097, 2.5479],
+  DEL: [28.5562, 77.1000],
+  DEN: [39.8561, -104.6737],
+  DFW: [32.8998, -97.0403],
+  DOH: [25.2731, 51.6081],
+  DUB: [53.4264, -6.2499],
+  DXB: [25.2532, 55.3657],
+  EWR: [40.6895, -74.1745],
+  FCO: [41.8003, 12.2389],
+  FRA: [50.0379, 8.5622],
+  GRU: [-23.4356, -46.4731],
+  HKG: [22.3080, 113.9185],
+  HND: [35.5494, 139.7798],
+  IAD: [38.9531, -77.4565],
+  IAH: [29.9902, -95.3368],
+  ICN: [37.4602, 126.4407],
+  IST: [41.2753, 28.7519],
+  JFK: [40.6413, -73.7781],
+  JNB: [-26.1392, 28.2460],
+  KUL: [2.7456, 101.7099],
+  LAX: [33.9425, -118.4081],
+  LGA: [40.7769, -73.8740],
+  LHR: [51.4700, -0.4543],
+  LIS: [38.7813, -9.1359],
+  MAD: [40.4983, -3.5676],
+  MEX: [19.4363, -99.0721],
+  MIA: [25.7959, -80.2870],
+  MRS: [43.4393, 5.2214],
+  MUC: [48.3538, 11.7861],
+  NCE: [43.6584, 7.2159],
+  NRT: [35.7720, 140.3929],
+  ORD: [41.9742, -87.9073],
+  ORY: [48.7262, 2.3652],
+  PEK: [40.0799, 116.6031],
+  PVG: [31.1443, 121.8083],
+  SFO: [37.6213, -122.3790],
+  SIN: [1.3644, 103.9915],
+  SYD: [-33.9461, 151.1772],
+  TLS: [43.6291, 1.3638],
+  YUL: [45.4706, -73.7408],
+  YYZ: [43.6777, -79.6248],
+  ZRH: [47.4647, 8.5492],
+};
+
+interface RouteEntry {
+  id: string;
+  origin: string;
+  destination: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface FleetEntry {
+  id: string;
+  aircraftType: string;
+  numberOfAircraft: number;
+}
+
+interface NetworkSummaryProps {
+  routeEntries: RouteEntry[];
+  fleetEntries: FleetEntry[];
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate }: NetworkSummaryProps) {
+  const [yearFilter, setYearFilter] = useState('all');
+
+  // KPIs
+  const numberOfRoutes = routeEntries.length;
+
+  const airports = useMemo(() => {
+    const set = new Set<string>();
+    routeEntries.forEach(r => {
+      set.add(r.origin);
+      set.add(r.destination);
+    });
+    return set;
+  }, [routeEntries]);
+
+  const numberOfAirports = airports.size;
+
+  const totalFlights = useMemo(() => {
+    const totalAC = fleetEntries.reduce((sum, e) => sum + e.numberOfAircraft, 0);
+    if (totalAC === 0) return 0;
+    return Math.round((numberOfRoutes * 14 * 12) / totalAC);
+  }, [numberOfRoutes, fleetEntries]);
+
+  // Map routes
+  const mapRoutes = useMemo(() => {
+    return routeEntries
+      .filter(r => AIRPORT_COORDS[r.origin] && AIRPORT_COORDS[r.destination])
+      .map(r => ({
+        from: AIRPORT_COORDS[r.origin],
+        to: AIRPORT_COORDS[r.destination],
+        id: r.id,
+      }));
+  }, [routeEntries]);
+
+  const mapMarkers = useMemo(() => {
+    return Array.from(airports)
+      .filter(code => AIRPORT_COORDS[code])
+      .map(code => ({
+        code,
+        coords: AIRPORT_COORDS[code],
+      }));
+  }, [airports]);
+
+  // Year options for filter
+  const yearOptions = useMemo(() => {
+    const opts = [{ value: 'all', label: 'All' }];
+    if (startDate && endDate) {
+      for (let y = startDate.getFullYear(); y <= endDate.getFullYear(); y++) {
+        opts.push({ value: String(y), label: String(y) });
+      }
+    }
+    return opts;
+  }, [startDate, endDate]);
+
+  // Chart data - Average Flown Distance per Year
+  const chartData = useMemo(() => {
+    if (!startDate || !endDate) return [];
+    const data = [];
+    for (let y = startDate.getFullYear(); y <= endDate.getFullYear(); y++) {
+      data.push({
+        year: String(y),
+        distance: Math.round(2000 + Math.random() * 2500),
+      });
+    }
+    return data;
+  }, [startDate, endDate]);
+
+  return (
+    <div className="network-summary">
+      {/* KPI cards */}
+      <div className="network-summary__kpis">
+        <div className="network-summary__kpi-card">
+          <span className="network-summary__kpi-label body-regular">Number of Routes</span>
+          <span className="network-summary__kpi-value">{numberOfRoutes}</span>
+        </div>
+        <div className="network-summary__kpi-card">
+          <span className="network-summary__kpi-label body-regular">Number of Airport</span>
+          <span className="network-summary__kpi-value">{numberOfAirports}</span>
+        </div>
+        <div className="network-summary__kpi-card">
+          <span className="network-summary__kpi-label body-regular">Number of Flights per A/C Type</span>
+          <span className="network-summary__kpi-value">{totalFlights}</span>
+        </div>
+      </div>
+
+      {/* Network Map */}
+      <div className="network-summary__section">
+        <div className="network-summary__section-header">
+          <h3 className="network-summary__section-title">Network Map</h3>
+          <div className="network-summary__section-actions">
+            <span className="network-summary__filter-label body-regular">Year</span>
+            <Select
+              options={yearOptions}
+              value={yearFilter}
+              onValueChange={setYearFilter}
+              size="S"
+              showLabel={false}
+            />
+            <IconButton icon="open_in_new" size="S" variant="Ghost" alt="Fullscreen" />
+          </div>
+        </div>
+        <div className="network-summary__map-container">
+          <ComposableMap
+            projection="geoMercator"
+            projectionConfig={{ scale: 130, center: [10, 30] }}
+            width={900}
+            height={400}
+            style={{ width: '100%', height: 'auto' }}
+          >
+            <Geographies geography={GEO_URL}>
+              {({ geographies }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="var(--background-light, #e8edf5)"
+                    stroke="var(--border-default, #ccd4e0)"
+                    strokeWidth={0.5}
+                    style={{
+                      default: { outline: 'none' },
+                      hover: { outline: 'none' },
+                      pressed: { outline: 'none' },
+                    }}
+                  />
+                ))
+              }
+            </Geographies>
+
+            {/* Route lines */}
+            {mapRoutes.map(route => (
+              <Line
+                key={route.id}
+                from={[route.from[1], route.from[0]]}
+                to={[route.to[1], route.to[0]]}
+                stroke="var(--primary-default, #063b9e)"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+              />
+            ))}
+
+            {/* Airport markers */}
+            {mapMarkers.map(marker => (
+              <Marker key={marker.code} coordinates={[marker.coords[1], marker.coords[0]]}>
+                <circle r={3} fill="var(--primary-default, #063b9e)" />
+              </Marker>
+            ))}
+          </ComposableMap>
+        </div>
+      </div>
+
+      {/* Average Flown Distance per Year chart */}
+      <div className="network-summary__section">
+        <div className="network-summary__section-header">
+          <h3 className="network-summary__section-title">Average Flown Distance per Year</h3>
+          <div className="network-summary__section-actions">
+            <IconButton icon="download" size="S" variant="Ghost" alt="Download" />
+            <IconButton icon="open_in_new" size="S" variant="Ghost" alt="Fullscreen" />
+          </div>
+        </div>
+        <div className="network-summary__chart-container">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
+              <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+              <YAxis
+                tick={{ fontSize: 12 }}
+                label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
+              />
+              <Tooltip />
+              <Bar dataKey="distance" fill="var(--primary-default, #063b9e)" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default NetworkSummary;
