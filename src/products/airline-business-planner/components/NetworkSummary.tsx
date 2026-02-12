@@ -260,10 +260,10 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
                   <circle r={3 / mapZoom} fill="var(--primary-default, #063b9e)" />
                   <text
                     textAnchor="middle"
-                    y={-6 / mapZoom}
+                    y={-7 / mapZoom}
                     style={{
                       fontFamily: 'Inter, sans-serif',
-                      fontSize: `${10 / mapZoom}px`,
+                      fontSize: `${12 / mapZoom}px`,
                       fontWeight: 600,
                       fill: 'var(--text-corporate, #00205b)',
                       stroke: '#ffffff',
