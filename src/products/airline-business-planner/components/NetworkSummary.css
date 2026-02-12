@@ -1,17 +1,8 @@
-.network-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px 0 0 0;
-  /* Fill available viewport */
-  min-height: calc(100vh - 200px);
-}
-
 /* KPI cards */
 .network-summary__kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -36,9 +27,15 @@
   line-height: 1;
 }
 
-/* ChartCard overrides */
+/* ChartCard overrides - min height for readability, scroll if screen too small */
 .network-summary__chart-card {
-  min-height: 0;
+  min-height: 280px;
+  flex-shrink: 0;
+}
+
+/* Remove padding-top from tab-content when used for kpis */
+.network-summary__kpis:first-child {
+  padding-top: 0;
 }
 
 /* Filter inline (Year select in header) */
@@ -79,7 +76,7 @@
   gap: 2px;
   background: var(--background-main, #fff);
   border-radius: var(--radius-xs, 3px);
-  box-shadow: var(--shadow-1, 0 0 3px 0 rgba(0, 0, 0, 0.10));
+  box-shadow: var(--shadow-1, 0 0 3px 0 rgba(0, 0, 0, 0.1));
 }
 
 .network-summary__map-wrapper svg {
