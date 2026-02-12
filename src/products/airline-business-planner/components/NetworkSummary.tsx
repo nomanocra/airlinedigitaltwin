@@ -341,7 +341,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
                 if (bars[index]) (bars[index] as HTMLElement).style.fill = 'var(--primary-default, #063b9e)';
               }}
             >
-              <LabelList dataKey="distance" position="top" style={{ fontSize: 11, fill: 'var(--text-secondary, #63728a)' }} />
+              <LabelList dataKey="distance" position="top" style={{ fontSize: 11, fill: 'var(--primary-default, #063b9e)', stroke: '#ffffff', strokeWidth: 3, paintOrder: 'stroke fill' }} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
