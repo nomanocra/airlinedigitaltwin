@@ -2018,9 +2018,9 @@ export default function StudyPage() {
   }, [routePricingData, hasRoutes]);
 
   const fleetPlanErrors = useMemo(() => {
-    if (!hasRoutes || !hasAircraft) return 0;
+    if (!hasRoutes) return 0;
     return fleetPlanData.filter(f => !f.allocatedAircraftId).length;
-  }, [fleetPlanData, hasRoutes, hasAircraft]);
+  }, [fleetPlanData, hasRoutes]);
 
   const frequencyErrors = useMemo(() => {
     if (!hasRoutes) return 0;
@@ -2601,9 +2601,9 @@ export default function StudyPage() {
                   <Tab
                     label="Fleet Plan"
                     size="M"
-                    status={hasRoutes && hasAircraft && networkTab === 'fleet-plan' ? 'Active' : 'Default'}
-                    disabled={!hasRoutes || !hasAircraft}
-                    onClick={() => { if (hasRoutes && hasAircraft) setNetworkTab('fleet-plan'); }}
+                    status={hasRoutes && networkTab === 'fleet-plan' ? 'Active' : 'Default'}
+                    disabled={!hasRoutes}
+                    onClick={() => { if (hasRoutes) setNetworkTab('fleet-plan'); }}
                   />
                 </div>
                 <div className={`study-page__tab-wrapper${frequencyErrors > 0 ? ' study-page__tab-wrapper--error' : ''}`}>
