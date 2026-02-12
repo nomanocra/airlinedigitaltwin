@@ -104,7 +104,7 @@
   color: var(--ag-header-foreground-color);
 }
 
-.as-ag-grid .ag-header-cell:first-child:not(.ag-checkbox-header) {
+.as-ag-grid .ag-header-cell:first-child {
   padding-left: 16px;
 }
 
@@ -197,28 +197,8 @@
   border: none !important;
 }
 
-.as-ag-grid .ag-cell:first-child:not(.ag-checkbox-cell) {
+.as-ag-grid .ag-cell:first-child {
   padding-left: 16px;
-}
-
-/* Checkbox cell - remove extra padding and ensure centering */
-.as-ag-grid .ag-checkbox-cell {
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.as-ag-grid .ag-checkbox-header {
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Hide the extra comp-wrapper in checkbox header that causes misalignment */
-.as-ag-grid .ag-checkbox-header .ag-header-cell-comp-wrapper {
-  display: none !important;
 }
 
 .as-ag-grid .ag-cell,

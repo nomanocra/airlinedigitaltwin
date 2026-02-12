@@ -110,7 +110,7 @@
   flex-shrink: 0;
 }
 
-.study-page__fleet-content {
+.study-page__tab-content {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -121,7 +121,7 @@
   overflow-y: auto;
 }
 
-.study-page__main--computed .study-page__fleet-content,
+.study-page__main--computed .study-page__tab-content,
 .study-page__main--computed .study-page__content {
   padding-bottom: 16px;
 }

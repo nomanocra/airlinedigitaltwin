@@ -77,6 +77,7 @@ import moreHorizIcon from '../assets/svg/icons/more_horiz.svg?raw';
 import navigateBeforeIcon from '../assets/svg/icons/navigate_before.svg?raw';
 import navigateNextIcon from '../assets/svg/icons/navigate_next.svg?raw';
 import notificationsIcon from '../assets/svg/icons/notifications.svg?raw';
+import openInFullIcon from '../assets/svg/icons/open_in_full.svg?raw';
 import openInNewIcon from '../assets/svg/icons/open_in_new.svg?raw';
 import playIcon from '../assets/svg/icons/play.svg?raw';
 import removeIcon from '../assets/svg/icons/remove.svg?raw';
@@ -173,6 +174,7 @@ const iconMap: Record<string, string> = {
   'navigate_before': navigateBeforeIcon,
   'navigate_next': navigateNextIcon,
   'notifications': notificationsIcon,
+  'open_in_full': openInFullIcon,
   'open_in_new': openInNewIcon,
   'play': playIcon,
   'remove': removeIcon,
@@ -270,6 +272,7 @@ export const availableIcons = [
   'navigate_before',
   'navigate_next',
   'notifications',
+  'open_in_full',
   'open_in_new',
   'play',
   'remove',

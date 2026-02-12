@@ -2089,7 +2089,7 @@ export default function StudyPage() {
 
               {/* Fleet tab content */}
               {fleetTab === 'fleet' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   {/* Title bar */}
                   <div className="study-page__fleet-title-bar">
                     <div className="study-page__fleet-title-left">
@@ -2252,7 +2252,7 @@ export default function StudyPage() {
 
               {/* Cost Operations tab content */}
               {fleetTab === 'cost-operations' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Cost Operations</h2>
                     <div className="study-page__fleet-title-right">
@@ -2275,7 +2275,7 @@ export default function StudyPage() {
 
               {/* Cost Ownership tab content */}
               {fleetTab === 'cost-ownership' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Cost Ownership</h2>
                     <div className="study-page__fleet-title-right">
@@ -2298,7 +2298,7 @@ export default function StudyPage() {
 
               {/* Crew Configuration tab content */}
               {fleetTab === 'crew' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Crew Configuration</h2>
                     <div className="study-page__fleet-title-right">
@@ -2372,7 +2372,7 @@ export default function StudyPage() {
 
               {/* Routes tab content */}
               {networkTab === 'routes' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Routes</h2>
                     <div className="study-page__fleet-title-right">
@@ -2489,7 +2489,7 @@ export default function StudyPage() {
 
               {/* Pricing tab content */}
               {networkTab === 'pricing' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   {/* Discount input row - separate from title bar */}
                   <div className="study-page__pricing-discount-row">
                     <NumberInput
@@ -2541,7 +2541,7 @@ export default function StudyPage() {
 
               {/* Fleet Plan tab content */}
               {networkTab === 'fleet-plan' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Fleet Plan</h2>
                     <div className="study-page__fleet-title-right">
@@ -2564,7 +2564,7 @@ export default function StudyPage() {
 
               {/* Frequencies tab content */}
               {networkTab === 'frequencies' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Frequencies</h2>
                     <div className="study-page__fleet-title-right">
@@ -2585,7 +2585,7 @@ export default function StudyPage() {
               )}
 
               {networkTab === 'summary' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <NetworkSummary
                     routeEntries={routeEntries}
                     fleetEntries={fleetEntries}
@@ -2682,7 +2682,7 @@ export default function StudyPage() {
               )}
 
               {loadFactorTab === 'per-route' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Load Factor</h2>
                     <div className="study-page__fleet-title-right">
@@ -3111,7 +3111,7 @@ export default function StudyPage() {
 
               {/* Working Capital */}
               {financialTab === 'working-capital' && (
-                <div className="study-page__fleet-content">
+                <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
                     <h2 className="study-page__fleet-title">Working Capital</h2>
                     <div className="study-page__fleet-title-right">

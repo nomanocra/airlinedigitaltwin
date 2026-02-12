@@ -1,0 +1,105 @@
+/**
+ * ChartCard Component Styles
+ * A flexible card container for charts, maps, tables, or data visualizations.
+ */
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-main, var(--white, #ffffff));
+  border-radius: var(--radius-xs, 3px);
+  box-shadow: var(--shadow-2, 0 0 5px 0 rgba(0, 0, 0, 0.15));
+  overflow: hidden;
+  /* Default height - can be overridden via style prop */
+  height: 320px;
+}
+
+/* Header */
+.chart-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2xs, 4px);
+  padding: 16px 16px 0 16px;
+  background-color: var(--background-main, var(--white, #ffffff));
+  flex-shrink: 0;
+}
+
+.chart-card__title {
+  min-width: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--text-secondary, var(--cool-grey-70, #63728a));
+  flex-shrink: 0;
+}
+
+.chart-card__header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.chart-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Filters */
+.chart-card__filters {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 16px;
+  background-color: var(--background-main, var(--white, #ffffff));
+  flex-shrink: 0;
+}
+
+/* Content */
+.chart-card__content {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure content children fill available space */
+.chart-card__content > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Footer */
+.chart-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m, 16px);
+  padding: var(--spacing-xs, 8px);
+  background-color: var(--warm-grey-20, #f1f1f1);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+/* Dark mode support */
+html.dark .chart-card {
+  background-color: var(--background-main);
+  box-shadow: var(--shadow-2);
+}
+
+html.dark .chart-card__header,
+html.dark .chart-card__filters {
+  background-color: var(--background-main);
+}
+
+html.dark .chart-card__title {
+  color: var(--text-secondary);
+}
+
+html.dark .chart-card__footer {
+  background-color: var(--cool-grey-90, #2a2f38);
+}

@@ -130,6 +130,7 @@
 
   /* Shadow */
   --shadow-1: 0 0 3px 0 rgba(0, 0, 0, 0.10);
+  --shadow-2: 0 0 5px 0 rgba(0, 0, 0, 0.15);
 
   /* Feedback Success - Références Green */
   --feedback-success-default: var(--green-80);
@@ -194,6 +195,7 @@ html.dark {
 
   /* Shadow */
   --shadow-1: 0 0 3px 0 rgba(255, 255, 255, 0.15);
+  --shadow-2: 0 0 5px 0 rgba(255, 255, 255, 0.20);
 
   /* Feedback Success - Lighter greens */
   --feedback-success-default: #5ef7c4;

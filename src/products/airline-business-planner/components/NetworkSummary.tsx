@@ -166,7 +166,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
   }, [startDate, endDate]);
 
   return (
-    <div className="network-summary">
+    <>
       {/* KPI cards */}
       <div className="network-summary__kpis">
         <div className="network-summary__kpi-card">
@@ -202,7 +202,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
           <IconButton icon="open_in_full" size="XS" variant="Ghost" alt="Fullscreen" />
         }
         className="network-summary__chart-card"
-        style={{ flex: 1, height: 'auto' }}
+        style={{ flex: 1 }}
       >
         <div className="network-summary__map-wrapper">
           <ComposableMap
@@ -294,7 +294,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
           </>
         }
         className="network-summary__chart-card"
-        style={{ flex: 1, height: 'auto' }}
+        style={{ flex: 1 }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
@@ -304,12 +304,24 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
               tick={{ fontSize: 12 }}
               label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
             />
-            <Tooltip />
-            <Bar dataKey="distance" fill="var(--primary-default, #063b9e)" radius={[2, 2, 0, 0]} />
+            <Tooltip cursor={false} />
+            <Bar
+              dataKey="distance"
+              fill="var(--primary-default, #063b9e)"
+              radius={[2, 2, 0, 0]}
+              onMouseOver={(_, index) => {
+                const bars = document.querySelectorAll('.study-page__tab-content .recharts-bar-rectangle path');
+                if (bars[index]) (bars[index] as HTMLElement).style.fill = 'var(--primary-hover, #255fcc)';
+              }}
+              onMouseOut={(_, index) => {
+                const bars = document.querySelectorAll('.study-page__tab-content .recharts-bar-rectangle path');
+                if (bars[index]) (bars[index] as HTMLElement).style.fill = 'var(--primary-default, #063b9e)';
+              }}
+            />
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
-    </div>
+    </>
   );
 }
 
