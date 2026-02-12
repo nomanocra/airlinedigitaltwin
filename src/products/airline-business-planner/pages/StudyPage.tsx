@@ -1838,6 +1838,23 @@ export default function StudyPage() {
     });
   }, [routeEntries]);
 
+  // Clean up invalid allocatedAircraftId when fleet entries change
+  useEffect(() => {
+    const validAircraftIds = new Set(fleetEntries.map(e => e.id));
+    setFleetPlanData(prev => {
+      const updated = prev.map(f => {
+        // If the allocated aircraft no longer exists, set to null
+        if (f.allocatedAircraftId && !validAircraftIds.has(f.allocatedAircraftId)) {
+          return { ...f, allocatedAircraftId: null };
+        }
+        return f;
+      });
+      // Only update state if something actually changed
+      const hasChanges = updated.some((f, i) => f.allocatedAircraftId !== prev[i]?.allocatedAircraftId);
+      return hasChanges ? updated : prev;
+    });
+  }, [fleetEntries]);
+
   // Add route handler
   const handleAddRoute = (route: RouteEntry) => {
     setRouteEntries((prev) => [...prev, route]);
