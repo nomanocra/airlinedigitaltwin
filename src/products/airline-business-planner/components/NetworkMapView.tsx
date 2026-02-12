@@ -213,14 +213,14 @@ export function NetworkMapView({ routeEntries, startDate, endDate }: NetworkMapV
                 <circle r={3 / mapZoom} fill="var(--primary-default, #063b9e)" />
                 <text
                   textAnchor="middle"
-                  y={-7 / mapZoom}
+                  y={-6 / mapZoom}
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: `${12 / mapZoom}px`,
+                    fontSize: `${10 / mapZoom}px`,
                     fontWeight: 600,
                     fill: 'var(--text-corporate, #00205b)',
                     stroke: '#ffffff',
-                    strokeWidth: 3 / mapZoom,
+                    strokeWidth: 2.5 / mapZoom,
                     paintOrder: 'stroke fill',
                   }}
                 >

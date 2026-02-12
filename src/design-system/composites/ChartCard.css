@@ -26,10 +26,11 @@
 
 .chart-card__title {
   min-width: 0;
+  /* label-medium-s */
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 20px;
   color: var(--text-secondary, var(--cool-grey-70, #63728a));
   flex-shrink: 0;
 }

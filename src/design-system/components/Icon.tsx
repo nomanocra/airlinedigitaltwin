@@ -71,6 +71,7 @@ import keyboardArrowRightIcon from '../assets/svg/icons/keyboard_arrow_right.svg
 import keyboardArrowUpIcon from '../assets/svg/icons/keyboard_arrow_up.svg?raw';
 import lightModeIcon from '../assets/svg/icons/light_mode.svg?raw';
 import listIcon from '../assets/svg/icons/list.svg?raw';
+import mapIcon from '../assets/svg/icons/map.svg?raw';
 import menuIcon from '../assets/svg/icons/menu.svg?raw';
 import monetizationOnIcon from '../assets/svg/icons/monetization_on.svg?raw';
 import moreHorizIcon from '../assets/svg/icons/more_horiz.svg?raw';
@@ -168,6 +169,7 @@ const iconMap: Record<string, string> = {
   'keyboard_arrow_up': keyboardArrowUpIcon,
   'light_mode': lightModeIcon,
   'list': listIcon,
+  'map': mapIcon,
   'menu': menuIcon,
   'monetization_on': monetizationOnIcon,
   'more_horiz': moreHorizIcon,
@@ -266,6 +268,7 @@ export const availableIcons = [
   'keyboard_arrow_up',
   'light_mode',
   'list',
+  'map',
   'menu',
   'monetization_on',
   'more_horiz',
