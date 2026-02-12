@@ -737,13 +737,13 @@ export default function StudyPage() {
       const yearIndex = y - start.getFullYear() + 1;
       columns.push({
         field: `Y${yearIndex}`,
-        headerName: `Y${yearIndex}`,
+        headerName: periodType === 'duration' ? `Y${yearIndex}` : String(y),
         flex: 1,
         minWidth: 90,
       });
     }
     return columns;
-  }, []);
+  }, [periodType]);
 
   // Utility: Generate year keys from period
   const yearKeys = useMemo(() => {
@@ -754,6 +754,13 @@ export default function StudyPage() {
     }
     return keys;
   }, [startDate, endDate]);
+
+  // Utility: Map year key (Y1, Y2...) to display label based on periodType
+  const yearKeyToLabel = useCallback((key: string): string => {
+    if (periodType === 'duration' || !startDate) return key;
+    const idx = parseInt(key.replace('Y', ''), 10);
+    return String(startDate.getFullYear() + idx - 1);
+  }, [periodType, startDate]);
 
   // Utility: Generate month keys from period
   const monthKeys = useMemo(() => {
@@ -803,9 +810,11 @@ export default function StudyPage() {
 
   // ========== LOAD FACTOR: Column Definitions ==========
   const targetedYearlyLFColDefs = useMemo<ColDef[]>(() => {
-    const yearCols = ['Y2', 'Y3', 'Y4', 'Y5', 'Y6'].map(y => ({
+    // Skip Y1 (startup year uses ramp-up instead)
+    const lfYearKeys = yearKeys.filter(k => k !== 'Y1');
+    const yearCols = lfYearKeys.map(y => ({
       field: y,
-      headerName: y,
+      headerName: yearKeyToLabel(y),
       flex: 1,
       minWidth: 90,
       cellRenderer: (props: ICellRendererParams) => {
@@ -826,7 +835,7 @@ export default function StudyPage() {
       { field: 'classType', headerName: '', width: 120, pinned: 'left' as const },
       ...yearCols,
     ];
-  }, []);
+  }, [yearKeys, yearKeyToLabel]);
 
   const targetedYearlyLFRowData = useMemo(() =>
     Object.entries(targetedYearlyLF).map(([classType, values]) => ({ classType, ...values })),
@@ -951,7 +960,7 @@ export default function StudyPage() {
     const editableMetrics = ['Market Share (%)', 'Price per kg', 'Number of Sectors'];
     const yCols = yearKeys.map(y => ({
       field: y,
-      headerName: y,
+      headerName: yearKeyToLabel(y),
       flex: 1,
       minWidth: 100,
       cellRenderer: (props: ICellRendererParams) => {
@@ -982,7 +991,7 @@ export default function StudyPage() {
       { field: 'metric', headerName: '', width: 200, pinned: 'left' as const },
       ...yCols,
     ];
-  }, [yearKeys]);
+  }, [yearKeys, yearKeyToLabel]);
 
   // Cargo monthly data (read-only)
   const cargoMonthlyRowData = useMemo(() => [
@@ -1007,7 +1016,7 @@ export default function StudyPage() {
   const inflationColDefs = useMemo<ColDef[]>(() => {
     const yCols = yearKeys.map(y => ({
       field: y,
-      headerName: y,
+      headerName: yearKeyToLabel(y),
       flex: 1,
       minWidth: 90,
       cellRenderer: (props: ICellRendererParams) => {
@@ -1027,7 +1036,7 @@ export default function StudyPage() {
       { field: 'factor', headerName: '', width: 220, pinned: 'left' as const },
       ...yCols,
     ];
-  }, [yearKeys]);
+  }, [yearKeys, yearKeyToLabel]);
 
   // Working Capital data initialization
   const workingCapitalRowData = useMemo(() => {
@@ -1085,18 +1094,18 @@ export default function StudyPage() {
   const sellingCostYearlyInputs = useMemo(() => {
     return yearKeys.map(y => ({
       key: y,
-      label: y,
+      label: yearKeyToLabel(y),
       value: sellingCostPerPax[y] ?? 0,
     }));
-  }, [yearKeys, sellingCostPerPax]);
+  }, [yearKeys, yearKeyToLabel, sellingCostPerPax]);
 
   const marketingBudgetYearlyInputs = useMemo(() => {
     return yearKeys.map(y => ({
       key: y,
-      label: y,
+      label: yearKeyToLabel(y),
       value: marketingBudget[y] ?? 0,
     }));
-  }, [yearKeys, marketingBudget]);
+  }, [yearKeys, yearKeyToLabel, marketingBudget]);
 
   // Gantt rows: expand fleet entries by numberOfAircraft
   const ganttRows = useMemo<GanttAircraftRow[]>(() =>
