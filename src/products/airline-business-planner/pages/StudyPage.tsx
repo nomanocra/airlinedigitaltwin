@@ -3,6 +3,86 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, type ICellRendererParams, type ColDef } from 'ag-grid-community';
 import { useFavicon } from '@/hooks/useFavicon';
+
+// ========== LOCAL STORAGE PERSISTENCE ==========
+const STORAGE_PREFIX = 'abp_study_';
+
+interface PersistedStudyData {
+  // Meta
+  studyName: string;
+  workspaceName: string;
+  studyStatus: string;
+  // Period
+  periodType: 'dates' | 'duration';
+  simulationYears: number;
+  startDate: string | null;
+  endDate: string | null;
+  operatingDays: number;
+  startupDuration: number;
+  // Fleet
+  fleetEntries: Array<{
+    id: string;
+    aircraftType: string;
+    engine: string;
+    layout: string;
+    numberOfAircraft: number;
+    enterInService: string;
+    retirement?: string;
+    ownership: 'Owned' | 'Leased';
+  }>;
+  costOperationsData: Array<{ id: string; groundHandlingCharge: number; fuelAgeingFactor: number }>;
+  costOwnershipData: Array<{ id: string; monthlyLeaseRate: number; acValueUponAcquisition: number; sparesProvisioningPerFamily: number }>;
+  crewConfigData: Array<{ id: string; captainPerCrew: number; firstOfficerPerCrew: number; cabinManagerPerCrew: number; cabinAttendantPerCrew: number }>;
+  // Network
+  routeEntries: Array<{ id: string; origin: string; destination: string; startDate: string; endDate: string }>;
+  routePricingData: Array<{ routeId: string; marketYield: number; discountStrategy: string; yield: number; fare: number }>;
+  fleetPlanData: Array<{ routeId: string; allocatedAircraftId: string | null }>;
+  routeFrequencyData: Array<{ routeId: string; frequencies: Record<string, number> }>;
+  discountForNormalFares: number;
+}
+
+function getStorageKey(studyId: string | undefined): string {
+  return `${STORAGE_PREFIX}${studyId || 'default'}`;
+}
+
+function loadFromStorage(studyId: string | undefined): PersistedStudyData | null {
+  try {
+    const key = getStorageKey(studyId);
+    const data = localStorage.getItem(key);
+    if (data) {
+      return JSON.parse(data) as PersistedStudyData;
+    }
+  } catch (e) {
+    console.warn('Failed to load study from localStorage:', e);
+  }
+  return null;
+}
+
+function saveToStorage(studyId: string | undefined, data: PersistedStudyData): void {
+  try {
+    const key = getStorageKey(studyId);
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn('Failed to save study to localStorage:', e);
+  }
+}
+
+// Debounce helper
+function useDebouncedCallback<T extends (...args: Parameters<T>) => void>(
+  callback: T,
+  delay: number
+): T {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return useCallback((...args: Parameters<T>) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]) as T;
+}
 import { AppHeader } from '@/design-system/composites/AppHeader';
 import { LeftPanel } from '@/design-system/composites/LeftPanel';
 import { PanelHeader } from '@/design-system/composites/PanelHeader';
@@ -183,9 +263,23 @@ export default function StudyPage() {
       }>;
     };
   } | null;
-  const studyName = locationState?.studyName || 'Study Name';
-  const workspaceName = locationState?.workspaceName || 'Workspace Name';
+
+  // Load persisted data from localStorage (fallback if no location.state)
+  const persistedData = useMemo(() => {
+    if (locationState?.studyData) return null; // Use location.state if available
+    return loadFromStorage(studyId);
+  }, [studyId, locationState]);
+
+  const studyName = locationState?.studyName || persistedData?.studyName || 'Study Name';
+  const workspaceName = locationState?.workspaceName || persistedData?.workspaceName || 'Workspace Name';
   const studyData = locationState?.studyData;
+
+  // Helper to parse date strings
+  const parseDate = (dateStr: string | undefined | null): Date | undefined => {
+    if (!dateStr) return undefined;
+    const parsed = new Date(dateStr);
+    return isNaN(parsed.getTime()) ? undefined : parsed;
+  };
 
   useFavicon('airline-business-planner');
 
@@ -204,42 +298,36 @@ export default function StudyPage() {
     itemId: 'period',
   });
 
-  // Helper to parse date strings like "Jan 01, 2026"
-  const parseDate = (dateStr: string | undefined): Date | undefined => {
-    if (!dateStr) return undefined;
-    const parsed = new Date(dateStr);
-    return isNaN(parsed.getTime()) ? undefined : parsed;
-  };
-
-  // Form state (Simulation Period) - pre-fill if studyData exists
-  const [periodType, setPeriodType] = useState<'dates' | 'duration'>('dates');
-  const [simulationYears, setSimulationYears] = useState<number>(4);
-  const [startDate, setStartDate] = useState<Date | undefined>(() => parseDate(studyData?.startDate));
-  const [endDate, setEndDate] = useState<Date | undefined>(() => parseDate(studyData?.endDate));
+  // Form state (Simulation Period) - pre-fill from studyData or persistedData
+  const [periodType, setPeriodType] = useState<'dates' | 'duration'>(() => persistedData?.periodType || 'dates');
+  const [simulationYears, setSimulationYears] = useState<number>(() => persistedData?.simulationYears || 4);
+  const [startDate, setStartDate] = useState<Date | undefined>(() => parseDate(studyData?.startDate) || parseDate(persistedData?.startDate));
+  const [endDate, setEndDate] = useState<Date | undefined>(() => parseDate(studyData?.endDate) || parseDate(persistedData?.endDate));
   // Saved dates for restoring when switching back from duration to dates mode
-  const savedDatesRef = useRef<{ start?: Date; end?: Date }>({ start: parseDate(studyData?.startDate), end: parseDate(studyData?.endDate) });
+  const savedDatesRef = useRef<{ start?: Date; end?: Date }>({ start: parseDate(studyData?.startDate) || parseDate(persistedData?.startDate), end: parseDate(studyData?.endDate) || parseDate(persistedData?.endDate) });
   // Saved fleet/route entry dates per mode
   const savedFleetDatesRef = useRef<Record<string, { enterInService: Date; retirement?: Date }>>({});
   const savedRouteDatesRef = useRef<Record<string, { startDate: Date; endDate: Date }>>({});
   const savedFleetDatesDurationRef = useRef<Record<string, { enterInService: Date; retirement?: Date }>>({});
   const savedRouteDatesDurationRef = useRef<Record<string, { startDate: Date; endDate: Date }>>({});
-  const [operatingDays, setOperatingDays] = useState<number>(studyData ? 365 : 0);
-  const [startupDuration, setStartupDuration] = useState<number>(studyData ? 6 : 0);
+  const [operatingDays, setOperatingDays] = useState<number>(() => persistedData?.operatingDays ?? (studyData ? 365 : 0));
+  const [startupDuration, setStartupDuration] = useState<number>(() => persistedData?.startupDuration ?? (studyData ? 6 : 0));
 
   // Fleet sub-tab state
   const [fleetTab, setFleetTab] = useState<FleetTabType>('fleet');
   const [fleetViewMode, setFleetViewMode] = useState<FleetViewMode>('table');
   const [fleetSearchValue, setFleetSearchValue] = useState('');
 
-  // Fleet cost and crew data
-  const [costOperationsData, setCostOperationsData] = useState<FleetCostOperationsEntry[]>([]);
-  const [costOwnershipData, setCostOwnershipData] = useState<FleetCostOwnershipEntry[]>([]);
-  const [crewConfigData, setCrewConfigData] = useState<CrewConfigEntry[]>([]);
+  // Fleet cost and crew data - load from persistedData if available
+  const [costOperationsData, setCostOperationsData] = useState<FleetCostOperationsEntry[]>(() => persistedData?.costOperationsData || []);
+  const [costOwnershipData, setCostOwnershipData] = useState<FleetCostOwnershipEntry[]>(() => persistedData?.costOwnershipData || []);
+  const [crewConfigData, setCrewConfigData] = useState<CrewConfigEntry[]>(() => persistedData?.crewConfigData || []);
 
   // Network tab state
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('routes');
   const [routesViewMode, setRoutesViewMode] = useState<RoutesViewMode>('table');
   const [routeEntries, setRouteEntries] = useState<RouteEntry[]>(() => {
+    // First try studyData (from navigation)
     if (studyData?.routes) {
       return studyData.routes.map(r => ({
         id: r.id,
@@ -249,15 +337,25 @@ export default function StudyPage() {
         endDate: new Date(r.endDate),
       }));
     }
+    // Then try persistedData (from localStorage)
+    if (persistedData?.routeEntries) {
+      return persistedData.routeEntries.map(r => ({
+        id: r.id,
+        origin: r.origin,
+        destination: r.destination,
+        startDate: new Date(r.startDate),
+        endDate: new Date(r.endDate),
+      }));
+    }
     return [];
   });
-  const [routePricingData, setRoutePricingData] = useState<RoutePricingEntry[]>([]);
-  const [fleetPlanData, setFleetPlanData] = useState<FleetPlanEntry[]>([]);
-  const [routeFrequencyData, setRouteFrequencyData] = useState<RouteFrequencyEntry[]>([]);
+  const [routePricingData, setRoutePricingData] = useState<RoutePricingEntry[]>(() => persistedData?.routePricingData || []);
+  const [fleetPlanData, setFleetPlanData] = useState<FleetPlanEntry[]>(() => persistedData?.fleetPlanData || []);
+  const [routeFrequencyData, setRouteFrequencyData] = useState<RouteFrequencyEntry[]>(() => persistedData?.routeFrequencyData || []);
   const [isAddRouteModalOpen, setIsAddRouteModalOpen] = useState(false);
   const [isEditRouteModalOpen, setIsEditRouteModalOpen] = useState(false);
   const [isImportAirlineNetworkModalOpen, setIsImportAirlineNetworkModalOpen] = useState(false);
-  const [discountForNormalFares, setDiscountForNormalFares] = useState<number>(0);
+  const [discountForNormalFares, setDiscountForNormalFares] = useState<number>(() => persistedData?.discountForNormalFares ?? 0);
 
   // ========== LOAD FACTOR STATE ==========
   const [loadFactorTab, setLoadFactorTab] = useState<LoadFactorTabType>('general');
@@ -351,8 +449,9 @@ export default function StudyPage() {
   const [acPreparationAmortRate, setAcPreparationAmortRate] = useState(3);
   const [workingCapitalData, setWorkingCapitalData] = useState<Array<{ category: string; item: string; [key: string]: number | string }>>([]);
 
-  // Fleet data - pre-fill if studyData exists
+  // Fleet data - pre-fill from studyData or persistedData
   const [fleetEntries, setFleetEntries] = useState<FleetEntry[]>(() => {
+    // First try studyData (from navigation)
     if (studyData?.fleet) {
       return studyData.fleet.map((f, index) => ({
         id: f.id,
@@ -361,8 +460,21 @@ export default function StudyPage() {
         layout: f.layout,
         numberOfAircraft: f.numberOfAircraft,
         enterInService: new Date(f.enterInService),
-        retirement: f.retirement ? new Date(f.retirement) : undefined,
+        retirement: undefined,
         ownership: (index % 2 === 0 ? 'Owned' : 'Leased') as const,
+      }));
+    }
+    // Then try persistedData (from localStorage)
+    if (persistedData?.fleetEntries) {
+      return persistedData.fleetEntries.map(f => ({
+        id: f.id,
+        aircraftType: f.aircraftType,
+        engine: f.engine,
+        layout: f.layout,
+        numberOfAircraft: f.numberOfAircraft,
+        enterInService: new Date(f.enterInService),
+        retirement: f.retirement ? new Date(f.retirement) : undefined,
+        ownership: f.ownership,
       }));
     }
     return [];
@@ -2057,6 +2169,56 @@ export default function StudyPage() {
     0
   );
 
+  // ========== PERSIST TO LOCALSTORAGE (debounced) ==========
+  const debouncedSave = useDebouncedCallback(() => {
+    const dataToSave: PersistedStudyData = {
+      studyName,
+      workspaceName,
+      studyStatus: studyData?.status || studyStatus,
+      periodType,
+      simulationYears,
+      startDate: startDate?.toISOString() || null,
+      endDate: endDate?.toISOString() || null,
+      operatingDays,
+      startupDuration,
+      fleetEntries: fleetEntries.map(f => ({
+        id: f.id,
+        aircraftType: f.aircraftType,
+        engine: f.engine,
+        layout: f.layout,
+        numberOfAircraft: f.numberOfAircraft,
+        enterInService: f.enterInService.toISOString(),
+        retirement: f.retirement?.toISOString(),
+        ownership: f.ownership,
+      })),
+      costOperationsData,
+      costOwnershipData,
+      crewConfigData,
+      routeEntries: routeEntries.map(r => ({
+        id: r.id,
+        origin: r.origin,
+        destination: r.destination,
+        startDate: r.startDate.toISOString(),
+        endDate: r.endDate.toISOString(),
+      })),
+      routePricingData,
+      fleetPlanData,
+      routeFrequencyData,
+      discountForNormalFares,
+    };
+    saveToStorage(studyId, dataToSave);
+  }, 500);
+
+  // Save whenever relevant state changes
+  useEffect(() => {
+    debouncedSave();
+  }, [
+    periodType, simulationYears, startDate, endDate, operatingDays, startupDuration,
+    fleetEntries, costOperationsData, costOwnershipData, crewConfigData,
+    routeEntries, routePricingData, fleetPlanData, routeFrequencyData, discountForNormalFares,
+    debouncedSave
+  ]);
+
   return (
     <div className="study-page">
       <AppHeader
@@ -3013,10 +3175,14 @@ export default function StudyPage() {
                       showInfo
                       infoText="Average fuel price including distribution costs"
                     />
-                    <div className="study-page__readonly-field">
-                      <span className="study-page__readonly-label">Av. Fuel Price (USD/kg)</span>
-                      <div className="study-page__readonly-value">{(fuelPricePerGallon * 0.264172).toFixed(2)}</div>
-                    </div>
+                    <NumberInput
+                      label="Av. Fuel Price (USD/kg)"
+                      value={Number((fuelPricePerGallon * 0.264172).toFixed(2))}
+                      onChange={() => {}}
+                      size="S"
+                      showLabel
+                      disabled
+                    />
                     <NumberInput
                       label="Fuel Deposits in Advance (month)"
                       value={fuelDepositsMonths}
