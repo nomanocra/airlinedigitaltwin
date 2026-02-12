@@ -19,6 +19,11 @@ export interface FleetEntryForEdit {
   ownership: 'Owned' | 'Leased';
 }
 
+interface RelativeMonthOption {
+  value: string;
+  label: string;
+}
+
 interface EditFleetModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,6 +31,8 @@ interface EditFleetModalProps {
   selectedEntries: FleetEntryForEdit[];
   simulationStartDate?: Date;
   simulationEndDate?: Date;
+  periodType?: 'dates' | 'duration';
+  relativeMonthOptions?: RelativeMonthOption[];
 }
 
 function checkUniformValue<T>(entries: FleetEntryForEdit[], getter: (e: FleetEntryForEdit) => T): { isUniform: boolean; value: T | undefined } {
@@ -48,6 +55,8 @@ export function EditFleetModal({
   selectedEntries,
   simulationStartDate,
   simulationEndDate,
+  periodType = 'dates',
+  relativeMonthOptions = [],
 }: EditFleetModalProps) {
   // Determine if values are uniform across selection
   const numberOfAircraftCheck = useMemo(
@@ -155,33 +164,68 @@ export function EditFleetModal({
             size="M"
             placeholder={!numberOfAircraftCheck.isUniform ? 'Multiple values' : '1'}
           />
-          <Calendar
-            label="Enter in Service"
-            placeholder={!enterInServiceCheck.isUniform ? 'Multiple values' : 'Select a month'}
-            mode="month"
-            value={enterInService}
-            onChange={(val) => {
-              setEnterInService(val);
-              setEnterInServiceModified(true);
-            }}
-            size="M"
-            minDate={simulationStartDate}
-            maxDate={simulationEndDate}
-          />
-          <Calendar
-            label="Retirement"
-            placeholder={!retirementCheck.isUniform ? 'Multiple values' : (retirementCheck.value === undefined ? 'None' : 'Select a month')}
-            mode="month"
-            value={retirement}
-            onChange={(val) => {
-              setRetirement(val);
-              setRetirementModified(true);
-            }}
-            size="M"
-            minDate={enterInService || simulationStartDate}
-            maxDate={simulationEndDate}
-            showOptional
-          />
+          {periodType === 'duration' ? (
+            <Select
+              label="Enter in Service"
+              placeholder={!enterInServiceCheck.isUniform ? 'Multiple values' : 'Select'}
+              options={relativeMonthOptions}
+              value={enterInService ? `${enterInService.getFullYear()}-${String(enterInService.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                const [y, m] = key.split('-').map(Number);
+                setEnterInService(new Date(y, m - 1, 1));
+                setEnterInServiceModified(true);
+              }}
+              size="M"
+            />
+          ) : (
+            <Calendar
+              label="Enter in Service"
+              placeholder={!enterInServiceCheck.isUniform ? 'Multiple values' : 'Select a month'}
+              mode="month"
+              value={enterInService}
+              onChange={(val) => {
+                setEnterInService(val);
+                setEnterInServiceModified(true);
+              }}
+              size="M"
+              minDate={simulationStartDate}
+              maxDate={simulationEndDate}
+            />
+          )}
+          {periodType === 'duration' ? (
+            <Select
+              label="Retirement"
+              placeholder={!retirementCheck.isUniform ? 'Multiple values' : (retirementCheck.value === undefined ? 'None' : 'Select')}
+              options={relativeMonthOptions}
+              value={retirement ? `${retirement.getFullYear()}-${String(retirement.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                if (key) {
+                  const [y, m] = key.split('-').map(Number);
+                  setRetirement(new Date(y, m - 1, 1));
+                } else {
+                  setRetirement(undefined);
+                }
+                setRetirementModified(true);
+              }}
+              size="M"
+              showOptional
+            />
+          ) : (
+            <Calendar
+              label="Retirement"
+              placeholder={!retirementCheck.isUniform ? 'Multiple values' : (retirementCheck.value === undefined ? 'None' : 'Select a month')}
+              mode="month"
+              value={retirement}
+              onChange={(val) => {
+                setRetirement(val);
+                setRetirementModified(true);
+              }}
+              size="M"
+              minDate={enterInService || simulationStartDate}
+              maxDate={simulationEndDate}
+              showOptional
+            />
+          )}
           <Select
             label="Ownership"
             placeholder={!ownershipCheck.isUniform ? 'Multiple values' : 'Select...'}

@@ -595,10 +595,17 @@ export interface FleetEntry {
   ownership: 'Owned' | 'Leased';
 }
 
+interface RelativeMonthOption {
+  value: string;
+  label: string;
+}
+
 interface AddAircraftModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddAircraft: (aircraft: FleetEntry) => void;
+  periodType?: 'dates' | 'duration';
+  relativeMonthOptions?: RelativeMonthOption[];
 }
 
 // Ownership options
@@ -607,7 +614,7 @@ const OWNERSHIP_OPTIONS = [
   { value: 'Leased', label: 'Leased' },
 ];
 
-export function AddAircraftModal({ isOpen, onClose, onAddAircraft }: AddAircraftModalProps) {
+export function AddAircraftModal({ isOpen, onClose, onAddAircraft, periodType = 'dates', relativeMonthOptions = [] }: AddAircraftModalProps) {
   // Step 1: Aircraft selection state
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   const [selectedPath, setSelectedPath] = useState<AircraftTreeNode[]>([]);
@@ -767,23 +774,56 @@ export function AddAircraftModal({ isOpen, onClose, onAddAircraft }: AddAircraft
             min={1}
             state={numberOfAircraft < 1 ? 'Error' : 'Default'}
           />
-          <Calendar
-            label="Entry into Service"
-            placeholder="Select a month"
-            mode="month"
-            value={entryIntoService}
-            onChange={setEntryIntoService}
-            size="S"
-          />
-          <Calendar
-            label="Retirement"
-            placeholder="None"
-            mode="month"
-            value={retirement}
-            onChange={setRetirement}
-            size="S"
-            showOptional
-          />
+          {periodType === 'duration' ? (
+            <Select
+              label="Entry into Service"
+              placeholder="Select"
+              options={relativeMonthOptions}
+              value={entryIntoService ? `${entryIntoService.getFullYear()}-${String(entryIntoService.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                const [y, m] = key.split('-').map(Number);
+                setEntryIntoService(new Date(y, m - 1, 1));
+              }}
+              size="S"
+            />
+          ) : (
+            <Calendar
+              label="Entry into Service"
+              placeholder="Select a month"
+              mode="month"
+              value={entryIntoService}
+              onChange={setEntryIntoService}
+              size="S"
+            />
+          )}
+          {periodType === 'duration' ? (
+            <Select
+              label="Retirement"
+              placeholder="None"
+              options={relativeMonthOptions}
+              value={retirement ? `${retirement.getFullYear()}-${String(retirement.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                if (key) {
+                  const [y, m] = key.split('-').map(Number);
+                  setRetirement(new Date(y, m - 1, 1));
+                } else {
+                  setRetirement(undefined);
+                }
+              }}
+              size="S"
+              showOptional
+            />
+          ) : (
+            <Calendar
+              label="Retirement"
+              placeholder="None"
+              mode="month"
+              value={retirement}
+              onChange={setRetirement}
+              size="S"
+              showOptional
+            />
+          )}
           <Select
             label="Ownership"
             options={OWNERSHIP_OPTIONS}

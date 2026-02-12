@@ -3,6 +3,7 @@ import { Modal } from '@/design-system/composites/Modal';
 import { Button } from '@/design-system/components/Button';
 import { Combobox, ComboboxOption } from '@/design-system/components/Combobox';
 import { Calendar } from '@/design-system/composites/Calendar';
+import { Select } from '@/design-system/components/Select';
 import './AddRouteModal.css';
 
 const AIRPORT_OPTIONS: ComboboxOption[] = [
@@ -64,12 +65,19 @@ export interface RouteEntry {
   endDate: Date;
 }
 
+interface RelativeMonthOption {
+  value: string;
+  label: string;
+}
+
 interface AddRouteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddRoute: (route: RouteEntry) => void;
   simulationStartDate?: Date;
   simulationEndDate?: Date;
+  periodType?: 'dates' | 'duration';
+  relativeMonthOptions?: RelativeMonthOption[];
 }
 
 export function AddRouteModal({
@@ -78,6 +86,8 @@ export function AddRouteModal({
   onAddRoute,
   simulationStartDate,
   simulationEndDate,
+  periodType = 'dates',
+  relativeMonthOptions = [],
 }: AddRouteModalProps) {
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
@@ -161,32 +171,66 @@ export function AddRouteModal({
             showLegend={destination === ''}
             legend="Required"
           />
-          <Calendar
-            label="Start Date"
-            placeholder="Select a month"
-            mode="month"
-            value={startDate}
-            onChange={setStartDate}
-            size="M"
-            state={!startDate ? 'Error' : 'Default'}
-            showLegend={!startDate}
-            legend="Required"
-            minDate={simulationStartDate}
-            maxDate={simulationEndDate}
-          />
-          <Calendar
-            label="End Date"
-            placeholder="Select a month"
-            mode="month"
-            value={endDate}
-            onChange={setEndDate}
-            size="M"
-            state={!endDate ? 'Error' : 'Default'}
-            showLegend={!endDate}
-            legend="Required"
-            minDate={startDate || simulationStartDate}
-            maxDate={simulationEndDate}
-          />
+          {periodType === 'duration' ? (
+            <Select
+              label="Start Date"
+              placeholder="Select"
+              options={relativeMonthOptions}
+              value={startDate ? `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                const [y, m] = key.split('-').map(Number);
+                setStartDate(new Date(y, m - 1, 1));
+              }}
+              size="M"
+              state={!startDate ? 'Error' : 'Default'}
+              showLegend={!startDate}
+              legend="Required"
+            />
+          ) : (
+            <Calendar
+              label="Start Date"
+              placeholder="Select a month"
+              mode="month"
+              value={startDate}
+              onChange={setStartDate}
+              size="M"
+              state={!startDate ? 'Error' : 'Default'}
+              showLegend={!startDate}
+              legend="Required"
+              minDate={simulationStartDate}
+              maxDate={simulationEndDate}
+            />
+          )}
+          {periodType === 'duration' ? (
+            <Select
+              label="End Date"
+              placeholder="Select"
+              options={relativeMonthOptions}
+              value={endDate ? `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                const [y, m] = key.split('-').map(Number);
+                setEndDate(new Date(y, m - 1, 1));
+              }}
+              size="M"
+              state={!endDate ? 'Error' : 'Default'}
+              showLegend={!endDate}
+              legend="Required"
+            />
+          ) : (
+            <Calendar
+              label="End Date"
+              placeholder="Select a month"
+              mode="month"
+              value={endDate}
+              onChange={setEndDate}
+              size="M"
+              state={!endDate ? 'Error' : 'Default'}
+              showLegend={!endDate}
+              legend="Required"
+              minDate={startDate || simulationStartDate}
+              maxDate={simulationEndDate}
+            />
+          )}
         </div>
       </div>
     </Modal>

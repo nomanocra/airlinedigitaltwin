@@ -128,7 +128,7 @@ interface GanttAircraftRow {
 
 // Assumption items configuration
 const ASSUMPTION_ITEMS = [
-  { id: 'period', label: 'Period', icon: 'calendar_month' },
+  { id: 'period', label: 'Global Settings', icon: 'calendar_month' },
   { id: 'fleet', label: 'Fleet', icon: 'AIR_fleet' },
   { id: 'network', label: 'Network', icon: 'share' },
   { id: 'load-factor', label: 'Load factor', icon: 'airline_seat_recline_extra' },
@@ -210,10 +210,89 @@ export default function StudyPage() {
   };
 
   // Form state (Simulation Period) - pre-fill if studyData exists
+  const [periodType, setPeriodType] = useState<'dates' | 'duration'>('dates');
+  const [simulationYears, setSimulationYears] = useState<number>(1);
   const [startDate, setStartDate] = useState<Date | undefined>(() => parseDate(studyData?.startDate));
   const [endDate, setEndDate] = useState<Date | undefined>(() => parseDate(studyData?.endDate));
+  // Saved dates for restoring when switching back from duration to dates mode
+  const savedDatesRef = useRef<{ start?: Date; end?: Date }>({ start: parseDate(studyData?.startDate), end: parseDate(studyData?.endDate) });
+  // Saved fleet/route entry dates per mode
+  const savedFleetDatesRef = useRef<Record<string, { enterInService: Date; retirement?: Date }>>({});
+  const savedRouteDatesRef = useRef<Record<string, { startDate: Date; endDate: Date }>>({});
+  const savedFleetDatesDurationRef = useRef<Record<string, { enterInService: Date; retirement?: Date }>>({});
+  const savedRouteDatesDurationRef = useRef<Record<string, { startDate: Date; endDate: Date }>>({});
   const [operatingDays, setOperatingDays] = useState<number>(studyData ? 365 : 0);
   const [startupDuration, setStartupDuration] = useState<number>(studyData ? 6 : 0);
+
+  // Handle period type switching — save/restore dates for period and entries
+  const handlePeriodTypeChange = useCallback((newType: string) => {
+    if (newType === 'duration' && periodType === 'dates') {
+      // Save current dates-mode data
+      savedDatesRef.current = { start: startDate, end: endDate };
+      const fleetSnapshot: Record<string, { enterInService: Date; retirement?: Date }> = {};
+      fleetEntries.forEach(e => { fleetSnapshot[e.id] = { enterInService: e.enterInService, retirement: e.retirement }; });
+      savedFleetDatesRef.current = fleetSnapshot;
+      const routeSnapshot: Record<string, { startDate: Date; endDate: Date }> = {};
+      routeEntries.forEach(r => { routeSnapshot[r.id] = { startDate: r.startDate, endDate: r.endDate }; });
+      savedRouteDatesRef.current = routeSnapshot;
+
+      // Set synthetic period dates
+      const newStart = new Date(2000, 0, 1);
+      const newEnd = new Date(2000 + simulationYears - 1, 11, 1);
+      setStartDate(newStart);
+      setEndDate(newEnd);
+
+      // Restore saved duration data, or default to min/max
+      const savedDuration = savedFleetDatesDurationRef.current;
+      setFleetEntries(prev => prev.map(e => ({
+        ...e,
+        enterInService: savedDuration[e.id]?.enterInService ?? newStart,
+        retirement: savedDuration[e.id] ? savedDuration[e.id].retirement : (e.retirement ? newEnd : undefined),
+      })));
+      const savedRouteDuration = savedRouteDatesDurationRef.current;
+      setRouteEntries(prev => prev.map(r => ({
+        ...r,
+        startDate: savedRouteDuration[r.id]?.startDate ?? newStart,
+        endDate: savedRouteDuration[r.id]?.endDate ?? newEnd,
+      })));
+    } else if (newType === 'dates' && periodType === 'duration') {
+      // Save current duration-mode data
+      const fleetSnapshot: Record<string, { enterInService: Date; retirement?: Date }> = {};
+      fleetEntries.forEach(e => { fleetSnapshot[e.id] = { enterInService: e.enterInService, retirement: e.retirement }; });
+      savedFleetDatesDurationRef.current = fleetSnapshot;
+      const routeSnapshot: Record<string, { startDate: Date; endDate: Date }> = {};
+      routeEntries.forEach(r => { routeSnapshot[r.id] = { startDate: r.startDate, endDate: r.endDate }; });
+      savedRouteDatesDurationRef.current = routeSnapshot;
+
+      // Restore dates-mode data
+      const restoredStart = savedDatesRef.current.start;
+      const restoredEnd = savedDatesRef.current.end;
+      setStartDate(restoredStart);
+      setEndDate(restoredEnd);
+
+      const savedFleet = savedFleetDatesRef.current;
+      setFleetEntries(prev => prev.map(e => ({
+        ...e,
+        enterInService: savedFleet[e.id]?.enterInService ?? (restoredStart || e.enterInService),
+        retirement: savedFleet[e.id] ? savedFleet[e.id].retirement : e.retirement,
+      })));
+      const savedRoute = savedRouteDatesRef.current;
+      setRouteEntries(prev => prev.map(r => ({
+        ...r,
+        startDate: savedRoute[r.id]?.startDate ?? (restoredStart || r.startDate),
+        endDate: savedRoute[r.id]?.endDate ?? (restoredEnd || r.endDate),
+      })));
+    }
+    setPeriodType(newType as 'dates' | 'duration');
+  }, [periodType, startDate, endDate, simulationYears, fleetEntries, routeEntries]);
+
+  // When simulationYears changes in duration mode, update synthetic dates
+  useEffect(() => {
+    if (periodType === 'duration') {
+      setStartDate(new Date(2000, 0, 1));
+      setEndDate(new Date(2000 + simulationYears - 1, 11, 1));
+    }
+  }, [simulationYears]);
 
   // Fleet sub-tab state
   const [fleetTab, setFleetTab] = useState<FleetTabType>('fleet');
@@ -472,8 +551,47 @@ export default function StudyPage() {
     );
   };
 
-  // AG Grid: Custom cell renderer for Enter in Service (Calendar)
+  // Relative month options for duration mode (M1 Y1, M2 Y1, ... M12 YN)
+  const relativeMonthOptions = useMemo(() => {
+    if (!startDate || !endDate) return [];
+    const opts: { value: string; label: string }[] = [];
+    const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+    let idx = 1;
+    while (current <= end) {
+      const yIdx = Math.ceil(idx / 12);
+      const mIdx = ((idx - 1) % 12) + 1;
+      opts.push({
+        value: `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`,
+        label: `M${mIdx} Y${yIdx}`,
+      });
+      current.setMonth(current.getMonth() + 1);
+      idx++;
+    }
+    return opts;
+  }, [startDate, endDate]);
+
+  const dateToRelativeKey = useCallback((d: Date | undefined) => {
+    if (!d) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }, []);
+
+  const relativeKeyToDate = useCallback((key: string) => {
+    const [y, m] = key.split('-').map(Number);
+    return new Date(y, m - 1, 1);
+  }, []);
+
+  // AG Grid context — passed to grids so cell renderers can react to periodType changes
+  const gridContext = useMemo(() => ({
+    periodType,
+    relativeMonthOptions,
+    dateToRelativeKey,
+    relativeKeyToDate,
+  }), [periodType, relativeMonthOptions, dateToRelativeKey, relativeKeyToDate]);
+
+  // AG Grid: Custom cell renderer for Enter in Service (Calendar or Select in duration mode)
   const EnterInServiceCellRenderer = (props: ICellRendererParams) => {
+    const ctx = props.context || {};
     const handleChange = (newValue: Date | undefined) => {
       if (newValue) {
         props.node.setDataValue(props.colDef?.field || '', newValue);
@@ -484,6 +602,21 @@ export default function StudyPage() {
         );
       }
     };
+
+    if (ctx.periodType === 'duration') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
+          <Select
+            value={ctx.dateToRelativeKey(props.value instanceof Date ? props.value : undefined)}
+            onValueChange={(key: string) => handleChange(ctx.relativeKeyToDate(key))}
+            options={ctx.relativeMonthOptions}
+            size="S"
+            showLabel={false}
+            placeholder="Select"
+          />
+        </div>
+      );
+    }
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -499,8 +632,9 @@ export default function StudyPage() {
     );
   };
 
-  // AG Grid: Custom cell renderer for Retirement (Calendar, optional)
+  // AG Grid: Custom cell renderer for Retirement (Calendar or Select in duration mode, optional)
   const RetirementCellRenderer = (props: ICellRendererParams) => {
+    const ctx = props.context || {};
     const handleChange = (newValue: Date | undefined) => {
       props.node.setDataValue(props.colDef?.field || '', newValue);
       setFleetEntries((prev) =>
@@ -509,6 +643,24 @@ export default function StudyPage() {
         )
       );
     };
+
+    if (ctx.periodType === 'duration') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
+          <Select
+            value={ctx.dateToRelativeKey(props.value instanceof Date ? props.value : undefined)}
+            onValueChange={(key: string) => {
+              if (key) handleChange(ctx.relativeKeyToDate(key));
+              else handleChange(undefined);
+            }}
+            options={ctx.relativeMonthOptions}
+            size="S"
+            showLabel={false}
+            placeholder="None"
+          />
+        </div>
+      );
+    }
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -556,19 +708,25 @@ export default function StudyPage() {
     if (!start || !end) return [];
     const columns: ColDef[] = [];
     const current = new Date(start.getFullYear(), start.getMonth(), 1);
-    const endDate = new Date(end.getFullYear(), end.getMonth(), 1);
-    while (current <= endDate) {
+    const endD = new Date(end.getFullYear(), end.getMonth(), 1);
+    let monthIndex = 1;
+    while (current <= endD) {
       const key = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
+      const yearIndex = Math.ceil(monthIndex / 12);
+      const monthInYear = ((monthIndex - 1) % 12) + 1;
       columns.push({
         field: key,
-        headerName: current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        headerName: periodType === 'duration'
+          ? `M${monthInYear} Y${yearIndex}`
+          : current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         flex: 1,
         minWidth: 100,
       });
       current.setMonth(current.getMonth() + 1);
+      monthIndex++;
     }
     return columns;
-  }, []);
+  }, [periodType]);
 
   // Utility: Generate year columns from start to end date
   const generateYearColumns = useCallback((start: Date | undefined, end: Date | undefined): ColDef[] => {
@@ -1266,6 +1424,7 @@ export default function StudyPage() {
 
   // Route cell renderers (only for dates now)
   const RouteStartDateCellRenderer = (props: ICellRendererParams) => {
+    const ctx = props.context || {};
     const handleChange = (newValue: Date | undefined) => {
       if (newValue) {
         props.node.setDataValue(props.colDef?.field || '', newValue);
@@ -1274,6 +1433,21 @@ export default function StudyPage() {
         );
       }
     };
+
+    if (ctx.periodType === 'duration') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
+          <Select
+            value={ctx.dateToRelativeKey(props.value instanceof Date ? props.value : undefined)}
+            onValueChange={(key: string) => handleChange(ctx.relativeKeyToDate(key))}
+            options={ctx.relativeMonthOptions}
+            size="S"
+            showLabel={false}
+            placeholder="Select"
+          />
+        </div>
+      );
+    }
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -1290,6 +1464,7 @@ export default function StudyPage() {
   };
 
   const RouteEndDateCellRenderer = (props: ICellRendererParams) => {
+    const ctx = props.context || {};
     const handleChange = (newValue: Date | undefined) => {
       if (newValue) {
         props.node.setDataValue(props.colDef?.field || '', newValue);
@@ -1298,6 +1473,21 @@ export default function StudyPage() {
         );
       }
     };
+
+    if (ctx.periodType === 'duration') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
+          <Select
+            value={ctx.dateToRelativeKey(props.value instanceof Date ? props.value : undefined)}
+            onValueChange={(key: string) => handleChange(ctx.relativeKeyToDate(key))}
+            options={ctx.relativeMonthOptions}
+            size="S"
+            showLabel={false}
+            placeholder="Select"
+          />
+        </div>
+      );
+    }
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -1996,53 +2186,86 @@ export default function StudyPage() {
           {/* Period content */}
           {selectedItem.itemId === 'period' && (
             <div className="study-page__content">
-              <h1 className="study-page__title">Simulation Period</h1>
+              <h1 className="study-page__title">General Settings</h1>
 
-              <div className="study-page__form-row">
-                <Calendar
-                  label="Start Date"
-                  placeholder="Select a month"
-                  mode="month"
-                  value={startDate}
-                  onChange={setStartDate}
-                  state={!startDate ? 'Error' : 'Default'}
-                  showLegend={!startDate}
-                  legend="Required"
-                />
-                <Calendar
-                  label="End Date"
-                  placeholder="Select a month"
-                  mode="month"
-                  value={endDate}
-                  onChange={setEndDate}
-                  state={!endDate ? 'Error' : 'Default'}
-                  showLegend={!endDate}
-                  legend="Required"
-                />
-                <NumberInput
-                  label="Av. A/C Operating Days per Year"
-                  placeholder="Enter a value"
-                  value={operatingDays}
-                  onChange={(v) => setOperatingDays(Math.max(0, v))}
-                  size="M"
-                  min={0}
-                  state={operatingDays <= 0 ? 'Error' : 'Default'}
-                  showLegend={operatingDays <= 0}
-                  legend="Value must be greater than 0"
-                />
-                <NumberInput
-                  label="Startup Period Duration (months)"
-                  placeholder="Enter a value"
-                  value={startupDuration}
-                  onChange={(v) => setStartupDuration(Math.max(0, v))}
-                  size="M"
-                  min={0}
-                  state={startupDuration <= 0 ? 'Error' : 'Default'}
-                  showLegend={startupDuration <= 0}
-                  legend="Value must be greater than 0"
-                  showInfo
-                  infoText="Period from company inception down to 1st commercial flight"
-                />
+              <div className="study-page__section">
+                <h2 className="study-page__section-title">Simulation Period</h2>
+                <div className="study-page__form-row study-page__form-row--narrow">
+                  <div className="study-page__field">
+                    <span className="study-page__field-label">Period Type</span>
+                    <ButtonGroup
+                      options={[
+                        { label: 'Dates', value: 'dates' },
+                        { label: 'Duration', value: 'duration' },
+                      ]}
+                      value={periodType}
+                      onChange={handlePeriodTypeChange}
+                    />
+                  </div>
+                  {periodType === 'dates' ? (
+                    <>
+                      <Calendar
+                        label="Start Date"
+                        placeholder="Select a month"
+                        mode="month"
+                        value={startDate}
+                        onChange={(v) => { setStartDate(v); savedDatesRef.current.start = v; }}
+                        state={!startDate ? 'Error' : 'Default'}
+                        showLegend={!startDate}
+                        legend="Required"
+                      />
+                      <Calendar
+                        label="End Date"
+                        placeholder="Select a month"
+                        mode="month"
+                        value={endDate}
+                        onChange={(v) => { setEndDate(v); savedDatesRef.current.end = v; }}
+                        state={!endDate ? 'Error' : 'Default'}
+                        showLegend={!endDate}
+                        legend="Required"
+                      />
+                    </>
+                  ) : (
+                    <NumberInput
+                      label="Number of Years Simulated"
+                      placeholder="Enter a value"
+                      value={simulationYears}
+                      onChange={(v) => setSimulationYears(Math.max(1, v))}
+                      size="M"
+                      min={1}
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="study-page__section">
+                <h2 className="study-page__section-title">Other</h2>
+                <div className="study-page__form-row">
+                  <NumberInput
+                    label="Av. A/C Operating Days per Year"
+                    placeholder="Enter a value"
+                    value={operatingDays}
+                    onChange={(v) => setOperatingDays(Math.max(0, v))}
+                    size="M"
+                    min={0}
+                    state={operatingDays <= 0 ? 'Error' : 'Default'}
+                    showLegend={operatingDays <= 0}
+                    legend="Value must be greater than 0"
+                  />
+                  <NumberInput
+                    label="Startup Period Duration (months)"
+                    placeholder="Enter a value"
+                    value={startupDuration}
+                    onChange={(v) => setStartupDuration(Math.max(0, v))}
+                    size="M"
+                    min={0}
+                    state={startupDuration <= 0 ? 'Error' : 'Default'}
+                    showLegend={startupDuration <= 0}
+                    legend="Value must be greater than 0"
+                    showInfo
+                    infoText="Period from company inception down to 1st commercial flight"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -2225,6 +2448,7 @@ export default function StudyPage() {
                         className="as-ag-grid"
                         rowData={filteredFleetEntries}
                         columnDefs={fleetColDefs}
+                        context={gridContext}
                         rowSelection="multiple"
                         suppressRowClickSelection={true}
                         onSelectionChanged={onSelectionChanged}
@@ -2476,11 +2700,11 @@ export default function StudyPage() {
                         className="as-ag-grid"
                         rowData={routeEntries}
                         columnDefs={routesColDefs}
+                        context={gridContext}
                         rowSelection="multiple"
                         suppressRowClickSelection={true}
                         onSelectionChanged={onRouteSelectionChanged}
                         getRowId={(params) => params.data.id}
-
                       />
                     )}
                   </div>
@@ -2591,6 +2815,7 @@ export default function StudyPage() {
                     fleetEntries={fleetEntries}
                     startDate={startDate}
                     endDate={endDate}
+                    periodType={periodType}
                   />
                 </div>
               )}
@@ -3180,6 +3405,8 @@ export default function StudyPage() {
         isOpen={isAddAircraftModalOpen}
         onClose={() => setIsAddAircraftModalOpen(false)}
         onAddAircraft={handleAddAircraft}
+        periodType={periodType}
+        relativeMonthOptions={relativeMonthOptions}
       />
 
       {/* Add Route Modal */}
@@ -3189,6 +3416,8 @@ export default function StudyPage() {
         onAddRoute={handleAddRoute}
         simulationStartDate={startDate}
         simulationEndDate={endDate}
+        periodType={periodType}
+        relativeMonthOptions={relativeMonthOptions}
       />
 
       {/* Import Airline Fleet Modal */}
@@ -3217,6 +3446,8 @@ export default function StudyPage() {
         selectedEntries={fleetEntries.filter((e) => selectedAircraftIds.has(e.id))}
         simulationStartDate={startDate}
         simulationEndDate={endDate}
+        periodType={periodType}
+        relativeMonthOptions={relativeMonthOptions}
       />
 
       {/* Edit Route Modal */}
@@ -3227,6 +3458,8 @@ export default function StudyPage() {
         selectedEntries={routeEntries.filter((r) => selectedRouteIds.has(r.id))}
         simulationStartDate={startDate}
         simulationEndDate={endDate}
+        periodType={periodType}
+        relativeMonthOptions={relativeMonthOptions}
       />
     </div>
   );

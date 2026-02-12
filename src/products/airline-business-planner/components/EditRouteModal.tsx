@@ -2,12 +2,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/design-system/composites/Modal';
 import { Button } from '@/design-system/components/Button';
 import { Calendar } from '@/design-system/composites/Calendar';
+import { Select } from '@/design-system/components/Select';
 import './EditRouteModal.css';
 
 export interface RouteEntryForEdit {
   id: string;
   startDate: Date;
   endDate: Date;
+}
+
+interface RelativeMonthOption {
+  value: string;
+  label: string;
 }
 
 interface EditRouteModalProps {
@@ -17,6 +23,8 @@ interface EditRouteModalProps {
   selectedEntries: RouteEntryForEdit[];
   simulationStartDate?: Date;
   simulationEndDate?: Date;
+  periodType?: 'dates' | 'duration';
+  relativeMonthOptions?: RelativeMonthOption[];
 }
 
 function getUniformDateValue(entries: RouteEntryForEdit[], getter: (e: RouteEntryForEdit) => Date): Date | undefined {
@@ -36,6 +44,8 @@ export function EditRouteModal({
   selectedEntries,
   simulationStartDate,
   simulationEndDate,
+  periodType = 'dates',
+  relativeMonthOptions = [],
 }: EditRouteModalProps) {
   // Determine if values are uniform across selection
   const uniformStartDate = useMemo(
@@ -108,32 +118,62 @@ export function EditRouteModal({
     >
       <div className="edit-route-content">
         <div className="edit-route-form">
-          <Calendar
-            label="Start Date"
-            placeholder={uniformStartDate === undefined ? 'Multiple values' : 'Select a month'}
-            mode="month"
-            value={startDate}
-            onChange={(val) => {
-              setStartDate(val);
-              setStartDateModified(true);
-            }}
-            size="M"
-            minDate={simulationStartDate}
-            maxDate={simulationEndDate}
-          />
-          <Calendar
-            label="End Date"
-            placeholder={uniformEndDate === undefined ? 'Multiple values' : 'Select a month'}
-            mode="month"
-            value={endDate}
-            onChange={(val) => {
-              setEndDate(val);
-              setEndDateModified(true);
-            }}
-            size="M"
-            minDate={startDate || simulationStartDate}
-            maxDate={simulationEndDate}
-          />
+          {periodType === 'duration' ? (
+            <Select
+              label="Start Date"
+              placeholder={uniformStartDate === undefined ? 'Multiple values' : 'Select'}
+              options={relativeMonthOptions}
+              value={startDate ? `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                const [y, m] = key.split('-').map(Number);
+                setStartDate(new Date(y, m - 1, 1));
+                setStartDateModified(true);
+              }}
+              size="M"
+            />
+          ) : (
+            <Calendar
+              label="Start Date"
+              placeholder={uniformStartDate === undefined ? 'Multiple values' : 'Select a month'}
+              mode="month"
+              value={startDate}
+              onChange={(val) => {
+                setStartDate(val);
+                setStartDateModified(true);
+              }}
+              size="M"
+              minDate={simulationStartDate}
+              maxDate={simulationEndDate}
+            />
+          )}
+          {periodType === 'duration' ? (
+            <Select
+              label="End Date"
+              placeholder={uniformEndDate === undefined ? 'Multiple values' : 'Select'}
+              options={relativeMonthOptions}
+              value={endDate ? `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}` : ''}
+              onValueChange={(key) => {
+                const [y, m] = key.split('-').map(Number);
+                setEndDate(new Date(y, m - 1, 1));
+                setEndDateModified(true);
+              }}
+              size="M"
+            />
+          ) : (
+            <Calendar
+              label="End Date"
+              placeholder={uniformEndDate === undefined ? 'Multiple values' : 'Select a month'}
+              mode="month"
+              value={endDate}
+              onChange={(val) => {
+                setEndDate(val);
+                setEndDateModified(true);
+              }}
+              size="M"
+              minDate={startDate || simulationStartDate}
+              maxDate={simulationEndDate}
+            />
+          )}
         </div>
       </div>
     </Modal>

@@ -95,9 +95,10 @@ interface NetworkSummaryProps {
   fleetEntries: FleetEntry[];
   startDate?: Date;
   endDate?: Date;
+  periodType?: 'dates' | 'duration';
 }
 
-export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate }: NetworkSummaryProps) {
+export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate, periodType = 'dates' }: NetworkSummaryProps) {
   const [yearFilter, setYearFilter] = useState('all');
   const [mapZoom, setMapZoom] = useState(1);
   const [mapCenter, setMapCenter] = useState<[number, number]>([10, 30]);
@@ -169,24 +170,27 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
     const opts = [{ value: 'all', label: 'All' }];
     if (startDate && endDate) {
       for (let y = startDate.getFullYear(); y <= endDate.getFullYear(); y++) {
-        opts.push({ value: String(y), label: String(y) });
+        const yearIndex = y - startDate.getFullYear() + 1;
+        const label = periodType === 'duration' ? `Y${yearIndex}` : String(y);
+        opts.push({ value: String(y), label });
       }
     }
     return opts;
-  }, [startDate, endDate]);
+  }, [startDate, endDate, periodType]);
 
   // Chart data - Average Flown Distance per Year
   const chartData = useMemo(() => {
     if (!startDate || !endDate) return [];
     const data = [];
     for (let y = startDate.getFullYear(); y <= endDate.getFullYear(); y++) {
+      const yearIndex = y - startDate.getFullYear() + 1;
       data.push({
-        year: String(y),
+        year: periodType === 'duration' ? `Y${yearIndex}` : String(y),
         distance: Math.round(2000 + Math.random() * 2500),
       });
     }
     return data;
-  }, [startDate, endDate]);
+  }, [startDate, endDate, periodType]);
 
   return (
     <>
