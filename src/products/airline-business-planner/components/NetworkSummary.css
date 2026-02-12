@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0;
-  /* Fill viewport minus KPIs + header/tabs area */
+  padding: 16px 0 0 0;
+  /* Fill available viewport */
   min-height: calc(100vh - 200px);
 }
 
@@ -20,9 +20,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border: 1px solid var(--border-default, #ccd4e0);
-  border-radius: 8px;
+  border-radius: var(--radius-s, 6px);
   background: var(--background-main, #fff);
+  box-shadow: var(--shadow-2, 0 2px 8px 0 rgba(0, 0, 0, 0.12));
 }
 
 .network-summary__kpi-label {
