@@ -567,11 +567,24 @@ export default function HomePage() {
                               { id: `${study.id}-4`, aircraftType: 'B737-800', engine: 'CFM56-7B', layout: 'Y189', numberOfAircraft: 3, enterInService: addMonths(baseDate, 8), retirement: addYear(new Date(addMonths(baseDate, 8))) },
                             ];
                           })(),
-                          routes: [
-                            { id: `${study.id}-r1`, origin: 'CDG', destination: 'LHR', startDate: new Date(study.startDate).toISOString(), endDate: new Date(study.endDate).toISOString() },
-                            { id: `${study.id}-r2`, origin: 'CDG', destination: 'BCN', startDate: new Date(study.startDate).toISOString(), endDate: new Date(study.endDate).toISOString() },
-                            { id: `${study.id}-r3`, origin: 'LHR', destination: 'JFK', startDate: new Date(study.startDate).toISOString(), endDate: new Date(study.endDate).toISOString() },
-                          ],
+                          routes: (() => {
+                            const baseStart = new Date(study.startDate);
+                            const baseEnd = new Date(study.endDate);
+                            const addMonthsToDate = (date: Date, months: number) => {
+                              const d = new Date(date);
+                              d.setMonth(d.getMonth() + months);
+                              return d.toISOString();
+                            };
+                            return [
+                              // Routes starting from day 1
+                              { id: `${study.id}-r1`, origin: 'CDG', destination: 'LHR', startDate: baseStart.toISOString(), endDate: baseEnd.toISOString() },
+                              { id: `${study.id}-r2`, origin: 'CDG', destination: 'BCN', startDate: baseStart.toISOString(), endDate: baseEnd.toISOString() },
+                              // Routes with staggered start dates
+                              { id: `${study.id}-r3`, origin: 'LHR', destination: 'JFK', startDate: addMonthsToDate(baseStart, 6), endDate: baseEnd.toISOString() },
+                              { id: `${study.id}-r4`, origin: 'CDG', destination: 'DXB', startDate: addMonthsToDate(baseStart, 12), endDate: baseEnd.toISOString() },
+                              { id: `${study.id}-r5`, origin: 'LHR', destination: 'SIN', startDate: addMonthsToDate(baseStart, 18), endDate: baseEnd.toISOString() },
+                            ];
+                          })(),
                         },
                       },
                     })}
