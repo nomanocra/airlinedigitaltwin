@@ -143,7 +143,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
         className="network-summary__chart-card"
         style={{ flex: 1 }}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" debounce={0}>
           <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
             <XAxis dataKey="year" tick={{ fontSize: 12 }} />
@@ -187,7 +187,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
         className="network-summary__chart-card"
         style={{ flex: 1 }}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" debounce={0}>
           <BarChart data={flightsPerAcTypeData} margin={{ top: 25, right: 30, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
             <XAxis dataKey="aircraftType" tick={{ fontSize: 11 }} />

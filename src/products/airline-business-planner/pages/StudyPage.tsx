@@ -213,7 +213,7 @@ export default function StudyPage() {
 
   // Form state (Simulation Period) - pre-fill if studyData exists
   const [periodType, setPeriodType] = useState<'dates' | 'duration'>('dates');
-  const [simulationYears, setSimulationYears] = useState<number>(1);
+  const [simulationYears, setSimulationYears] = useState<number>(4);
   const [startDate, setStartDate] = useState<Date | undefined>(() => parseDate(studyData?.startDate));
   const [endDate, setEndDate] = useState<Date | undefined>(() => parseDate(studyData?.endDate));
   // Saved dates for restoring when switching back from duration to dates mode
