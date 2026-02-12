@@ -188,7 +188,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
         style={{ flex: 1 }}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={flightsPerAcTypeData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+          <BarChart data={flightsPerAcTypeData} margin={{ top: 25, right: 30, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
             <XAxis dataKey="aircraftType" tick={{ fontSize: 11 }} />
             <YAxis
@@ -200,7 +200,30 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
               {flightsPerAcTypeData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
-              <LabelList dataKey="flights" position="top" style={{ fontSize: 11, fontWeight: 700, fill: 'var(--text-main, #1f2937)', stroke: '#ffffff', strokeWidth: 3, paintOrder: 'stroke fill' }} />
+              <LabelList
+                dataKey="flights"
+                position="top"
+                content={({ x, y, width, value, index }: { x?: number; y?: number; width?: number; value?: number; index?: number }) => {
+                  const color = flightsPerAcTypeData[index ?? 0]?.color || 'var(--text-main)';
+                  return (
+                    <text
+                      x={(x ?? 0) + (width ?? 0) / 2}
+                      y={(y ?? 0) - 5}
+                      textAnchor="middle"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        fill: color,
+                        stroke: '#ffffff',
+                        strokeWidth: 3,
+                        paintOrder: 'stroke fill',
+                      }}
+                    >
+                      {value}
+                    </text>
+                  );
+                }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
