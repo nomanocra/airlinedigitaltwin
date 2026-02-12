@@ -10,6 +10,8 @@ Toutes les interfaces doivent être construites avec les composants du **AS Desi
 
 ### Commandes CLI (le cli est installé en local)
 
+LE CLI EST INSTALLE EN LOCAL, PAS BESOIN DE FAIRE NPM OU NPX !!!
+
 ```bash
 
 # Ajouter un composant
