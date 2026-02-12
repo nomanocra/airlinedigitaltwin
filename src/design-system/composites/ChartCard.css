@@ -46,7 +46,7 @@
 .chart-card__actions {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 2px;
   flex-shrink: 0;
   margin-left: auto;
 }
