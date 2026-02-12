@@ -20,7 +20,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-radius: var(--radius-s, 6px);
+  border-radius: var(--radius-xs, 3px);
   background: var(--background-main, #fff);
   box-shadow: var(--shadow-2, 0 2px 8px 0 rgba(0, 0, 0, 0.12));
 }
