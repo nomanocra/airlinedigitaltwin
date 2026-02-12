@@ -224,76 +224,6 @@ export default function StudyPage() {
   const [operatingDays, setOperatingDays] = useState<number>(studyData ? 365 : 0);
   const [startupDuration, setStartupDuration] = useState<number>(studyData ? 6 : 0);
 
-  // Handle period type switching — save/restore dates for period and entries
-  const handlePeriodTypeChange = useCallback((newType: string) => {
-    if (newType === 'duration' && periodType === 'dates') {
-      // Save current dates-mode data
-      savedDatesRef.current = { start: startDate, end: endDate };
-      const fleetSnapshot: Record<string, { enterInService: Date; retirement?: Date }> = {};
-      fleetEntries.forEach(e => { fleetSnapshot[e.id] = { enterInService: e.enterInService, retirement: e.retirement }; });
-      savedFleetDatesRef.current = fleetSnapshot;
-      const routeSnapshot: Record<string, { startDate: Date; endDate: Date }> = {};
-      routeEntries.forEach(r => { routeSnapshot[r.id] = { startDate: r.startDate, endDate: r.endDate }; });
-      savedRouteDatesRef.current = routeSnapshot;
-
-      // Set synthetic period dates
-      const newStart = new Date(2000, 0, 1);
-      const newEnd = new Date(2000 + simulationYears - 1, 11, 1);
-      setStartDate(newStart);
-      setEndDate(newEnd);
-
-      // Restore saved duration data, or default to min/max
-      const savedDuration = savedFleetDatesDurationRef.current;
-      setFleetEntries(prev => prev.map(e => ({
-        ...e,
-        enterInService: savedDuration[e.id]?.enterInService ?? newStart,
-        retirement: savedDuration[e.id] ? savedDuration[e.id].retirement : (e.retirement ? newEnd : undefined),
-      })));
-      const savedRouteDuration = savedRouteDatesDurationRef.current;
-      setRouteEntries(prev => prev.map(r => ({
-        ...r,
-        startDate: savedRouteDuration[r.id]?.startDate ?? newStart,
-        endDate: savedRouteDuration[r.id]?.endDate ?? newEnd,
-      })));
-    } else if (newType === 'dates' && periodType === 'duration') {
-      // Save current duration-mode data
-      const fleetSnapshot: Record<string, { enterInService: Date; retirement?: Date }> = {};
-      fleetEntries.forEach(e => { fleetSnapshot[e.id] = { enterInService: e.enterInService, retirement: e.retirement }; });
-      savedFleetDatesDurationRef.current = fleetSnapshot;
-      const routeSnapshot: Record<string, { startDate: Date; endDate: Date }> = {};
-      routeEntries.forEach(r => { routeSnapshot[r.id] = { startDate: r.startDate, endDate: r.endDate }; });
-      savedRouteDatesDurationRef.current = routeSnapshot;
-
-      // Restore dates-mode data
-      const restoredStart = savedDatesRef.current.start;
-      const restoredEnd = savedDatesRef.current.end;
-      setStartDate(restoredStart);
-      setEndDate(restoredEnd);
-
-      const savedFleet = savedFleetDatesRef.current;
-      setFleetEntries(prev => prev.map(e => ({
-        ...e,
-        enterInService: savedFleet[e.id]?.enterInService ?? (restoredStart || e.enterInService),
-        retirement: savedFleet[e.id] ? savedFleet[e.id].retirement : e.retirement,
-      })));
-      const savedRoute = savedRouteDatesRef.current;
-      setRouteEntries(prev => prev.map(r => ({
-        ...r,
-        startDate: savedRoute[r.id]?.startDate ?? (restoredStart || r.startDate),
-        endDate: savedRoute[r.id]?.endDate ?? (restoredEnd || r.endDate),
-      })));
-    }
-    setPeriodType(newType as 'dates' | 'duration');
-  }, [periodType, startDate, endDate, simulationYears, fleetEntries, routeEntries]);
-
-  // When simulationYears changes in duration mode, update synthetic dates
-  useEffect(() => {
-    if (periodType === 'duration') {
-      setStartDate(new Date(2000, 0, 1));
-      setEndDate(new Date(2000 + simulationYears - 1, 11, 1));
-    }
-  }, [simulationYears]);
-
   // Fleet sub-tab state
   const [fleetTab, setFleetTab] = useState<FleetTabType>('fleet');
   const [fleetViewMode, setFleetViewMode] = useState<FleetViewMode>('table');
@@ -434,6 +364,77 @@ export default function StudyPage() {
     }
     return [];
   });
+
+  // Handle period type switching — save/restore dates for period and entries
+  const handlePeriodTypeChange = useCallback((newType: string) => {
+    if (newType === 'duration' && periodType === 'dates') {
+      // Save current dates-mode data
+      savedDatesRef.current = { start: startDate, end: endDate };
+      const fleetSnapshot: Record<string, { enterInService: Date; retirement?: Date }> = {};
+      fleetEntries.forEach(e => { fleetSnapshot[e.id] = { enterInService: e.enterInService, retirement: e.retirement }; });
+      savedFleetDatesRef.current = fleetSnapshot;
+      const routeSnapshot: Record<string, { startDate: Date; endDate: Date }> = {};
+      routeEntries.forEach(r => { routeSnapshot[r.id] = { startDate: r.startDate, endDate: r.endDate }; });
+      savedRouteDatesRef.current = routeSnapshot;
+
+      // Set synthetic period dates
+      const newStart = new Date(2000, 0, 1);
+      const newEnd = new Date(2000 + simulationYears - 1, 11, 1);
+      setStartDate(newStart);
+      setEndDate(newEnd);
+
+      // Restore saved duration data, or default to min/max
+      const savedDuration = savedFleetDatesDurationRef.current;
+      setFleetEntries(prev => prev.map(e => ({
+        ...e,
+        enterInService: savedDuration[e.id]?.enterInService ?? newStart,
+        retirement: savedDuration[e.id] ? savedDuration[e.id].retirement : (e.retirement ? newEnd : undefined),
+      })));
+      const savedRouteDuration = savedRouteDatesDurationRef.current;
+      setRouteEntries(prev => prev.map(r => ({
+        ...r,
+        startDate: savedRouteDuration[r.id]?.startDate ?? newStart,
+        endDate: savedRouteDuration[r.id]?.endDate ?? newEnd,
+      })));
+    } else if (newType === 'dates' && periodType === 'duration') {
+      // Save current duration-mode data
+      const fleetSnapshot: Record<string, { enterInService: Date; retirement?: Date }> = {};
+      fleetEntries.forEach(e => { fleetSnapshot[e.id] = { enterInService: e.enterInService, retirement: e.retirement }; });
+      savedFleetDatesDurationRef.current = fleetSnapshot;
+      const routeSnapshot: Record<string, { startDate: Date; endDate: Date }> = {};
+      routeEntries.forEach(r => { routeSnapshot[r.id] = { startDate: r.startDate, endDate: r.endDate }; });
+      savedRouteDatesDurationRef.current = routeSnapshot;
+
+      // Restore dates-mode data
+      const restoredStart = savedDatesRef.current.start;
+      const restoredEnd = savedDatesRef.current.end;
+      setStartDate(restoredStart);
+      setEndDate(restoredEnd);
+
+      const savedFleet = savedFleetDatesRef.current;
+      setFleetEntries(prev => prev.map(e => ({
+        ...e,
+        enterInService: savedFleet[e.id]?.enterInService ?? (restoredStart || e.enterInService),
+        retirement: savedFleet[e.id] ? savedFleet[e.id].retirement : e.retirement,
+      })));
+      const savedRoute = savedRouteDatesRef.current;
+      setRouteEntries(prev => prev.map(r => ({
+        ...r,
+        startDate: savedRoute[r.id]?.startDate ?? (restoredStart || r.startDate),
+        endDate: savedRoute[r.id]?.endDate ?? (restoredEnd || r.endDate),
+      })));
+    }
+    setPeriodType(newType as 'dates' | 'duration');
+  }, [periodType, startDate, endDate, simulationYears, fleetEntries, routeEntries]);
+
+  // When simulationYears changes in duration mode, update synthetic dates
+  useEffect(() => {
+    if (periodType === 'duration') {
+      setStartDate(new Date(2000, 0, 1));
+      setEndDate(new Date(2000 + simulationYears - 1, 11, 1));
+    }
+  }, [simulationYears]);
+
   const [isAddAircraftModalOpen, setIsAddAircraftModalOpen] = useState(false);
   const [isEditFleetModalOpen, setIsEditFleetModalOpen] = useState(false);
   const [isImportAirlineFleetModalOpen, setIsImportAirlineFleetModalOpen] = useState(false);
