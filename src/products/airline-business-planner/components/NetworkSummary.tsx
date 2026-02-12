@@ -277,7 +277,6 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
           <div className="network-summary__zoom-controls">
             <IconButton icon="add" size="XS" variant="Ghost" alt="Zoom in" onClick={() => setMapZoom(z => Math.min(z * 1.5, 8))} />
             <IconButton icon="remove" size="XS" variant="Ghost" alt="Zoom out" onClick={() => setMapZoom(z => Math.max(z / 1.5, 1))} />
-            <IconButton icon="center_focus_strong" size="XS" variant="Ghost" alt="Reset" onClick={() => { setMapZoom(1); setMapCenter([10, 30]); }} />
           </div>
         </div>
       </ChartCard>
