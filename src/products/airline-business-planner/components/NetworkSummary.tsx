@@ -15,6 +15,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  LabelList,
 } from 'recharts';
 import { Select } from '@/design-system/components/Select';
 import { IconButton } from '@/design-system/components/IconButton';
@@ -339,7 +340,9 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
                 const bars = document.querySelectorAll('.study-page__tab-content .recharts-bar-rectangle path');
                 if (bars[index]) (bars[index] as HTMLElement).style.fill = 'var(--primary-default, #063b9e)';
               }}
-            />
+            >
+              <LabelList dataKey="distance" position="top" style={{ fontSize: 11, fill: 'var(--text-secondary, #63728a)' }} />
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
