@@ -266,6 +266,9 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
                       fontSize: `${10 / mapZoom}px`,
                       fontWeight: 600,
                       fill: 'var(--text-corporate, #00205b)',
+                      stroke: '#ffffff',
+                      strokeWidth: 3 / mapZoom,
+                      paintOrder: 'stroke fill',
                     }}
                   >
                     {marker.code}
