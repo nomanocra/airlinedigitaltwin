@@ -258,6 +258,18 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
               {mapMarkers.map(marker => (
                 <Marker key={marker.code} coordinates={[marker.coords[1], marker.coords[0]]}>
                   <circle r={3 / mapZoom} fill="var(--primary-default, #063b9e)" />
+                  <text
+                    textAnchor="middle"
+                    y={-6 / mapZoom}
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: `${10 / mapZoom}px`,
+                      fontWeight: 600,
+                      fill: 'var(--text-corporate, #00205b)',
+                    }}
+                  >
+                    {marker.code}
+                  </text>
                 </Marker>
               ))}
             </ZoomableGroup>
