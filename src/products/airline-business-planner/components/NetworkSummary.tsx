@@ -131,9 +131,9 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
         </div>
       </div>
 
-      {/* Average Flown Distance per Year chart */}
+      {/* Av. Flown Distance per Year chart */}
       <ChartCard
-        title="Average Flown Distance per Year"
+        title="Av. Flown Distance per Year"
         actions={
           <>
             <IconButton icon="download" size="XS" variant="Ghost" alt="Download" />
@@ -141,6 +141,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
           </>
         }
         className="network-summary__chart-card"
+        style={{ flex: 1 }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
@@ -184,6 +185,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
           </>
         }
         className="network-summary__chart-card"
+        style={{ flex: 1 }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={flightsPerAcTypeData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
