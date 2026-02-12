@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import {
   BarChart,
   Bar,
@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   LabelList,
   Cell,
 } from 'recharts';
@@ -24,6 +23,29 @@ const AC_TYPE_COLORS = [
   'var(--sea-blue-30, #64b5f6)',
   'var(--cool-grey-70, #374151)',
 ];
+
+// Hook: real-time container size via ResizeObserver (no debounce)
+function useContainerSize<T extends HTMLElement>(): [React.RefObject<T | null>, { width: number; height: number }] {
+  const ref = useRef<T | null>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  const updateSize = useCallback(() => {
+    if (ref.current) {
+      setSize({ width: ref.current.clientWidth, height: ref.current.clientHeight });
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    updateSize();
+    const ro = new ResizeObserver(() => updateSize());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [updateSize]);
+
+  return [ref, size];
+}
 
 interface RouteEntry {
   id: string;
@@ -49,6 +71,8 @@ interface NetworkSummaryProps {
 
 export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate, periodType = 'dates' }: NetworkSummaryProps) {
   const [flightsYearFilter, setFlightsYearFilter] = useState('all');
+  const [distanceRef, distanceSize] = useContainerSize<HTMLDivElement>();
+  const [flightsRef, flightsSize] = useContainerSize<HTMLDivElement>();
 
   // KPIs
   const numberOfRoutes = routeEntries.length;
@@ -143,24 +167,26 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
         className="network-summary__chart-card"
         style={{ flex: 1 }}
       >
-        <ResponsiveContainer width="100%" height="100%" debounce={0}>
-          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
-            <XAxis dataKey="year" tick={{ fontSize: 12 }} />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
-            />
-            <Tooltip cursor={false} />
-            <Bar
-              dataKey="distance"
-              fill="var(--primary-default, #063b9e)"
-              radius={[2, 2, 0, 0]}
-            >
-              <LabelList dataKey="distance" position="top" style={{ fontSize: 11, fontWeight: 700, fill: 'var(--primary-default, #063b9e)', stroke: '#ffffff', strokeWidth: 3, paintOrder: 'stroke fill' }} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div ref={distanceRef} style={{ width: '100%', height: '100%' }}>
+          {distanceSize.width > 0 && distanceSize.height > 0 && (
+            <BarChart width={distanceSize.width} height={distanceSize.height} data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
+              <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+              <YAxis
+                tick={{ fontSize: 12 }}
+                label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
+              />
+              <Tooltip cursor={false} />
+              <Bar
+                dataKey="distance"
+                fill="var(--primary-default, #063b9e)"
+                radius={[2, 2, 0, 0]}
+              >
+                <LabelList dataKey="distance" position="top" style={{ fontSize: 11, fontWeight: 700, fill: 'var(--primary-default, #063b9e)', stroke: '#ffffff', strokeWidth: 3, paintOrder: 'stroke fill' }} />
+              </Bar>
+            </BarChart>
+          )}
+        </div>
       </ChartCard>
 
       {/* Av. Flights per A/C Type chart */}
@@ -187,46 +213,48 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
         className="network-summary__chart-card"
         style={{ flex: 1 }}
       >
-        <ResponsiveContainer width="100%" height="100%" debounce={0}>
-          <BarChart data={flightsPerAcTypeData} margin={{ top: 25, right: 30, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
-            <XAxis dataKey="aircraftType" tick={{ fontSize: 11 }} />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              label={{ value: 'Flights', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
-            />
-            <Tooltip cursor={false} />
-            <Bar dataKey="flights" radius={[2, 2, 0, 0]}>
-              {flightsPerAcTypeData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-              <LabelList
-                dataKey="flights"
-                position="top"
-                content={({ x, y, width, value, index }: { x?: number; y?: number; width?: number; value?: number; index?: number }) => {
-                  const color = flightsPerAcTypeData[index ?? 0]?.color || 'var(--text-main)';
-                  return (
-                    <text
-                      x={(x ?? 0) + (width ?? 0) / 2}
-                      y={(y ?? 0) - 5}
-                      textAnchor="middle"
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        fill: color,
-                        stroke: '#ffffff',
-                        strokeWidth: 3,
-                        paintOrder: 'stroke fill',
-                      }}
-                    >
-                      {value}
-                    </text>
-                  );
-                }}
+        <div ref={flightsRef} style={{ width: '100%', height: '100%' }}>
+          {flightsSize.width > 0 && flightsSize.height > 0 && (
+            <BarChart width={flightsSize.width} height={flightsSize.height} data={flightsPerAcTypeData} margin={{ top: 25, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
+              <XAxis dataKey="aircraftType" tick={{ fontSize: 11 }} />
+              <YAxis
+                tick={{ fontSize: 12 }}
+                label={{ value: 'Flights', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
               />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+              <Tooltip cursor={false} />
+              <Bar dataKey="flights" radius={[2, 2, 0, 0]}>
+                {flightsPerAcTypeData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+                <LabelList
+                  dataKey="flights"
+                  position="top"
+                  content={({ x, y, width, value, index }: { x?: number; y?: number; width?: number; value?: number; index?: number }) => {
+                    const color = flightsPerAcTypeData[index ?? 0]?.color || 'var(--text-main)';
+                    return (
+                      <text
+                        x={(x ?? 0) + (width ?? 0) / 2}
+                        y={(y ?? 0) - 5}
+                        textAnchor="middle"
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          fill: color,
+                          stroke: '#ffffff',
+                          strokeWidth: 3,
+                          paintOrder: 'stroke fill',
+                        }}
+                      >
+                        {value}
+                      </text>
+                    );
+                  }}
+                />
+              </Bar>
+            </BarChart>
+          )}
+        </div>
       </ChartCard>
     </>
   );

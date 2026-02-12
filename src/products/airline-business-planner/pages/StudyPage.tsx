@@ -1730,8 +1730,8 @@ export default function StudyPage() {
       );
     };
 
-    // Check if any frequency in this row is > 0
-    const hasAnyFrequency = allMonthKeys.some(mk => (props.data?.[mk] ?? 0) > 0);
+    // Check if any frequency in this row is > 0 (use frequencies object directly)
+    const hasAnyFrequency = Object.values(props.data?.frequencies || {}).some((v: number) => v > 0);
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
