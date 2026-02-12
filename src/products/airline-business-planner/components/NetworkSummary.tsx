@@ -170,15 +170,15 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
       {/* KPI cards */}
       <div className="network-summary__kpis">
         <div className="network-summary__kpi-card">
-          <span className="network-summary__kpi-label body-regular">Number of Routes</span>
+          <span className="network-summary__kpi-label label-medium-s">Number of Routes</span>
           <span className="network-summary__kpi-value">{numberOfRoutes}</span>
         </div>
         <div className="network-summary__kpi-card">
-          <span className="network-summary__kpi-label body-regular">Number of Airport</span>
+          <span className="network-summary__kpi-label label-medium-s">Number of Airport</span>
           <span className="network-summary__kpi-value">{numberOfAirports}</span>
         </div>
         <div className="network-summary__kpi-card">
-          <span className="network-summary__kpi-label body-regular">Number of Flights per A/C Type</span>
+          <span className="network-summary__kpi-label label-medium-s">Number of Flights per A/C Type</span>
           <span className="network-summary__kpi-value">{totalFlights}</span>
         </div>
       </div>
@@ -199,7 +199,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
           </span>
         }
         actions={
-          <IconButton icon="open_in_new" size="XS" variant="Ghost" alt="Fullscreen" />
+          <IconButton icon="open_in_full" size="XS" variant="Ghost" alt="Fullscreen" />
         }
         className="network-summary__chart-card"
         style={{ flex: 1, height: 'auto' }}
@@ -290,7 +290,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
         actions={
           <>
             <IconButton icon="download" size="XS" variant="Ghost" alt="Download" />
-            <IconButton icon="open_in_new" size="XS" variant="Ghost" alt="Fullscreen" />
+            <IconButton icon="open_in_full" size="XS" variant="Ghost" alt="Fullscreen" />
           </>
         }
         className="network-summary__chart-card"
