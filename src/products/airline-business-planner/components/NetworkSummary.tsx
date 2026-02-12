@@ -5,6 +5,7 @@ import {
   Geography,
   Line,
   Marker,
+  ZoomableGroup,
 } from 'react-simple-maps';
 import {
   BarChart,
@@ -17,6 +18,7 @@ import {
 } from 'recharts';
 import { Select } from '@/design-system/components/Select';
 import { IconButton } from '@/design-system/components/IconButton';
+import { ChartCard } from '@/design-system/composites/ChartCard';
 import './NetworkSummary.css';
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
@@ -96,6 +98,8 @@ interface NetworkSummaryProps {
 
 export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate }: NetworkSummaryProps) {
   const [yearFilter, setYearFilter] = useState('all');
+  const [mapZoom, setMapZoom] = useState(1);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([10, 30]);
 
   // KPIs
   const numberOfRoutes = routeEntries.length;
@@ -180,94 +184,117 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
       </div>
 
       {/* Network Map */}
-      <div className="network-summary__section">
-        <div className="network-summary__section-header">
-          <h3 className="network-summary__section-title">Network Map</h3>
-          <div className="network-summary__section-actions">
+      <ChartCard
+        title="Network Map"
+        headerCenter={
+          <span className="network-summary__filter-inline">
             <span className="network-summary__filter-label body-regular">Year</span>
             <Select
               options={yearOptions}
               value={yearFilter}
               onValueChange={setYearFilter}
-              size="S"
+              size="XS"
               showLabel={false}
             />
-            <IconButton icon="open_in_new" size="S" variant="Ghost" alt="Fullscreen" />
-          </div>
-        </div>
-        <div className="network-summary__map-container">
+          </span>
+        }
+        actions={
+          <IconButton icon="open_in_new" size="XS" variant="Ghost" alt="Fullscreen" />
+        }
+        className="network-summary__chart-card"
+        style={{ flex: 1, height: 'auto' }}
+      >
+        <div className="network-summary__map-wrapper">
           <ComposableMap
             projection="geoMercator"
-            projectionConfig={{ scale: 130, center: [10, 30] }}
+            projectionConfig={{ scale: 130 }}
             width={900}
             height={400}
-            style={{ width: '100%', height: 'auto' }}
+            style={{ width: '100%', height: '100%' }}
           >
-            <Geographies geography={GEO_URL}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="var(--background-light, #e8edf5)"
-                    stroke="var(--border-default, #ccd4e0)"
-                    strokeWidth={0.5}
-                    style={{
-                      default: { outline: 'none' },
-                      hover: { outline: 'none' },
-                      pressed: { outline: 'none' },
-                    }}
-                  />
-                ))
-              }
-            </Geographies>
+            <ZoomableGroup
+              zoom={mapZoom}
+              center={mapCenter}
+              onMoveEnd={({ coordinates, zoom }) => {
+                setMapCenter(coordinates as [number, number]);
+                setMapZoom(zoom);
+              }}
+              minZoom={1}
+              maxZoom={8}
+              translateExtent={[[-Infinity, -Infinity], [Infinity, Infinity]]}
+            >
+              <Geographies geography={GEO_URL}>
+                {({ geographies }) =>
+                  geographies.map((geo) => (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill="var(--sea-blue-10)"
+                      stroke="var(--cool-grey-30)"
+                      strokeWidth={0.5}
+                      style={{
+                        default: { outline: 'none' },
+                        hover: { outline: 'none' },
+                        pressed: { outline: 'none' },
+                      }}
+                    />
+                  ))
+                }
+              </Geographies>
 
-            {/* Route lines */}
-            {mapRoutes.map(route => (
-              <Line
-                key={route.id}
-                from={[route.from[1], route.from[0]]}
-                to={[route.to[1], route.to[0]]}
-                stroke="var(--primary-default, #063b9e)"
-                strokeWidth={1.5}
-                strokeLinecap="round"
-              />
-            ))}
+              {/* Route lines */}
+              {mapRoutes.map(route => (
+                <Line
+                  key={route.id}
+                  from={[route.from[1], route.from[0]]}
+                  to={[route.to[1], route.to[0]]}
+                  stroke="var(--primary-default, #063b9e)"
+                  strokeWidth={1.5 / mapZoom}
+                  strokeLinecap="round"
+                />
+              ))}
 
-            {/* Airport markers */}
-            {mapMarkers.map(marker => (
-              <Marker key={marker.code} coordinates={[marker.coords[1], marker.coords[0]]}>
-                <circle r={3} fill="var(--primary-default, #063b9e)" />
-              </Marker>
-            ))}
+              {/* Airport markers */}
+              {mapMarkers.map(marker => (
+                <Marker key={marker.code} coordinates={[marker.coords[1], marker.coords[0]]}>
+                  <circle r={3 / mapZoom} fill="var(--primary-default, #063b9e)" />
+                </Marker>
+              ))}
+            </ZoomableGroup>
           </ComposableMap>
-        </div>
-      </div>
-
-      {/* Average Flown Distance per Year chart */}
-      <div className="network-summary__section">
-        <div className="network-summary__section-header">
-          <h3 className="network-summary__section-title">Average Flown Distance per Year</h3>
-          <div className="network-summary__section-actions">
-            <IconButton icon="download" size="S" variant="Ghost" alt="Download" />
-            <IconButton icon="open_in_new" size="S" variant="Ghost" alt="Fullscreen" />
+          <div className="network-summary__zoom-controls">
+            <IconButton icon="add" size="XS" variant="Ghost" alt="Zoom in" onClick={() => setMapZoom(z => Math.min(z * 1.5, 8))} />
+            <IconButton icon="remove" size="XS" variant="Ghost" alt="Zoom out" onClick={() => setMapZoom(z => Math.max(z / 1.5, 1))} />
+            <IconButton icon="center_focus_strong" size="XS" variant="Ghost" alt="Reset" onClick={() => { setMapZoom(1); setMapCenter([10, 30]); }} />
           </div>
         </div>
-        <div className="network-summary__chart-container">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
-              <XAxis dataKey="year" tick={{ fontSize: 12 }} />
-              <YAxis
-                tick={{ fontSize: 12 }}
-                label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
-              />
-              <Tooltip />
-              <Bar dataKey="distance" fill="var(--primary-default, #063b9e)" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      </ChartCard>
+
+      {/* Average Flown Distance per Year chart */}
+      <ChartCard
+        title="Average Flown Distance per Year"
+        actions={
+          <>
+            <IconButton icon="download" size="XS" variant="Ghost" alt="Download" />
+            <IconButton icon="open_in_new" size="XS" variant="Ghost" alt="Fullscreen" />
+          </>
+        }
+        className="network-summary__chart-card"
+        style={{ flex: 1, height: 'auto' }}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
+            <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
+            />
+            <Tooltip />
+            <Bar dataKey="distance" fill="var(--primary-default, #063b9e)" radius={[2, 2, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
     </div>
   );
 }

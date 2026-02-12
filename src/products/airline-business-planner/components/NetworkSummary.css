@@ -1,8 +1,10 @@
 .network-summary {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   padding: 16px 0;
+  /* Fill viewport minus KPIs + header/tabs area */
+  min-height: calc(100vh - 200px);
 }
 
 /* KPI cards */
@@ -10,6 +12,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .network-summary__kpi-card {
@@ -33,27 +36,13 @@
   line-height: 1;
 }
 
-/* Sections */
-.network-summary__section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* ChartCard overrides */
+.network-summary__chart-card {
+  min-height: 0;
 }
 
-.network-summary__section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.network-summary__section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main, #1a1a2e);
-  margin: 0;
-}
-
-.network-summary__section-actions {
+/* Filter inline (Year select in header) */
+.network-summary__filter-inline {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -62,24 +51,37 @@
 .network-summary__filter-label {
   color: var(--text-secondary, #6b7280);
   font-size: 13px;
+  white-space: nowrap;
 }
 
-/* Map */
-.network-summary__map-container {
-  border: 1px solid var(--border-default, #ccd4e0);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--background-light, #f0f4fa);
+/* Map wrapper */
+.network-summary__map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--sea-blue-20);
+  touch-action: none; /* Enable touch/wheel zoom */
+  cursor: grab;
 }
 
-.network-summary__map-container svg {
-  display: block;
+.network-summary__map-wrapper:active {
+  cursor: grabbing;
 }
 
-/* Chart */
-.network-summary__chart-container {
-  border: 1px solid var(--border-default, #ccd4e0);
-  border-radius: 8px;
-  padding: 16px;
+/* Zoom controls */
+.network-summary__zoom-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   background: var(--background-main, #fff);
+  border-radius: var(--radius-xs, 3px);
+  box-shadow: var(--shadow-1, 0 0 3px 0 rgba(0, 0, 0, 0.10));
+}
+
+.network-summary__map-wrapper svg {
+  display: block;
 }
