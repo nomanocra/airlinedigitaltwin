@@ -201,7 +201,7 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
           <span className="network-summary__kpi-value">{numberOfAirports}</span>
         </div>
         <div className="network-summary__kpi-card">
-          <span className="network-summary__kpi-label label-medium-s">Number of Flights per A/C Type</span>
+          <span className="network-summary__kpi-label label-medium-s">Av. Flights per A/C Type</span>
           <span className="network-summary__kpi-value">{totalFlights}</span>
         </div>
       </div>
