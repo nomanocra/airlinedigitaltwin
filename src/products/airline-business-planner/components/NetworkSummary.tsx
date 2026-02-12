@@ -121,25 +121,47 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate 
     return Math.round((numberOfRoutes * 14 * 12) / totalAC);
   }, [numberOfRoutes, fleetEntries]);
 
+  // Filter routes by year
+  const filteredRouteEntries = useMemo(() => {
+    if (yearFilter === 'all') return routeEntries;
+    const selectedYear = parseInt(yearFilter, 10);
+    return routeEntries.filter(r => {
+      const startYear = r.startDate.getFullYear();
+      const endYear = r.endDate.getFullYear();
+      // Route is visible if it overlaps with selected year
+      return startYear <= selectedYear && endYear >= selectedYear;
+    });
+  }, [routeEntries, yearFilter]);
+
   // Map routes
   const mapRoutes = useMemo(() => {
-    return routeEntries
+    return filteredRouteEntries
       .filter(r => AIRPORT_COORDS[r.origin] && AIRPORT_COORDS[r.destination])
       .map(r => ({
         from: AIRPORT_COORDS[r.origin],
         to: AIRPORT_COORDS[r.destination],
         id: r.id,
       }));
-  }, [routeEntries]);
+  }, [filteredRouteEntries]);
+
+  // Filtered airports (only from filtered routes)
+  const filteredAirports = useMemo(() => {
+    const set = new Set<string>();
+    filteredRouteEntries.forEach(r => {
+      set.add(r.origin);
+      set.add(r.destination);
+    });
+    return set;
+  }, [filteredRouteEntries]);
 
   const mapMarkers = useMemo(() => {
-    return Array.from(airports)
+    return Array.from(filteredAirports)
       .filter(code => AIRPORT_COORDS[code])
       .map(code => ({
         code,
         coords: AIRPORT_COORDS[code],
       }));
-  }, [airports]);
+  }, [filteredAirports]);
 
   // Year options for filter
   const yearOptions = useMemo(() => {
