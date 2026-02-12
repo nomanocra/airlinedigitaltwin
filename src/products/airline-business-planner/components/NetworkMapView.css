@@ -1,0 +1,46 @@
+.network-map-view__chart-card {
+  flex: 1;
+  min-height: 280px;
+}
+
+.network-map-view__filter-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.network-map-view__filter-label {
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.network-map-view__map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--sea-blue-20);
+  touch-action: none;
+  cursor: grab;
+}
+
+.network-map-view__map-wrapper:active {
+  cursor: grabbing;
+}
+
+.network-map-view__zoom-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--background-main, #fff);
+  border-radius: var(--radius-xs, 3px);
+  box-shadow: var(--shadow-1, 0 0 3px 0 rgba(0, 0, 0, 0.1));
+}
+
+.network-map-view__map-wrapper svg {
+  display: block;
+}

@@ -33,6 +33,7 @@ import { EditRouteModal, type RouteEntryForEdit } from '../components/EditRouteM
 import { ImportAirlineFleetModal } from '../components/ImportAirlineFleetModal';
 import { ImportAirlineNetworkModal } from '../components/ImportAirlineNetworkModal';
 import { NetworkSummary } from '../components/NetworkSummary';
+import { NetworkMapView } from '../components/NetworkMapView';
 import { AddRouteModal } from '../components/AddRouteModal';
 import '@/design-system/tokens/ag-grid-theme.css';
 import './StudyPage.css';
@@ -43,6 +44,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 // Fleet sub-tab types
 type FleetTabType = 'fleet' | 'cost-operations' | 'cost-ownership' | 'crew';
 type FleetViewMode = 'table' | 'gantt';
+type RoutesViewMode = 'table' | 'map';
 type NetworkTabType = 'routes' | 'pricing' | 'fleet-plan' | 'frequencies' | 'summary';
 
 // Load Factor tab types
@@ -236,6 +238,7 @@ export default function StudyPage() {
 
   // Network tab state
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('routes');
+  const [routesViewMode, setRoutesViewMode] = useState<RoutesViewMode>('table');
   const [routeEntries, setRouteEntries] = useState<RouteEntry[]>(() => {
     if (studyData?.routes) {
       return studyData.routes.map(r => ({
@@ -2608,14 +2611,25 @@ export default function StudyPage() {
               {networkTab === 'routes' && (
                 <div className="study-page__tab-content">
                   <div className="study-page__fleet-title-bar">
-                    <h2 className="study-page__fleet-title">Routes</h2>
+                    <div className="study-page__fleet-title-left">
+                      <h2 className="study-page__fleet-title">Routes</h2>
+                      <ButtonGroup
+                        options={[
+                          { value: 'table', iconName: 'table_chart' },
+                          { value: 'map', iconName: 'map' },
+                        ]}
+                        value={routesViewMode}
+                        onChange={(v) => setRoutesViewMode(v as RoutesViewMode)}
+                        size="S"
+                      />
+                    </div>
                     <div className="study-page__fleet-title-right">
                       <span className="label-regular-s study-page__fleet-entry-count">
                         {routeEntries.length} Routes
                       </span>
                     </div>
                     <div className="study-page__fleet-actions">
-                      {selectedRouteIds.size > 0 && (
+                      {selectedRouteIds.size > 0 && routesViewMode === 'table' && (
                         <>
                           <span className="label-regular-s study-page__fleet-selection-count">
                             {selectedRouteIds.size} {selectedRouteIds.size === 1 ? 'Route' : 'Routes'} Selected
@@ -2677,47 +2691,59 @@ export default function StudyPage() {
                       </DropdownMenu>
                     </div>
                   </div>
-                  <div className="study-page__fleet-table">
-                    {routeEntries.length === 0 ? (
-                      <div className="study-page__fleet-table-body">
-                        <EmptyState
-                          illustration="Folder"
-                          title="No routes defined"
-                          description="Add routes to define your network"
-                          actions={
-                            <>
-                              <Button
-                                label="ADD ROUTE"
-                                leftIcon="add"
-                                variant="Outlined"
-                                size="M"
-                                onClick={() => setIsAddRouteModalOpen(true)}
-                              />
-                              <Button
-                                label="IMPORT NETWORK"
-                                leftIcon="system_update_alt"
-                                variant="Outlined"
-                                size="M"
-                                onClick={() => setIsImportAirlineNetworkModalOpen(true)}
-                              />
-                            </>
-                          }
-                          className="study-page__fleet-empty"
+                  {/* Table View */}
+                  {routesViewMode === 'table' && (
+                    <div className="study-page__fleet-table">
+                      {routeEntries.length === 0 ? (
+                        <div className="study-page__fleet-table-body">
+                          <EmptyState
+                            illustration="Folder"
+                            title="No routes defined"
+                            description="Add routes to define your network"
+                            actions={
+                              <>
+                                <Button
+                                  label="ADD ROUTE"
+                                  leftIcon="add"
+                                  variant="Outlined"
+                                  size="M"
+                                  onClick={() => setIsAddRouteModalOpen(true)}
+                                />
+                                <Button
+                                  label="IMPORT NETWORK"
+                                  leftIcon="system_update_alt"
+                                  variant="Outlined"
+                                  size="M"
+                                  onClick={() => setIsImportAirlineNetworkModalOpen(true)}
+                                />
+                              </>
+                            }
+                            className="study-page__fleet-empty"
+                          />
+                        </div>
+                      ) : (
+                        <AgGridReact
+                          className="as-ag-grid"
+                          rowData={routeEntries}
+                          columnDefs={routesColDefs}
+                          context={gridContext}
+                          rowSelection="multiple"
+                          suppressRowClickSelection={true}
+                          onSelectionChanged={onRouteSelectionChanged}
+                          getRowId={(params) => params.data.id}
                         />
-                      </div>
-                    ) : (
-                      <AgGridReact
-                        className="as-ag-grid"
-                        rowData={routeEntries}
-                        columnDefs={routesColDefs}
-                        context={gridContext}
-                        rowSelection="multiple"
-                        suppressRowClickSelection={true}
-                        onSelectionChanged={onRouteSelectionChanged}
-                        getRowId={(params) => params.data.id}
-                      />
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Map View */}
+                  {routesViewMode === 'map' && (
+                    <NetworkMapView
+                      routeEntries={routeEntries}
+                      startDate={startDate}
+                      endDate={endDate}
+                    />
+                  )}
                 </div>
               )}
 
