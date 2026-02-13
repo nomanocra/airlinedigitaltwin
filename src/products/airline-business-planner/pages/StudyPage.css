@@ -528,6 +528,7 @@
 
 .study-page__table-scroll-wrapper {
   overflow-x: auto;
+  grid-column: 1 / -1;
 }
 
 .study-page__container-tabs + .study-page__container-tab-content {
