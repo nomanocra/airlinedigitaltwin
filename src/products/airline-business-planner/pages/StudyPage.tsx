@@ -477,6 +477,115 @@ export default function StudyPage() {
     };
   }, []);
 
+  // Initialize cost/crew data when fleet entries change
+  const isComputedStudy = studyData?.status === 'Computed';
+  useEffect(() => {
+    setCostOperationsData(prev => {
+      const existingIds = new Set(prev.map(c => c.id));
+      const newEntries = fleetEntries
+        .filter(e => !existingIds.has(e.id))
+        .map(e => ({
+          id: e.id,
+          groundHandlingCharge: isComputedStudy ? 850 : 0,
+          fuelAgeingFactor: isComputedStudy ? 2.5 : 0,
+        }));
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+
+    setCostOwnershipData(prev => {
+      const existingIds = new Set(prev.map(c => c.id));
+      const newEntries = fleetEntries
+        .filter(e => !existingIds.has(e.id))
+        .map(e => ({
+          id: e.id,
+          monthlyLeaseRate: isComputedStudy ? 380000 : 0,
+          acValueUponAcquisition: isComputedStudy ? 110000000 : 0,
+          sparesProvisioningPerFamily: isComputedStudy ? 2500000 : 0,
+        }));
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+
+    setCrewConfigData(prev => {
+      const existingIds = new Set(prev.map(c => c.id));
+      const newEntries = fleetEntries
+        .filter(e => !existingIds.has(e.id))
+        .map(e => ({
+          id: e.id,
+          captainPerCrew: isComputedStudy ? 2 : 1,
+          firstOfficerPerCrew: isComputedStudy ? 2 : 1,
+          cabinManagerPerCrew: isComputedStudy ? 2 : 1,
+          cabinAttendantPerCrew: isComputedStudy ? 4 : 1,
+        }));
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+  }, [fleetEntries]);
+
+  // Initialize pricing, fleet plan, and frequencies when routes change
+  useEffect(() => {
+    setRoutePricingData(prev => {
+      const existingIds = new Set(prev.map(p => p.routeId));
+      const newEntries = routeEntries
+        .filter(r => !existingIds.has(r.id))
+        .map(r => ({
+          routeId: r.id,
+          marketYield: isComputedStudy ? 0.08 : 0,
+          discountStrategy: 'None',
+          yield: isComputedStudy ? 0.07 : 0,
+          fare: 0,
+        }));
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+
+    setFleetPlanData(prev => {
+      const existingIds = new Set(prev.map(f => f.routeId));
+      const newEntries = routeEntries
+        .filter(r => !existingIds.has(r.id))
+        .map((r, index) => ({
+          routeId: r.id,
+          allocatedAircraftId: isComputedStudy && fleetEntries.length > 0
+            ? fleetEntries[index % fleetEntries.length].id
+            : null,
+        }));
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+
+    setRouteFrequencyData(prev => {
+      const existingIds = new Set(prev.map(f => f.routeId));
+      const newEntries = routeEntries
+        .filter(r => !existingIds.has(r.id))
+        .map(r => {
+          if (isComputedStudy && startDate && endDate) {
+            const freqs: Record<string, number> = {};
+            const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+            const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+            while (current <= end) {
+              const key = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
+              freqs[key] = 14;
+              current.setMonth(current.getMonth() + 1);
+            }
+            return { routeId: r.id, frequencies: freqs };
+          }
+          return { routeId: r.id, frequencies: {} };
+        });
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+  }, [routeEntries]);
+
+  // Clean up invalid allocatedAircraftId when fleet entries change
+  useEffect(() => {
+    const validAircraftIds = new Set(fleetEntries.map(e => e.id));
+    setFleetPlanData(prev => {
+      const updated = prev.map(f => {
+        if (f.allocatedAircraftId && !validAircraftIds.has(f.allocatedAircraftId)) {
+          return { ...f, allocatedAircraftId: null };
+        }
+        return f;
+      });
+      const hasChanges = updated.some((f, i) => f.allocatedAircraftId !== prev[i]?.allocatedAircraftId);
+      return hasChanges ? updated : prev;
+    });
+  }, [fleetEntries]);
+
   const handleCompute = useCallback(() => {
     setStudyStatus('computing');
     computeTimerRef.current = setTimeout(() => {
