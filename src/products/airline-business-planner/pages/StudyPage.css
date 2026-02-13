@@ -675,3 +675,36 @@
   border-radius: 50%;
   background-color: var(--error-default, #d32f2f);
 }
+
+/* ============================================================================
+   PRICING GRID - Alternating colors by O&D
+   ============================================================================ */
+
+.study-page__pricing-grid .pricing-row-group-even {
+  background-color: var(--background-main, #ffffff);
+}
+
+.study-page__pricing-grid .pricing-row-group-odd {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+/* Light border between O&D groups */
+.study-page__pricing-grid .pricing-row-group-first {
+  border-top: 1px solid var(--border-minimal, #eff1f4);
+}
+
+/* O&D cell styling */
+.study-page__pricing-grid .pricing-od-cell {
+  font-weight: 600;
+  color: var(--text-corporate, #00205b);
+}
+
+/* Hide O&D text for non-first rows of each group */
+.study-page__pricing-grid .pricing-od-cell--hidden {
+  color: transparent;
+}
+
+/* Fare cell - secondary text color */
+.study-page__pricing-grid .pricing-fare-cell {
+  color: var(--text-secondary, #63728a);
+}

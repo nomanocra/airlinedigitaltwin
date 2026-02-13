@@ -138,11 +138,51 @@ export function NetworkSection({
     { field: 'endDate', headerName: 'End Date', flex: 1, minWidth: 130, cellRenderer: RouteEndDateCellRenderer },
   ], []);
 
-  // Pricing — filter to show only active classes
+  // Pricing — filter to show only active classes, sorted by routeId for grouping
   const pricingRowData = useMemo(() => {
     const activeSet = new Set(activeClasses);
-    return routePricingData.filter(p => activeSet.has(p.classCode));
+    const filtered = routePricingData.filter(p => activeSet.has(p.classCode));
+    // Sort by routeId to ensure grouping
+    return filtered.sort((a, b) => a.routeId.localeCompare(b.routeId));
   }, [routePricingData, activeClasses]);
+
+  // Build a map of routeId -> group index for alternating colors
+  const pricingRouteGroupIndex = useMemo(() => {
+    const groups: Record<string, number> = {};
+    let currentGroupIndex = 0;
+    let lastRouteId = '';
+    pricingRowData.forEach(p => {
+      if (p.routeId !== lastRouteId) {
+        groups[p.routeId] = currentGroupIndex;
+        currentGroupIndex++;
+        lastRouteId = p.routeId;
+      }
+    });
+    return groups;
+  }, [pricingRowData]);
+
+  // Track which routeIds have already shown their O&D (for row spanning)
+  const pricingFirstRowOfRoute = useMemo(() => {
+    const firstRows: Set<string> = new Set();
+    const seen: Set<string> = new Set();
+    pricingRowData.forEach((p, idx) => {
+      if (!seen.has(p.routeId)) {
+        firstRows.add(`${p.routeId}-${p.classCode}`);
+        seen.add(p.routeId);
+      }
+    });
+    return firstRows;
+  }, [pricingRowData]);
+
+  // Row class for alternating colors by O&D group + first row border
+  const getPricingRowClass = useCallback((params: { data: RoutePricingEntry }) => {
+    if (!params.data) return '';
+    const groupIndex = pricingRouteGroupIndex[params.data.routeId] || 0;
+    const rowKey = `${params.data.routeId}-${params.data.classCode}`;
+    const isFirstRowOfGroup = pricingFirstRowOfRoute.has(rowKey);
+    const colorClass = groupIndex % 2 === 0 ? 'pricing-row-group-even' : 'pricing-row-group-odd';
+    return isFirstRowOfGroup ? `${colorClass} pricing-row-group-first` : colorClass;
+  }, [pricingRouteGroupIndex, pricingFirstRowOfRoute]);
 
   const DiscountStrategyCellRenderer = (props: ICellRendererParams) => {
     const handleChange = (newValue: string) => {
@@ -162,7 +202,21 @@ export function NetworkSection({
   };
 
   const pricingColDefs = useMemo<ColDef[]>(() => [
-    { field: 'route', headerName: 'Origin Destination', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { routeId: string } }) => { const route = routeEntries.find(r => r.id === params.data?.routeId); return route ? `${route.origin} - ${route.destination}` : ''; }},
+    {
+      field: 'route',
+      headerName: 'Origin Destination',
+      width: 140,
+      pinned: 'left' as const,
+      cellClass: (params) => {
+        const rowKey = `${params.data?.routeId}-${params.data?.classCode}`;
+        const isFirst = pricingFirstRowOfRoute.has(rowKey);
+        return isFirst ? 'pricing-od-cell pricing-od-cell--visible' : 'pricing-od-cell pricing-od-cell--hidden';
+      },
+      valueGetter: (params: { data: { routeId: string } }) => {
+        const route = routeEntries.find(r => r.id === params.data?.routeId);
+        return route ? `${route.origin} - ${route.destination}` : '';
+      },
+    },
     { field: 'classCode', headerName: 'Class', width: 110, pinned: 'left' as const, valueGetter: (params: { data: { classCode: string } }) => CLASS_LABELS[params.data?.classCode] || params.data?.classCode },
     { field: 'period', headerName: 'Period', width: 170, pinned: 'left' as const, valueGetter: (params: { data: { routeId: string } }) => { const route = routeEntries.find(r => r.id === params.data?.routeId); if (!route) return ''; const start = route.startDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() || ''; const end = route.endDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() || ''; return `${start} - ${end}`; }},
     { field: 'marketYield', headerName: 'Market Yield ($/pax km)', flex: 1.2, minWidth: 120, cellRenderer: MarketYieldCellRenderer },
@@ -172,8 +226,8 @@ export function NetworkSection({
       const value = props.data?.yield ?? 0;
       return (<div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}><NumberInput value={value} onChange={handleChange} size="S" min={0} step={0.1} showLabel={false} variant="Stepper" state={value === 0 ? 'Error' : 'Default'} /></div>);
     }},
-    { field: 'fare', headerName: 'Fare (yield*distance)', flex: 1.2, minWidth: 120, valueGetter: (params: { data: RoutePricingEntry }) => { const marketYield = params.data?.marketYield || 0; const discount = discountForNormalFares || 0; const yieldValue = marketYield * (1 - discount / 100); return (yieldValue * 100).toFixed(2); }},
-  ], [routeEntries, discountForNormalFares]);
+    { field: 'fare', headerName: 'Fare (yield*distance)', flex: 1.2, minWidth: 120, cellClass: 'pricing-fare-cell', valueGetter: (params: { data: RoutePricingEntry }) => { const marketYield = params.data?.marketYield || 0; const discount = discountForNormalFares || 0; const yieldValue = marketYield * (1 - discount / 100); return (yieldValue * 100).toFixed(2); }},
+  ], [routeEntries, discountForNormalFares, pricingFirstRowOfRoute]);
 
   // Fleet Plan
   const AllocatedAircraftCellRenderer = (props: ICellRendererParams & { aircraftOptions?: { value: string; label: string }[] }) => {
@@ -318,7 +372,7 @@ export function NetworkSection({
               <Button label="" leftIcon="download" rightIcon="arrow_drop_down" variant="Outlined" size="S" onClick={() => console.log('Export pricing')} />
             </div>
           </div>
-          <div className="study-page__fleet-table"><AgGridReact className="as-ag-grid" rowData={pricingRowData} columnDefs={pricingColDefs} getRowId={(params) => `${params.data.routeId}-${params.data.classCode}`} /></div>
+          <div className="study-page__fleet-table"><AgGridReact className="as-ag-grid study-page__pricing-grid" rowData={pricingRowData} columnDefs={pricingColDefs} getRowId={(params) => `${params.data.routeId}-${params.data.classCode}`} getRowClass={getPricingRowClass} /></div>
         </div>
       )}
 
