@@ -13,6 +13,13 @@ import type {
   GanttAircraftRow, Scenario, PersistedStudyData,
 } from './types';
 import { ASSUMPTION_ITEMS, OUTPUT_ITEMS } from './constants';
+import {
+  generateMonthColumns as genMonthCols,
+  generateYearColumns as genYearCols,
+  getMonthKeys, getYearKeys, getMonthLabels,
+  yearKeyToLabel as yearKeyToLabelFn,
+  formatCurrency,
+} from '../utils/periodUtils';
 import { AppHeader } from '@/design-system/composites/AppHeader';
 import { LeftPanel } from '@/design-system/composites/LeftPanel';
 import { PanelHeader } from '@/design-system/composites/PanelHeader';
@@ -640,99 +647,21 @@ export default function StudyPage() {
   };
 
   // Utility: Generate month columns from start to end date
-  const generateMonthColumns = useCallback((start: Date | undefined, end: Date | undefined): ColDef[] => {
-    if (!start || !end) return [];
-    const columns: ColDef[] = [];
-    const current = new Date(start.getFullYear(), start.getMonth(), 1);
-    const endD = new Date(end.getFullYear(), end.getMonth(), 1);
-    let monthIndex = 1;
-    while (current <= endD) {
-      const key = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
-      const yearIndex = Math.ceil(monthIndex / 12);
-      const monthInYear = ((monthIndex - 1) % 12) + 1;
-      columns.push({
-        field: key,
-        headerName: periodType === 'duration'
-          ? `M${monthInYear} Y${yearIndex}`
-          : current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        flex: 1,
-        minWidth: 100,
-      });
-      current.setMonth(current.getMonth() + 1);
-      monthIndex++;
-    }
-    return columns;
-  }, [periodType]);
-
-  // Utility: Generate year columns from start to end date
-  const generateYearColumns = useCallback((start: Date | undefined, end: Date | undefined): ColDef[] => {
-    if (!start || !end) return [];
-    const columns: ColDef[] = [];
-    for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
-      const yearIndex = y - start.getFullYear() + 1;
-      columns.push({
-        field: `Y${yearIndex}`,
-        headerName: periodType === 'duration' ? `Y${yearIndex}` : String(y),
-        flex: 1,
-        minWidth: 90,
-      });
-    }
-    return columns;
-  }, [periodType]);
-
-  // Utility: Generate year keys from period
-  const yearKeys = useMemo(() => {
-    if (!startDate || !endDate) return [];
-    const keys: string[] = [];
-    for (let y = startDate.getFullYear(); y <= endDate.getFullYear(); y++) {
-      keys.push(`Y${y - startDate.getFullYear() + 1}`);
-    }
-    return keys;
-  }, [startDate, endDate]);
-
-  // Utility: Map year key (Y1, Y2...) to display label based on periodType
-  const yearKeyToLabel = useCallback((key: string): string => {
-    if (periodType === 'duration' || !startDate) return key;
-    const idx = parseInt(key.replace('Y', ''), 10);
-    return String(startDate.getFullYear() + idx - 1);
-  }, [periodType, startDate]);
-
-  // Utility: Generate month keys from period
-  const monthKeys = useMemo(() => {
-    if (!startDate || !endDate) return [];
-    const keys: string[] = [];
-    const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-    while (current <= end) {
-      keys.push(`${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`);
-      current.setMonth(current.getMonth() + 1);
-    }
-    return keys;
-  }, [startDate, endDate]);
-
-  // Month labels for computed tables (dates mode: "Jan 2026", duration mode: "M1 Y1")
-  const monthLabels = useMemo(() => {
-    if (!startDate || !endDate) return [];
-    const labels: string[] = [];
-    const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-    let idx = 1;
-    while (current <= end) {
-      if (periodType === 'duration') {
-        const yIdx = Math.ceil(idx / 12);
-        const mIdx = ((idx - 1) % 12) + 1;
-        labels.push(`M${mIdx} Y${yIdx}`);
-      } else {
-        labels.push(current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-      }
-      current.setMonth(current.getMonth() + 1);
-      idx++;
-    }
-    return labels;
-  }, [startDate, endDate, periodType]);
-
-  // Helper to format currency
-  const formatCurrency = (v: number) => `$${v.toLocaleString('en-US')}`;
+  const generateMonthColumns = useMemo(
+    () => (start: Date | undefined, end: Date | undefined) => genMonthCols(start, end, periodType),
+    [periodType]
+  );
+  const generateYearColumns = useMemo(
+    () => (start: Date | undefined, end: Date | undefined) => genYearCols(start, end, periodType),
+    [periodType]
+  );
+  const yearKeys = useMemo(() => getYearKeys(startDate, endDate), [startDate, endDate]);
+  const yearKeyToLabel = useMemo(
+    () => (key: string) => yearKeyToLabelFn(key, periodType, startDate),
+    [periodType, startDate]
+  );
+  const monthKeys = useMemo(() => getMonthKeys(startDate, endDate), [startDate, endDate]);
+  const monthLabels = useMemo(() => getMonthLabels(startDate, endDate, periodType), [startDate, endDate, periodType]);
 
   // Computed crew cost tables (mock data based on inputs)
   const crewFixedWagesTableData = useMemo(() => {
