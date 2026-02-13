@@ -530,6 +530,63 @@
   margin-top: -12px;
 }
 
+/* Computed table in tab content */
+.study-page__container-tab-content--table {
+  background-color: var(--background-secondary, #fafafa);
+  overflow-x: auto;
+}
+
+.study-page__container-tabs + .study-page__container-tab-content--table {
+  margin-top: -12px;
+}
+
+.study-page__computed-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+}
+
+.study-page__computed-table thead th {
+  padding: 8px 12px;
+  text-align: right;
+  font-weight: 700;
+  color: var(--text-main, #14171d);
+  border-bottom: 1px solid var(--border-default, #dde1e8);
+  background-color: var(--background-secondary, #fafafa);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.study-page__computed-table thead th:first-child {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 240px;
+  max-width: 360px;
+  white-space: normal;
+}
+
+.study-page__computed-table tbody td {
+  padding: 8px 12px;
+  text-align: right;
+  color: var(--text-secondary, #63728a);
+  border-bottom: 1px solid var(--border-light, #eff1f4);
+  white-space: nowrap;
+}
+
+.study-page__computed-table tbody td:first-child {
+  text-align: left;
+  color: var(--text-main, #14171d);
+  position: sticky;
+  left: 0;
+  background-color: var(--background-secondary, #fafafa);
+  min-width: 240px;
+  max-width: 360px;
+  white-space: normal;
+}
+
 /* Read-only calculated field placeholder */
 .study-page__readonly-field {
   display: flex;

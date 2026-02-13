@@ -900,6 +900,63 @@ export default function StudyPage() {
     return keys;
   }, [startDate, endDate]);
 
+  // Month labels for computed tables (dates mode: "Jan 2026", duration mode: "M1 Y1")
+  const monthLabels = useMemo(() => {
+    if (!startDate || !endDate) return [];
+    const labels: string[] = [];
+    const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+    let idx = 1;
+    while (current <= end) {
+      if (periodType === 'duration') {
+        const yIdx = Math.ceil(idx / 12);
+        const mIdx = ((idx - 1) % 12) + 1;
+        labels.push(`M${mIdx} Y${yIdx}`);
+      } else {
+        labels.push(current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+      }
+      current.setMonth(current.getMonth() + 1);
+      idx++;
+    }
+    return labels;
+  }, [startDate, endDate, periodType]);
+
+  // Helper to format currency
+  const formatCurrency = (v: number) => `$${v.toLocaleString('en-US')}`;
+
+  // Computed crew cost tables (mock data based on inputs)
+  const crewFixedWagesTableData = useMemo(() => {
+    const w = crewFixedWages;
+    const captainTotal = Math.round(w.captainGrossWage * (1 + w.companyChargesCaptain / 100));
+    const foTotal = Math.round(w.firstOfficerGrossWage * (1 + w.companyChargesFirstOfficer / 100));
+    const ccLeaderTotal = Math.round(w.cabinCrewTeamLeaderWage * (1 + w.companyChargesCabinCrewTeamLeader / 100));
+    const caTotal = Math.round(w.cabinAttendantWage * (1 + w.companyChargesCabinAttendant / 100));
+    return [
+      { label: 'Captain Total Cost (incl. Company charges) per month', values: monthKeys.map(() => captainTotal) },
+      { label: 'F/O Total Cost (incl. Company charges) per month', values: monthKeys.map(() => foTotal) },
+      { label: 'Cabin Crew Team Leader Total Cost (incl. Company charges) per month', values: monthKeys.map(() => ccLeaderTotal) },
+      { label: 'Cabin Crew Std Total Cost (incl. Company charges) per month', values: monthKeys.map(() => caTotal) },
+    ];
+  }, [crewFixedWages, monthKeys]);
+
+  const variableWagesTableData = useMemo(() => {
+    const v = crewVariableWages;
+    return [
+      { label: 'Flight Crew Variable scheme per BH', perSector: v.flightCrewVariablePay, values: monthKeys.map(() => Math.round(v.flightCrewVariablePay * 720)) },
+      { label: 'Cabin Crew Variable scheme per BH', perSector: v.cabinCrewVariablePay, values: monthKeys.map(() => Math.round(v.cabinCrewVariablePay * 720)) },
+    ];
+  }, [crewVariableWages, monthKeys]);
+
+  const trainingCostsTableData = useMemo(() => {
+    const t = crewTraining;
+    return [
+      { label: 'Operator Conversion course per flight crew', values: monthKeys.map(() => Math.round(t.operatorConversionCourse * 300)) },
+      { label: 'Type rating Cost for non A/C type qualified pilots', values: monthKeys.map(() => Math.round(t.typeRatingCost * 640)) },
+      { label: 'Flight Crew Recurrent Training Cost per FC team (Captain + F/O + Instructor) incl. Accommodation', values: monthKeys.map(() => Math.round(t.flightCrewRecurrentTraining * 70)) },
+      { label: 'Cabin Crew Training Cost per Cabin Crew Member, incl. Accommodation', values: monthKeys.map(() => Math.round(t.cabinCrewTrainingCost * 10)) },
+    ];
+  }, [crewTraining, monthKeys]);
+
   // Generic NumberInput cell renderer factory for AG Grid (for new assumption pages)
   const createGenericNumberCellRenderer = (
     fieldName: string,
@@ -3258,8 +3315,23 @@ export default function StudyPage() {
                       </div>
                     )}
                     {crewFixedWagesSubTab === 'monthly-costs' && (
-                      <div className="study-page__container-tab-content" style={{ minHeight: 80, justifyContent: 'center' }}>
-                        <div className="study-page__readonly-value">Calculated values will appear here</div>
+                      <div className="study-page__container-tab-content--table">
+                        <table className="study-page__computed-table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {crewFixedWagesTableData.map((row, i) => (
+                              <tr key={i}>
+                                <td>{row.label}</td>
+                                {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     )}
                   </div>
@@ -3280,8 +3352,25 @@ export default function StudyPage() {
                       </div>
                     )}
                     {crewVariableWagesSubTab === 'monthly-costs' && (
-                      <div className="study-page__container-tab-content" style={{ minHeight: 80, justifyContent: 'center' }}>
-                        <div className="study-page__readonly-value">Calculated values will appear here</div>
+                      <div className="study-page__container-tab-content--table">
+                        <table className="study-page__computed-table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th>USD per Sector, excl. Company Charges</th>
+                              {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {variableWagesTableData.map((row, i) => (
+                              <tr key={i}>
+                                <td>{row.label}</td>
+                                <td>{formatCurrency(row.perSector)}</td>
+                                {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     )}
                   </div>
@@ -3305,8 +3394,23 @@ export default function StudyPage() {
                       </div>
                     )}
                     {crewTrainingSubTab === 'monthly-costs' && (
-                      <div className="study-page__container-tab-content" style={{ minHeight: 80, justifyContent: 'center' }}>
-                        <div className="study-page__readonly-value">Calculated values will appear here</div>
+                      <div className="study-page__container-tab-content--table">
+                        <table className="study-page__computed-table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {trainingCostsTableData.map((row, i) => (
+                              <tr key={i}>
+                                <td>{row.label}</td>
+                                {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     )}
                   </div>
