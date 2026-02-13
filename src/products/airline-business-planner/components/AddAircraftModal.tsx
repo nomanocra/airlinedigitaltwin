@@ -11,6 +11,7 @@ import {
   type PerformanceSource,
 } from '@/design-system/composites/AircraftSelector';
 import { SAMPLE_AIRCRAFT_DATA, AIRCRAFT_CONFIGS, getSummaryFromPath, getDefaultTechnicalConfig } from '../data/aircraftDatabase';
+import { parseLayoutClasses } from '../utils/cabinClassUtils';
 import './AddAircraftModal.css';
 
 export interface FleetEntry {
@@ -22,6 +23,7 @@ export interface FleetEntry {
   enterInService: Date;
   retirement?: Date;
   ownership: 'Owned' | 'Leased';
+  cabinClasses: Array<{ code: string; seats: number }>;
 }
 
 interface RelativeMonthOption {
@@ -111,6 +113,7 @@ export function AddAircraftModal({ isOpen, onClose, onAddAircraft, periodType = 
       enterInService: entryIntoService,
       retirement: retirement,
       ownership,
+      cabinClasses: parseLayoutClasses(aircraftData.summary.layout),
     };
 
     onAddAircraft(newEntry);

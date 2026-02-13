@@ -14,6 +14,7 @@ import {
   getMonthKeys, getYearKeys, getMonthLabels,
   yearKeyToLabel as yearKeyToLabelFn,
 } from '../utils/periodUtils';
+import { getActiveClasses, parseLayoutClasses, CLASS_LABELS } from '../utils/cabinClassUtils';
 import { AppHeader } from '@/design-system/composites/AppHeader';
 import { LeftPanel } from '@/design-system/composites/LeftPanel';
 import { PanelHeader } from '@/design-system/composites/PanelHeader';
@@ -141,7 +142,14 @@ export default function StudyPage() {
     }
     return [];
   });
-  const [routePricingData, setRoutePricingData] = useState<RoutePricingEntry[]>(() => persistedData?.routePricingData || []);
+  const [routePricingData, setRoutePricingData] = useState<RoutePricingEntry[]>(() => {
+    if (!persistedData?.routePricingData) return [];
+    // Migration: add classCode if missing (old data had one entry per route without classCode)
+    return persistedData.routePricingData.map(p => ({
+      ...p,
+      classCode: p.classCode || 'Y',
+    }));
+  });
   const [fleetPlanData, setFleetPlanData] = useState<FleetPlanEntry[]>(() => persistedData?.fleetPlanData || []);
   const [routeFrequencyData, setRouteFrequencyData] = useState<RouteFrequencyEntry[]>(() => persistedData?.routeFrequencyData || []);
   const [isAddRouteModalOpen, setIsAddRouteModalOpen] = useState(false);
@@ -150,21 +158,22 @@ export default function StudyPage() {
   const [discountForNormalFares, setDiscountForNormalFares] = useState<number>(() => persistedData?.discountForNormalFares ?? 0);
 
   // ========== LOAD FACTOR STATE ==========
+  // Keys are class codes (F, J, C, W, Y)
   const [targetedYearlyLF, setTargetedYearlyLF] = useState<Record<string, Record<string, number>>>({
-    'Economy (Y)': { Y2: 70, Y3: 75, Y4: 80, Y5: 82, Y6: 85 },
-    'Business (C)': { Y2: 60, Y3: 65, Y4: 70, Y5: 72, Y6: 75 },
-    'Premium (W)': { Y2: 55, Y3: 60, Y4: 65, Y5: 68, Y6: 70 },
+    Y: { Y2: 70, Y3: 75, Y4: 80, Y5: 82, Y6: 85 },
+    J: { Y2: 60, Y3: 65, Y4: 70, Y5: 72, Y6: 75 },
+    W: { Y2: 55, Y3: 60, Y4: 65, Y5: 68, Y6: 70 },
   });
   const [seasonalityCorrection, setSeasonalityCorrection] = useState<Record<string, number>>({
     Jan: 81, Feb: 77, Mar: 96, Apr: 99, May: 108, Jun: 117,
     Jul: 130, Aug: 136, Sep: 115, Oct: 83, Nov: 76, Dec: 83,
   });
   const [firstYearRampUp, setFirstYearRampUp] = useState<Record<string, Record<string, number>>>({
-    'Economy (Y)': {},
-    'Business (C)': {},
-    'Premium (W)': {},
+    Y: {},
+    J: {},
+    W: {},
   });
-  const [maxLoadFactor, setMaxLoadFactor] = useState({ economy: 98, business: 95, premium: 93 });
+  const [maxLoadFactor, setMaxLoadFactor] = useState<Record<string, number>>({ Y: 98, J: 95, W: 93 });
   const [routeLoadFactorData, setRouteLoadFactorData] = useState<Array<{ routeId: string; classType: string; [key: string]: number | string }>>([]);
 
   // ========== OPERATIONAL COST STATE ==========
@@ -198,10 +207,11 @@ export default function StudyPage() {
   const [marketingBudget, setMarketingBudget] = useState<Record<string, number>>({});
 
   // ========== REVENUE STATE ==========
+  // classType uses class codes (F, J, C, W, Y)
   const [ancillaryRevenueData, setAncillaryRevenueData] = useState<Array<{ classType: string; [key: string]: number | string }>>([
-    { classType: 'Y Pax' },
-    { classType: 'C Pax' },
-    { classType: 'W Pax' },
+    { classType: 'Y' },
+    { classType: 'J' },
+    { classType: 'W' },
   ]);
   const [codeShareDeduction, setCodeShareDeduction] = useState(20);
   const [cargoMarketCAGR, setCargoMarketCAGR] = useState(20);
@@ -244,6 +254,7 @@ export default function StudyPage() {
         enterInService: new Date(f.enterInService),
         retirement: undefined,
         ownership: (index % 2 === 0 ? 'Owned' : 'Leased') as const,
+        cabinClasses: parseLayoutClasses(f.layout),
       }));
     }
     if (persistedData?.fleetEntries) {
@@ -256,10 +267,14 @@ export default function StudyPage() {
         enterInService: new Date(f.enterInService),
         retirement: f.retirement ? new Date(f.retirement) : undefined,
         ownership: f.ownership,
+        cabinClasses: f.cabinClasses || parseLayoutClasses(f.layout),
       }));
     }
     return [];
   });
+
+  // Compute active cabin classes from fleet
+  const activeClasses = useMemo(() => getActiveClasses(fleetEntries), [fleetEntries]);
 
   // Handle period type switching — save/restore dates for period and entries
   const handlePeriodTypeChange = useCallback((newType: string) => {
@@ -520,19 +535,26 @@ export default function StudyPage() {
     });
   }, [fleetEntries]);
 
-  // Initialize pricing, fleet plan, and frequencies when routes change
+  // Initialize pricing, fleet plan, and frequencies when routes or active classes change
   useEffect(() => {
     setRoutePricingData(prev => {
-      const existingIds = new Set(prev.map(p => p.routeId));
-      const newEntries = routeEntries
-        .filter(r => !existingIds.has(r.id))
-        .map(r => ({
-          routeId: r.id,
-          marketYield: isComputedStudy ? 0.08 : 0,
-          discountStrategy: 'None',
-          yield: isComputedStudy ? 0.07 : 0,
-          fare: 0,
-        }));
+      const existingKeys = new Set(prev.map(p => `${p.routeId}-${p.classCode}`));
+      const classes = activeClasses.length > 0 ? activeClasses : ['Y'];
+      const newEntries: RoutePricingEntry[] = [];
+      for (const r of routeEntries) {
+        for (const cls of classes) {
+          if (!existingKeys.has(`${r.id}-${cls}`)) {
+            newEntries.push({
+              routeId: r.id,
+              classCode: cls,
+              marketYield: isComputedStudy ? 0.08 : 0,
+              discountStrategy: 'None',
+              yield: isComputedStudy ? 0.07 : 0,
+              fare: 0,
+            });
+          }
+        }
+      }
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
 
@@ -569,7 +591,7 @@ export default function StudyPage() {
         });
       return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
     });
-  }, [routeEntries]);
+  }, [routeEntries, activeClasses]);
 
   // Clean up invalid allocatedAircraftId when fleet entries change
   useEffect(() => {
@@ -585,6 +607,18 @@ export default function StudyPage() {
       return hasChanges ? updated : prev;
     });
   }, [fleetEntries]);
+
+  // Ensure ancillaryRevenueData has entries for all active classes
+  useEffect(() => {
+    if (activeClasses.length === 0) return;
+    setAncillaryRevenueData(prev => {
+      const existingCodes = new Set(prev.map(r => r.classType));
+      const newEntries = activeClasses
+        .filter(code => !existingCodes.has(code))
+        .map(code => ({ classType: code }));
+      return newEntries.length > 0 ? [...prev, ...newEntries] : prev;
+    });
+  }, [activeClasses]);
 
   const handleCompute = useCallback(() => {
     setStudyStatus('computing');
@@ -637,8 +671,10 @@ export default function StudyPage() {
 
   const pricingErrors = useMemo(() => {
     if (!hasRoutes) return 0;
-    return routePricingData.filter(p => p.marketYield === 0 || p.yield === 0).length;
-  }, [routePricingData, hasRoutes]);
+    // Only count errors for active classes
+    const activeSet = new Set(activeClasses);
+    return routePricingData.filter(p => activeSet.has(p.classCode) && (p.marketYield === 0 || p.yield === 0)).length;
+  }, [routePricingData, hasRoutes, activeClasses]);
 
   const fleetPlanErrors = useMemo(() => {
     if (!hasRoutes) return 0;
@@ -698,6 +734,7 @@ export default function StudyPage() {
         enterInService: f.enterInService.toISOString(),
         retirement: f.retirement?.toISOString(),
         ownership: f.ownership,
+        cabinClasses: f.cabinClasses,
       })),
       costOperationsData,
       costOwnershipData,
@@ -887,6 +924,7 @@ export default function StudyPage() {
               selectedRouteIds={selectedRouteIds}
               setSelectedRouteIds={setSelectedRouteIds}
               routesGridApiRef={routesGridApiRef}
+              activeClasses={activeClasses}
             />
           )}
 
@@ -909,6 +947,7 @@ export default function StudyPage() {
               setMaxLoadFactor={setMaxLoadFactor}
               routeLoadFactorData={routeLoadFactorData}
               setRouteLoadFactorData={setRouteLoadFactorData}
+              activeClasses={activeClasses}
             />
           )}
 
@@ -955,6 +994,7 @@ export default function StudyPage() {
               setCargoAddressableMarket={setCargoAddressableMarket}
               cargoYearlyData={cargoYearlyData}
               setCargoYearlyData={setCargoYearlyData}
+              activeClasses={activeClasses}
             />
           )}
 

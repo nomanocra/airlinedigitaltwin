@@ -9,6 +9,7 @@ import { Button } from '@/design-system/components/Button';
 import { SimpleTooltip } from '@/design-system/components/Tooltip';
 import { LoadFactorSummary } from '../LoadFactorSummary';
 import type { LoadFactorTabType, RouteEntry } from '../../pages/types';
+import { CLASS_LABELS } from '../../utils/cabinClassUtils';
 
 export interface LoadFactorSectionProps {
   startDate: Date | undefined;
@@ -24,10 +25,11 @@ export interface LoadFactorSectionProps {
   setSeasonalityCorrection: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   firstYearRampUp: Record<string, Record<string, number>>;
   setFirstYearRampUp: React.Dispatch<React.SetStateAction<Record<string, Record<string, number>>>>;
-  maxLoadFactor: { economy: number; business: number; premium: number };
-  setMaxLoadFactor: React.Dispatch<React.SetStateAction<{ economy: number; business: number; premium: number }>>;
+  maxLoadFactor: Record<string, number>;
+  setMaxLoadFactor: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   routeLoadFactorData: Array<{ routeId: string; classType: string; [key: string]: number | string }>;
   setRouteLoadFactorData: React.Dispatch<React.SetStateAction<Array<{ routeId: string; classType: string; [key: string]: number | string }>>>;
+  activeClasses: string[];
 }
 
 export function LoadFactorSection({
@@ -48,6 +50,7 @@ export function LoadFactorSection({
   setMaxLoadFactor,
   routeLoadFactorData,
   setRouteLoadFactorData,
+  activeClasses,
 }: LoadFactorSectionProps) {
   const [loadFactorTab, setLoadFactorTab] = useState<LoadFactorTabType>('general');
   const hasRoutes = routeEntries.length > 0;
@@ -75,14 +78,14 @@ export function LoadFactorSection({
       },
     }));
     return [
-      { field: 'classType', headerName: '', width: 120, pinned: 'left' as const },
+      { field: 'classType', headerName: '', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { classType: string } }) => CLASS_LABELS[params.data?.classType] || params.data?.classType },
       ...yearCols,
     ];
   }, [yearKeys, yearKeyToLabel]);
 
   const targetedYearlyLFRowData = useMemo(() =>
-    Object.entries(targetedYearlyLF).map(([classType, values]) => ({ classType, ...values })),
-    [targetedYearlyLF]
+    activeClasses.map(code => ({ classType: code, ...(targetedYearlyLF[code] || {}) })),
+    [targetedYearlyLF, activeClasses]
   );
 
   // First Year Ramp Up columns
@@ -106,24 +109,23 @@ export function LoadFactorSection({
       },
     }));
     return [
-      { field: 'classType', headerName: '', width: 120, pinned: 'left' as const },
+      { field: 'classType', headerName: '', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { classType: string } }) => CLASS_LABELS[params.data?.classType] || params.data?.classType },
       ...editableCols,
     ];
   }, [startDate, endDate, generateMonthColumns]);
 
   const firstYearRampUpRowData = useMemo(() =>
-    Object.entries(firstYearRampUp).map(([classType, values]) => ({ classType, ...values })),
-    [firstYearRampUp]
+    activeClasses.map(code => ({ classType: code, ...(firstYearRampUp[code] || {}) })),
+    [firstYearRampUp, activeClasses]
   );
 
-  // Load Factor per Route
+  // Load Factor per Route — show only active classes, preserve data for inactive ones
   const routeLoadFactorRowData = useMemo(() => {
-    if (routeLoadFactorData.length > 0) return routeLoadFactorData;
     const rows: Array<{ routeId: string; classType: string; routeDisplay: string; [key: string]: number | string }> = [];
-    const classes = ['Economy (Y)', 'Business (C)', 'Premium (W)'];
     routeEntries.forEach(route => {
-      classes.forEach(cls => {
-        rows.push({
+      activeClasses.forEach(cls => {
+        const existing = routeLoadFactorData.find(r => r.routeId === route.id && r.classType === cls);
+        rows.push(existing ? { ...existing, routeDisplay: `${route.origin} - ${route.destination}` } : {
           routeId: route.id,
           classType: cls,
           routeDisplay: `${route.origin} - ${route.destination}`,
@@ -131,7 +133,7 @@ export function LoadFactorSection({
       });
     });
     return rows;
-  }, [routeEntries, routeLoadFactorData]);
+  }, [routeEntries, routeLoadFactorData, activeClasses]);
 
   const routeLoadFactorColDefs = useMemo<ColDef[]>(() => {
     const monthCols = generateMonthColumns(startDate, endDate).map(col => ({
@@ -158,7 +160,7 @@ export function LoadFactorSection({
     }));
     return [
       { field: 'routeDisplay', headerName: 'O&D', width: 140, pinned: 'left' as const },
-      { field: 'classType', headerName: 'Class', width: 120, pinned: 'left' as const },
+      { field: 'classType', headerName: 'Class', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { classType: string } }) => CLASS_LABELS[params.data?.classType] || params.data?.classType },
       ...monthCols,
     ];
   }, [startDate, endDate, generateMonthColumns]);
@@ -179,8 +181,8 @@ export function LoadFactorSection({
             <div className="study-page__section-title-row">
               <h3 className="study-page__section-title">Targeted Yearly Load Factor</h3>
             </div>
-            <div className="study-page__fleet-table" style={{ maxHeight: 200 }}>
-              <AgGridReact className="as-ag-grid" rowData={targetedYearlyLFRowData} columnDefs={targetedYearlyLFColDefs} getRowId={(params) => params.data.classType} domLayout="autoHeight" />
+            <div className="study-page__fleet-table" style={{ flex: 'none', height: 41 + targetedYearlyLFRowData.length * 40 }}>
+              <AgGridReact className="as-ag-grid" rowData={targetedYearlyLFRowData} columnDefs={targetedYearlyLFColDefs} getRowId={(params) => params.data.classType} />
             </div>
           </div>
 
@@ -202,8 +204,8 @@ export function LoadFactorSection({
             <div className="study-page__section-title-row">
               <h3 className="study-page__section-title">First Year Load Factor Ramp Up</h3>
             </div>
-            <div className="study-page__fleet-table" style={{ maxHeight: 200 }}>
-              <AgGridReact className="as-ag-grid" rowData={firstYearRampUpRowData} columnDefs={firstYearRampUpColDefs} getRowId={(params) => params.data.classType} domLayout="autoHeight" />
+            <div className="study-page__fleet-table" style={{ flex: 'none', height: 41 + firstYearRampUpRowData.length * 40 }}>
+              <AgGridReact className="as-ag-grid" rowData={firstYearRampUpRowData} columnDefs={firstYearRampUpColDefs} getRowId={(params) => params.data.classType} />
             </div>
           </div>
 
@@ -215,9 +217,18 @@ export function LoadFactorSection({
               </SimpleTooltip>
             </div>
             <div className="study-page__form-grid">
-              <NumberInput label="Economy (Y)" value={maxLoadFactor.economy} onChange={(v) => setMaxLoadFactor(prev => ({ ...prev, economy: v }))} size="S" min={0} max={100} showLabel />
-              <NumberInput label="Business (C)" value={maxLoadFactor.business} onChange={(v) => setMaxLoadFactor(prev => ({ ...prev, business: v }))} size="S" min={0} max={100} showLabel />
-              <NumberInput label="Premium (W)" value={maxLoadFactor.premium} onChange={(v) => setMaxLoadFactor(prev => ({ ...prev, premium: v }))} size="S" min={0} max={100} showLabel />
+              {activeClasses.map(code => (
+                <NumberInput
+                  key={code}
+                  label={CLASS_LABELS[code] || code}
+                  value={maxLoadFactor[code] ?? 90}
+                  onChange={(v) => setMaxLoadFactor(prev => ({ ...prev, [code]: v }))}
+                  size="S"
+                  min={0}
+                  max={100}
+                  showLabel
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -245,7 +256,7 @@ export function LoadFactorSection({
 
       {loadFactorTab === 'summary' && (
         <div className="study-page__tab-content">
-          <LoadFactorSummary startDate={startDate} endDate={endDate} periodType={periodType} />
+          <LoadFactorSummary startDate={startDate} endDate={endDate} periodType={periodType} activeClasses={activeClasses} />
         </div>
       )}
     </div>

@@ -6,6 +6,7 @@ import { NumberInput } from '@/design-system/components/NumberInput';
 import { Icon } from '@/design-system/components/Icon';
 import { SimpleTooltip } from '@/design-system/components/Tooltip';
 import type { RevenueTabType } from '../../pages/types';
+import { CLASS_LABELS } from '../../utils/cabinClassUtils';
 
 export interface RevenueSectionProps {
   startDate: Date | undefined;
@@ -23,6 +24,7 @@ export interface RevenueSectionProps {
   setCargoAddressableMarket: (v: number) => void;
   cargoYearlyData: Array<{ metric: string; [key: string]: number | string }>;
   setCargoYearlyData: React.Dispatch<React.SetStateAction<Array<{ metric: string; [key: string]: number | string }>>>;
+  activeClasses: string[];
 }
 
 export function RevenueSection({
@@ -41,8 +43,15 @@ export function RevenueSection({
   setCargoAddressableMarket,
   cargoYearlyData,
   setCargoYearlyData,
+  activeClasses,
 }: RevenueSectionProps) {
   const [revenueTab, setRevenueTab] = useState<RevenueTabType>('ancillary');
+
+  // Ancillary revenue — show only active classes, preserve data for inactive ones
+  const ancillaryRowData = useMemo(() => {
+    const activeSet = new Set(activeClasses);
+    return ancillaryRevenueData.filter(r => activeSet.has(r.classType));
+  }, [ancillaryRevenueData, activeClasses]);
 
   // Ancillary revenue column definitions
   const ancillaryRevenueColDefs = useMemo<ColDef[]>(() => {
@@ -62,7 +71,7 @@ export function RevenueSection({
       },
     }));
     return [
-      { field: 'classType', headerName: '', width: 100, pinned: 'left' as const },
+      { field: 'classType', headerName: '', width: 150, pinned: 'left' as const, valueGetter: (params: { data: { classType: string } }) => { const code = params.data?.classType; return CLASS_LABELS[code] ? `${CLASS_LABELS[code]} Pax` : `${code} Pax`; } },
       ...monthCols,
     ];
   }, [startDate, endDate, generateMonthColumns]);
@@ -146,20 +155,19 @@ export function RevenueSection({
 
       {/* Ancillary Revenues */}
       {revenueTab === 'ancillary' && (
-        <div className="study-page__assumption-content">
+        <div className="study-page__assumption-content" style={{ flex: 'none' }}>
           <h2 className="study-page__fleet-title">Ancillary Revenues</h2>
 
           <div className="study-page__section">
             <div className="study-page__section-title-row">
               <h3 className="study-page__section-title">Ancillary Revenues per passenger</h3>
             </div>
-            <div className="study-page__fleet-table" style={{ maxHeight: 200 }}>
+            <div className="study-page__fleet-table" style={{ flex: 'none', height: 41 + ancillaryRowData.length * 40 }}>
               <AgGridReact
                 className="as-ag-grid"
-                rowData={ancillaryRevenueData}
+                rowData={ancillaryRowData}
                 columnDefs={ancillaryRevenueColDefs}
                 getRowId={(params) => params.data.classType}
-                domLayout="autoHeight"
               />
             </div>
           </div>

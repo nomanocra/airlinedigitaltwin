@@ -4,6 +4,7 @@ import { Button } from '@/design-system/components/Button';
 import { Combobox } from '@/design-system/components/Combobox';
 import { Select } from '@/design-system/components/Select';
 import type { FleetEntry } from './AddAircraftModal';
+import { parseLayoutClasses } from '../utils/cabinClassUtils';
 import './ImportAirlineFleetModal.css';
 
 // Sample airlines (ICAO - IATA - Name)
@@ -78,46 +79,51 @@ export function ImportAirlineFleetModal({ isOpen, onClose, onImportFleet, period
     const periodStart = periodStartDate ? new Date(periodStartDate) : new Date();
     const periodEnd = periodEndDate ? new Date(periodEndDate) : undefined;
 
+    const layouts = ['Y220', 'F12 Y138', 'Y144', 'Y189'];
     const entries: FleetEntry[] = [
       {
         id: `import-${Date.now()}-1`,
         aircraftType: 'A321neo',
         engine: 'CFM LEAP-1A',
-        layout: 'Y220',
+        layout: layouts[0],
         numberOfAircraft: 4,
         enterInService: new Date(periodStart),
         retirement: periodEnd ? new Date(periodEnd) : undefined,
         ownership: 'Leased',
+        cabinClasses: parseLayoutClasses(layouts[0]),
       },
       {
         id: `import-${Date.now()}-2`,
         aircraftType: 'A320-200',
         engine: 'CFM56-5A',
-        layout: 'F12 Y138',
+        layout: layouts[1],
         numberOfAircraft: 3,
         enterInService: new Date(periodStart),
         retirement: periodEnd ? new Date(periodEnd) : undefined,
         ownership: 'Owned',
+        cabinClasses: parseLayoutClasses(layouts[1]),
       },
       {
         id: `import-${Date.now()}-3`,
         aircraftType: 'A319',
         engine: 'CFM56-5B',
-        layout: 'Y144',
+        layout: layouts[2],
         numberOfAircraft: 4,
         enterInService: new Date(periodStart),
         retirement: periodEnd ? new Date(periodEnd) : undefined,
         ownership: 'Leased',
+        cabinClasses: parseLayoutClasses(layouts[2]),
       },
       {
         id: `import-${Date.now()}-4`,
         aircraftType: 'B737-800',
         engine: 'CFM56-7B',
-        layout: 'Y189',
+        layout: layouts[3],
         numberOfAircraft: 3,
         enterInService: new Date(periodStart),
         retirement: periodEnd ? new Date(periodEnd) : undefined,
         ownership: 'Owned',
+        cabinClasses: parseLayoutClasses(layouts[3]),
       },
     ];
 

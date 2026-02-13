@@ -21,6 +21,7 @@ import type {
   NetworkTabType, RoutesViewMode,
   RouteEntry, RoutePricingEntry, FleetPlanEntry, RouteFrequencyEntry,
 } from '../../pages/types';
+import { CLASS_LABELS } from '../../utils/cabinClassUtils';
 
 export interface NetworkSectionProps {
   startDate: Date | undefined;
@@ -49,6 +50,7 @@ export interface NetworkSectionProps {
   selectedRouteIds: Set<string>;
   setSelectedRouteIds: React.Dispatch<React.SetStateAction<Set<string>>>;
   routesGridApiRef: React.MutableRefObject<{ deselectAll: () => void } | null>;
+  activeClasses: string[];
 }
 
 export function NetworkSection({
@@ -78,6 +80,7 @@ export function NetworkSection({
   selectedRouteIds,
   setSelectedRouteIds,
   routesGridApiRef,
+  activeClasses,
 }: NetworkSectionProps) {
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('routes');
   const [routesViewMode, setRoutesViewMode] = useState<RoutesViewMode>('table');
@@ -135,11 +138,16 @@ export function NetworkSection({
     { field: 'endDate', headerName: 'End Date', flex: 1, minWidth: 130, cellRenderer: RouteEndDateCellRenderer },
   ], []);
 
-  // Pricing
+  // Pricing — filter to show only active classes
+  const pricingRowData = useMemo(() => {
+    const activeSet = new Set(activeClasses);
+    return routePricingData.filter(p => activeSet.has(p.classCode));
+  }, [routePricingData, activeClasses]);
+
   const DiscountStrategyCellRenderer = (props: ICellRendererParams) => {
     const handleChange = (newValue: string) => {
       props.node.setDataValue(props.colDef?.field || '', newValue);
-      setRoutePricingData((prev) => prev.map((p) => p.routeId === props.data.routeId ? { ...p, discountStrategy: newValue } : p));
+      setRoutePricingData((prev) => prev.map((p) => p.routeId === props.data.routeId && p.classCode === props.data.classCode ? { ...p, discountStrategy: newValue } : p));
     };
     return (<div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}><Select value={props.value || 'None'} onValueChange={handleChange} options={[{ value: 'None', label: 'None' }, { value: 'Early Bird', label: 'Early Bird' }, { value: 'Promotional', label: 'Promotional' }]} size="S" showLabel={false} /></div>);
   };
@@ -147,19 +155,20 @@ export function NetworkSection({
   const MarketYieldCellRenderer = (props: ICellRendererParams) => {
     const handleChange = (newValue: number) => {
       props.node.setDataValue(props.colDef?.field || '', newValue);
-      setRoutePricingData((prev) => prev.map((p) => p.routeId === props.data.routeId ? { ...p, marketYield: newValue } : p));
+      setRoutePricingData((prev) => prev.map((p) => p.routeId === props.data.routeId && p.classCode === props.data.classCode ? { ...p, marketYield: newValue } : p));
     };
     const value = props.value ?? 0;
     return (<div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}><NumberInput value={value} onChange={handleChange} size="S" min={0} showLabel={false} variant="Stepper" state={value === 0 ? 'Error' : 'Default'} /></div>);
   };
 
   const pricingColDefs = useMemo<ColDef[]>(() => [
-    { field: 'route', headerName: 'Origin Destination', flex: 1.2, minWidth: 120, valueGetter: (params: { data: { routeId: string } }) => { const route = routeEntries.find(r => r.id === params.data?.routeId); return route ? `${route.origin} - ${route.destination}` : ''; }},
-    { field: 'period', headerName: 'Period', flex: 1.2, minWidth: 140, valueGetter: (params: { data: { routeId: string } }) => { const route = routeEntries.find(r => r.id === params.data?.routeId); if (!route) return ''; const start = route.startDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() || ''; const end = route.endDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() || ''; return `${start} - ${end}`; }},
+    { field: 'route', headerName: 'Origin Destination', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { routeId: string } }) => { const route = routeEntries.find(r => r.id === params.data?.routeId); return route ? `${route.origin} - ${route.destination}` : ''; }},
+    { field: 'classCode', headerName: 'Class', width: 110, pinned: 'left' as const, valueGetter: (params: { data: { classCode: string } }) => CLASS_LABELS[params.data?.classCode] || params.data?.classCode },
+    { field: 'period', headerName: 'Period', width: 170, pinned: 'left' as const, valueGetter: (params: { data: { routeId: string } }) => { const route = routeEntries.find(r => r.id === params.data?.routeId); if (!route) return ''; const start = route.startDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() || ''; const end = route.endDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() || ''; return `${start} - ${end}`; }},
     { field: 'marketYield', headerName: 'Market Yield ($/pax km)', flex: 1.2, minWidth: 120, cellRenderer: MarketYieldCellRenderer },
     { field: 'discountStrategy', headerName: 'Discount Strategy', flex: 1.2, minWidth: 130, cellRenderer: DiscountStrategyCellRenderer },
     { field: 'yield', headerName: 'Yield', flex: 1, minWidth: 100, cellRenderer: (props: ICellRendererParams) => {
-      const handleChange = (newValue: number) => { const rounded = Math.round(newValue * 1000) / 1000; props.node.setDataValue('yield', rounded); setRoutePricingData((prev) => prev.map((p) => p.routeId === props.data.routeId ? { ...p, yield: rounded } : p)); };
+      const handleChange = (newValue: number) => { const rounded = Math.round(newValue * 1000) / 1000; props.node.setDataValue('yield', rounded); setRoutePricingData((prev) => prev.map((p) => p.routeId === props.data.routeId && p.classCode === props.data.classCode ? { ...p, yield: rounded } : p)); };
       const value = props.data?.yield ?? 0;
       return (<div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}><NumberInput value={value} onChange={handleChange} size="S" min={0} step={0.1} showLabel={false} variant="Stepper" state={value === 0 ? 'Error' : 'Default'} /></div>);
     }},
@@ -302,14 +311,14 @@ export function NetworkSection({
           <div className="study-page__fleet-title-bar">
             <h2 className="study-page__fleet-title">Pricing</h2>
             <div className="study-page__fleet-title-right">
-              <span className="label-regular-s study-page__fleet-entry-count">{routeEntries.length} Entries</span>
+              <span className="label-regular-s study-page__fleet-entry-count">{pricingRowData.length} Entries</span>
               <TextInput placeholder="Search" size="S" showLeftIcon leftIcon="search" showLabel={false} className="study-page__fleet-search" />
             </div>
             <div className="study-page__fleet-actions">
               <Button label="" leftIcon="download" rightIcon="arrow_drop_down" variant="Outlined" size="S" onClick={() => console.log('Export pricing')} />
             </div>
           </div>
-          <div className="study-page__fleet-table"><AgGridReact className="as-ag-grid" rowData={routePricingData} columnDefs={pricingColDefs} getRowId={(params) => params.data.routeId} /></div>
+          <div className="study-page__fleet-table"><AgGridReact className="as-ag-grid" rowData={pricingRowData} columnDefs={pricingColDefs} getRowId={(params) => `${params.data.routeId}-${params.data.classCode}`} /></div>
         </div>
       )}
 

@@ -33,7 +33,7 @@ export function PeriodSection({
 }: PeriodSectionProps) {
   return (
     <div className="study-page__content">
-      <h1 className="study-page__title">General Settings</h1>
+      <h1 className="study-page__title">Global Settings</h1>
 
       <div className="study-page__section">
         <h2 className="study-page__section-title">Simulation Period</h2>

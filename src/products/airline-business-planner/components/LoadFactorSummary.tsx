@@ -10,21 +10,34 @@ import {
   LabelList,
 } from 'recharts';
 import { IconButton } from '@/design-system/components/IconButton';
+import { Select } from '@/design-system/components/Select';
 import { ChartCard } from '@/design-system/composites/ChartCard';
 import { useContainerSize } from '../hooks/useContainerSize';
+import { CLASS_LABELS } from '../utils/cabinClassUtils';
 import './LoadFactorSummary.css';
 
 interface LoadFactorSummaryProps {
   startDate?: Date;
   endDate?: Date;
   periodType?: 'dates' | 'duration';
+  activeClasses?: string[];
 }
 
 const TICK_STYLE = { fontSize: 11, fill: 'var(--text-secondary, #63728a)' };
 const AXIS_LABEL_STYLE = { fontSize: 12, fontWeight: 700, fill: 'var(--text-secondary, #63728a)' };
 
-export function LoadFactorSummary({ startDate, endDate, periodType = 'dates' }: LoadFactorSummaryProps) {
+export function LoadFactorSummary({ startDate, endDate, periodType = 'dates', activeClasses = [] }: LoadFactorSummaryProps) {
   const [chartRef, chartSize] = useContainerSize<HTMLDivElement>();
+  const [selectedClass, setSelectedClass] = useState('all');
+
+  const classFilterOptions = useMemo(() => [
+    { value: 'all', label: 'All Classes' },
+    ...activeClasses.map(code => ({ value: code, label: CLASS_LABELS[code] || code })),
+  ], [activeClasses]);
+
+  const classLabel = selectedClass === 'all'
+    ? 'All booking classes'
+    : CLASS_LABELS[selectedClass] || selectedClass;
 
   const chartData = useMemo(() => {
     if (!startDate || !endDate) return [];
@@ -49,11 +62,11 @@ export function LoadFactorSummary({ startDate, endDate, periodType = 'dates' }: 
     <div className="load-factor-summary__legend">
       <div className="load-factor-summary__legend-item">
         <span className="load-factor-summary__legend-swatch" style={{ backgroundColor: 'var(--primary-hover, #255fcc)' }} />
-        <span className="load-factor-summary__legend-label">Seats, All booking classes</span>
+        <span className="load-factor-summary__legend-label">Seats, {classLabel}</span>
       </div>
       <div className="load-factor-summary__legend-item">
         <span className="load-factor-summary__legend-swatch" style={{ backgroundColor: 'var(--sea-blue-40, #86a8e9)' }} />
-        <span className="load-factor-summary__legend-label">PAX, All booking classes</span>
+        <span className="load-factor-summary__legend-label">PAX, {classLabel}</span>
       </div>
       <div className="load-factor-summary__legend-item">
         <span className="load-factor-summary__legend-line" style={{ backgroundColor: 'var(--sky-blue-50, #5fc3ff)' }} />
@@ -71,6 +84,19 @@ export function LoadFactorSummary({ startDate, endDate, periodType = 'dates' }: 
           <IconButton icon="open_in_full" size="XS" variant="Ghost" alt="Fullscreen" />
         </>
       }
+      filters={
+        activeClasses.length > 0 ? (
+          <div style={{ width: 140 }}>
+            <Select
+              options={classFilterOptions}
+              value={selectedClass}
+              onValueChange={setSelectedClass}
+              size="S"
+              showLabel={false}
+            />
+          </div>
+        ) : undefined
+      }
       footer={legend}
       className="load-factor-summary__chart-card"
       style={{ flex: 1 }}
@@ -81,7 +107,7 @@ export function LoadFactorSummary({ startDate, endDate, periodType = 'dates' }: 
             width={chartSize.width}
             height={chartSize.height}
             data={chartData}
-            margin={{ top: 10, right: 60, left: 10, bottom: 5 }}
+            margin={{ top: 16, right: 8, left: 8, bottom: 8 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
             <XAxis dataKey="year" tick={TICK_STYLE} />
@@ -102,7 +128,7 @@ export function LoadFactorSummary({ startDate, endDate, periodType = 'dates' }: 
               cursor={false}
               formatter={(value: number, name: string) => {
                 if (name === 'loadFactor') return [`${value}%`, 'Av. Load Factor'];
-                return [value, name === 'seats' ? 'Seats, All booking classes' : 'PAX, All booking classes'];
+                return [value, name === 'seats' ? `Seats, ${classLabel}` : `PAX, ${classLabel}`];
               }}
             />
             <Bar

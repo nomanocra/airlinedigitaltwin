@@ -53,6 +53,7 @@ export interface RouteEntry {
 // Pricing
 export interface RoutePricingEntry {
   routeId: string;
+  classCode: string;
   marketYield: number;
   discountStrategy: string;
   yield: number;
@@ -112,12 +113,13 @@ export interface PersistedStudyData {
     enterInService: string;
     retirement?: string;
     ownership: 'Owned' | 'Leased';
+    cabinClasses?: Array<{ code: string; seats: number }>;
   }>;
   costOperationsData: Array<{ id: string; groundHandlingCharge: number; fuelAgeingFactor: number }>;
   costOwnershipData: Array<{ id: string; monthlyLeaseRate: number; acValueUponAcquisition: number; sparesProvisioningPerFamily: number }>;
   crewConfigData: Array<{ id: string; captainPerCrew: number; firstOfficerPerCrew: number; cabinManagerPerCrew: number; cabinAttendantPerCrew: number }>;
   routeEntries: Array<{ id: string; origin: string; destination: string; startDate: string; endDate: string }>;
-  routePricingData: Array<{ routeId: string; marketYield: number; discountStrategy: string; yield: number; fare: number }>;
+  routePricingData: Array<{ routeId: string; classCode: string; marketYield: number; discountStrategy: string; yield: number; fare: number }>;
   fleetPlanData: Array<{ routeId: string; allocatedAircraftId: string | null }>;
   routeFrequencyData: Array<{ routeId: string; frequencies: Record<string, number> }>;
   discountForNormalFares: number;
