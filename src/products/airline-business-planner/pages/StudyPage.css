@@ -708,3 +708,28 @@
 .study-page__pricing-grid .pricing-fare-cell {
   color: var(--text-secondary, #63728a);
 }
+
+/* ============================================================================
+   LOAD FACTOR PER ROUTE GRID - Alternating colors by O&D
+   ============================================================================ */
+
+.study-page__lf-route-grid .lf-row-group-even {
+  background-color: var(--background-main, #ffffff);
+}
+
+.study-page__lf-route-grid .lf-row-group-odd {
+  background-color: var(--background-secondary, #fafafa);
+}
+
+.study-page__lf-route-grid .lf-row-group-first {
+  border-top: 1px solid var(--border-minimal, #eff1f4);
+}
+
+.study-page__lf-route-grid .lf-od-cell {
+  font-weight: 600;
+  color: var(--text-corporate, #00205b);
+}
+
+.study-page__lf-route-grid .lf-od-cell--hidden {
+  color: transparent;
+}

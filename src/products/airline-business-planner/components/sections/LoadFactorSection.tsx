@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Tab } from '@/design-system/components/Tab';
@@ -135,6 +135,42 @@ export function LoadFactorSection({
     return rows;
   }, [routeEntries, routeLoadFactorData, activeClasses]);
 
+  // O&D grouping — alternating colors + first row tracking
+  const routeLFGroupIndex = useMemo(() => {
+    const groups: Record<string, number> = {};
+    let currentGroupIndex = 0;
+    let lastRouteId = '';
+    routeLoadFactorRowData.forEach(r => {
+      if (r.routeId !== lastRouteId) {
+        groups[r.routeId] = currentGroupIndex;
+        currentGroupIndex++;
+        lastRouteId = r.routeId;
+      }
+    });
+    return groups;
+  }, [routeLoadFactorRowData]);
+
+  const routeLFFirstRow = useMemo(() => {
+    const firstRows = new Set<string>();
+    const seen = new Set<string>();
+    routeLoadFactorRowData.forEach(r => {
+      if (!seen.has(r.routeId)) {
+        firstRows.add(`${r.routeId}-${r.classType}`);
+        seen.add(r.routeId);
+      }
+    });
+    return firstRows;
+  }, [routeLoadFactorRowData]);
+
+  const getRouteLFRowClass = useCallback((params: { data: { routeId: string; classType: string } }) => {
+    if (!params.data) return '';
+    const groupIndex = routeLFGroupIndex[params.data.routeId] || 0;
+    const rowKey = `${params.data.routeId}-${params.data.classType}`;
+    const isFirst = routeLFFirstRow.has(rowKey);
+    const colorClass = groupIndex % 2 === 0 ? 'lf-row-group-even' : 'lf-row-group-odd';
+    return isFirst ? `${colorClass} lf-row-group-first` : colorClass;
+  }, [routeLFGroupIndex, routeLFFirstRow]);
+
   const routeLoadFactorColDefs = useMemo<ColDef[]>(() => {
     const monthCols = generateMonthColumns(startDate, endDate).map(col => ({
       ...col,
@@ -159,11 +195,21 @@ export function LoadFactorSection({
       },
     }));
     return [
-      { field: 'routeDisplay', headerName: 'O&D', width: 140, pinned: 'left' as const },
+      {
+        field: 'routeDisplay',
+        headerName: 'O&D',
+        width: 140,
+        pinned: 'left' as const,
+        cellClass: (params: { data: { routeId: string; classType: string } }) => {
+          const rowKey = `${params.data?.routeId}-${params.data?.classType}`;
+          const isFirst = routeLFFirstRow.has(rowKey);
+          return isFirst ? 'lf-od-cell lf-od-cell--visible' : 'lf-od-cell lf-od-cell--hidden';
+        },
+      },
       { field: 'classType', headerName: 'Class', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { classType: string } }) => CLASS_LABELS[params.data?.classType] || params.data?.classType },
       ...monthCols,
     ];
-  }, [startDate, endDate, generateMonthColumns]);
+  }, [startDate, endDate, generateMonthColumns, routeLFFirstRow]);
 
   return (
     <div className="study-page__fleet">
@@ -249,7 +295,7 @@ export function LoadFactorSection({
             </div>
           </div>
           <div className="study-page__fleet-table">
-            <AgGridReact className="as-ag-grid" rowData={routeLoadFactorRowData} columnDefs={routeLoadFactorColDefs} getRowId={(params) => `${params.data.routeId}-${params.data.classType}`} />
+            <AgGridReact className="as-ag-grid study-page__lf-route-grid" rowData={routeLoadFactorRowData} columnDefs={routeLoadFactorColDefs} getRowId={(params) => `${params.data.routeId}-${params.data.classType}`} getRowClass={getRouteLFRowClass} />
           </div>
         </div>
       )}
