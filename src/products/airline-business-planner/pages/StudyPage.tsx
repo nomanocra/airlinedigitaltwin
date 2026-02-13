@@ -1437,8 +1437,14 @@ export default function StudyPage() {
   const SparesProvisioningCellRenderer = createNumberCellRenderer('sparesProvisioningPerFamily', setCostOwnershipData, 0, { errorWhenZero: true });
 
   // Monthly Insurance is calculated: acValueUponAcquisition * 0.01 / 12
+  const costOwnershipMap = useMemo(() => {
+    const map = new Map<string, typeof costOwnershipData[number]>();
+    for (const entry of costOwnershipData) map.set(entry.id, entry);
+    return map;
+  }, [costOwnershipData]);
+
   const MonthlyInsuranceCellRenderer = (props: ICellRendererParams) => {
-    const ownershipEntry = costOwnershipData.find(e => e.id === props.data.id);
+    const ownershipEntry = costOwnershipMap.get(props.data.id);
     const acValue = ownershipEntry?.acValueUponAcquisition ?? 0;
     const insurance = (acValue * 0.01 / 12).toFixed(2);
     return (
@@ -1498,34 +1504,43 @@ export default function StudyPage() {
   ], []);
 
   // Merged fleet data for cost/crew tabs
-  const fleetWithCostOps = useMemo(() =>
-    fleetEntries.map(entry => ({
+  const fleetWithCostOps = useMemo(() => {
+    const map = new Map<string, typeof costOperationsData[number]>();
+    for (const c of costOperationsData) map.set(c.id, c);
+    return fleetEntries.map(entry => ({
       ...entry,
-      ...(costOperationsData.find(c => c.id === entry.id) || { groundHandlingCharge: 0, fuelAgeingFactor: 0 }),
-    })), [fleetEntries, costOperationsData]
+      ...(map.get(entry.id) || { groundHandlingCharge: 0, fuelAgeingFactor: 0 }),
+    }));
+  }, [fleetEntries, costOperationsData]
   );
 
-  const fleetWithCostOwnership = useMemo(() =>
-    fleetEntries.map(entry => ({
+  const fleetWithCostOwnership = useMemo(() => {
+    const map = new Map<string, typeof costOwnershipData[number]>();
+    for (const c of costOwnershipData) map.set(c.id, c);
+    return fleetEntries.map(entry => ({
       ...entry,
-      ...(costOwnershipData.find(c => c.id === entry.id) || {
+      ...(map.get(entry.id) || {
         monthlyLeaseRate: 0,
         acValueUponAcquisition: 0,
         sparesProvisioningPerFamily: 0
       }),
-    })), [fleetEntries, costOwnershipData]
+    }));
+  }, [fleetEntries, costOwnershipData]
   );
 
-  const fleetWithCrewConfig = useMemo(() =>
-    fleetEntries.map(entry => ({
+  const fleetWithCrewConfig = useMemo(() => {
+    const map = new Map<string, typeof crewConfigData[number]>();
+    for (const c of crewConfigData) map.set(c.id, c);
+    return fleetEntries.map(entry => ({
       ...entry,
-      ...(crewConfigData.find(c => c.id === entry.id) || {
+      ...(map.get(entry.id) || {
         captainPerCrew: 1,
         firstOfficerPerCrew: 1,
         cabinManagerPerCrew: 1,
         cabinAttendantPerCrew: 1
       }),
-    })), [fleetEntries, crewConfigData]
+    }));
+  }, [fleetEntries, crewConfigData]
   );
 
   // Initialize cost/crew data when fleet entries change
@@ -3315,23 +3330,25 @@ export default function StudyPage() {
                       </div>
                     )}
                     {crewFixedWagesSubTab === 'monthly-costs' && (
-                      <div className="study-page__container-tab-content--table">
-                        <table className="study-page__computed-table">
-                          <thead>
-                            <tr>
-                              <th></th>
-                              {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {crewFixedWagesTableData.map((row, i) => (
-                              <tr key={i}>
-                                <td>{row.label}</td>
-                                {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                      <div className="study-page__container-tab-content">
+                        <div className="study-page__table-scroll-wrapper">
+                          <table className="study-page__computed-table">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {crewFixedWagesTableData.map((row, i) => (
+                                <tr key={i}>
+                                  <td>{row.label}</td>
+                                  {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -3352,25 +3369,27 @@ export default function StudyPage() {
                       </div>
                     )}
                     {crewVariableWagesSubTab === 'monthly-costs' && (
-                      <div className="study-page__container-tab-content--table">
-                        <table className="study-page__computed-table">
-                          <thead>
-                            <tr>
-                              <th></th>
-                              <th>USD per Sector, excl. Company Charges</th>
-                              {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {variableWagesTableData.map((row, i) => (
-                              <tr key={i}>
-                                <td>{row.label}</td>
-                                <td>{formatCurrency(row.perSector)}</td>
-                                {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                      <div className="study-page__container-tab-content">
+                        <div className="study-page__table-scroll-wrapper">
+                          <table className="study-page__computed-table">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                <th>USD per Sector, excl. Company Charges</th>
+                                {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {variableWagesTableData.map((row, i) => (
+                                <tr key={i}>
+                                  <td>{row.label}</td>
+                                  <td>{formatCurrency(row.perSector)}</td>
+                                  {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -3394,23 +3413,25 @@ export default function StudyPage() {
                       </div>
                     )}
                     {crewTrainingSubTab === 'monthly-costs' && (
-                      <div className="study-page__container-tab-content--table">
-                        <table className="study-page__computed-table">
-                          <thead>
-                            <tr>
-                              <th></th>
-                              {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {trainingCostsTableData.map((row, i) => (
-                              <tr key={i}>
-                                <td>{row.label}</td>
-                                {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                      <div className="study-page__container-tab-content">
+                        <div className="study-page__table-scroll-wrapper">
+                          <table className="study-page__computed-table">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                {monthLabels.map((label, i) => <th key={i}>{label}</th>)}
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {trainingCostsTableData.map((row, i) => (
+                                <tr key={i}>
+                                  <td>{row.label}</td>
+                                  {row.values.map((v, j) => <td key={j}>{formatCurrency(v)}</td>)}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </div>
