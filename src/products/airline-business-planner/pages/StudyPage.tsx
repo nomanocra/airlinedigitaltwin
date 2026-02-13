@@ -43,6 +43,11 @@ import './StudyPage.css';
 // Register AG-Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+const DEFAULT_RAMPUP: Record<string, number[]> = {
+  Y: [30, 35, 40, 45, 50, 55, 60, 65, 70, 70, 70, 70],
+  J: [20, 25, 30, 35, 40, 45, 50, 55, 60, 60, 60, 60],
+};
+
 export default function StudyPage() {
   const navigate = useNavigate();
   const { studyId } = useParams();
@@ -126,22 +131,28 @@ export default function StudyPage() {
 
   // ========== LOAD FACTOR STATE ==========
   // Keys are class codes (F, J, C, W, Y)
-  const [targetedYearlyLF, setTargetedYearlyLF] = useState<Record<string, Record<string, number>>>({
-    Y: { Y2: 70, Y3: 75, Y4: 80, Y5: 82, Y6: 85 },
-    J: { Y2: 60, Y3: 65, Y4: 70, Y5: 72, Y6: 75 },
-    W: { Y2: 55, Y3: 60, Y4: 65, Y5: 68, Y6: 70 },
-  });
-  const [seasonalityCorrection, setSeasonalityCorrection] = useState<Record<string, number>>({
-    Jan: 81, Feb: 77, Mar: 96, Apr: 99, May: 108, Jun: 117,
-    Jul: 130, Aug: 136, Sep: 115, Oct: 83, Nov: 76, Dec: 83,
-  });
-  const [firstYearRampUp, setFirstYearRampUp] = useState<Record<string, Record<string, number>>>({
-    Y: {},
-    J: {},
-    W: {},
-  });
-  const [maxLoadFactor, setMaxLoadFactor] = useState<Record<string, number>>({ Y: 98, J: 95, W: 93 });
-  const [routeLoadFactorData, setRouteLoadFactorData] = useState<Array<{ routeId: string; classType: string; [key: string]: number | string }>>([]);
+  const [targetedYearlyLF, setTargetedYearlyLF] = useState<Record<string, Record<string, number>>>(() =>
+    persistedData?.targetedYearlyLF ?? {
+      Y: { Y2: 70, Y3: 75, Y4: 80, Y5: 82, Y6: 85 },
+      J: { Y2: 60, Y3: 65, Y4: 70, Y5: 72, Y6: 75 },
+      W: { Y2: 55, Y3: 60, Y4: 65, Y5: 68, Y6: 70 },
+    }
+  );
+  const [seasonalityCorrection, setSeasonalityCorrection] = useState<Record<string, number>>(() =>
+    persistedData?.seasonalityCorrection ?? {
+      Jan: 81, Feb: 77, Mar: 96, Apr: 99, May: 108, Jun: 117,
+      Jul: 130, Aug: 136, Sep: 115, Oct: 83, Nov: 76, Dec: 83,
+    }
+  );
+  const [firstYearRampUp, setFirstYearRampUp] = useState<Record<string, Record<string, number>>>(() =>
+    persistedData?.firstYearRampUp ?? { Y: {}, J: {}, W: {} }
+  );
+  const [maxLoadFactor, setMaxLoadFactor] = useState<Record<string, number>>(() =>
+    persistedData?.maxLoadFactor ?? { Y: 98, J: 95, W: 93 }
+  );
+  const [routeLoadFactorData, setRouteLoadFactorData] = useState<Array<{ routeId: string; classType: string; [key: string]: number | string }>>(() =>
+    persistedData?.routeLoadFactorOverrides ?? []
+  );
 
   // ========== OPERATIONAL COST STATE ==========
   const [fuelPricePerGallon, setFuelPricePerGallon] = useState(2.8);
@@ -413,31 +424,55 @@ export default function StudyPage() {
   const monthLabels = useMemo(() => getMonthLabels(startDate, endDate, periodType), [startDate, endDate, periodType]);
 
   // Study lifecycle: draft → computing → computed
-  const getInitialStatus = (): 'draft' | 'computing' | 'computed' => {
+  const initialStatus = useMemo((): 'draft' | 'computing' | 'computed' => {
     const raw = persistedData?.studyStatus;
     if (!raw) return 'draft';
-    switch (raw.toLowerCase()) {
-      case 'computed': return 'computed';
-      case 'computing': return 'computing';
-      default: return 'draft';
-    }
-  };
-  const [studyStatus, setStudyStatus] = useState<'draft' | 'computing' | 'computed'>(getInitialStatus);
+    const normalized = raw.toLowerCase();
+    if (normalized === 'computed') return 'computed';
+    if (normalized === 'computing') return 'computing';
+    return 'draft';
+  }, [persistedData?.studyStatus]);
+
+  const [studyStatus, setStudyStatus] = useState<'draft' | 'computing' | 'computed'>(initialStatus);
   const computeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Track if it's the first render (to avoid resetting status on mount)
-  const isFirstRender = useRef(true);
+  // Track previous values to detect actual changes (not just re-renders)
+  const prevValuesRef = useRef({
+    startDate: startDate?.toISOString(),
+    endDate: endDate?.toISOString(),
+    operatingDays,
+    startupDuration,
+    initialized: false,
+  });
 
-  // Reset to draft when inputs change after computed (but not on initial render)
+  // Reset to draft when inputs actually change after computed
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    const currentValues = {
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
+      operatingDays,
+      startupDuration,
+    };
+
+    // Skip on first render
+    if (!prevValuesRef.current.initialized) {
+      prevValuesRef.current = { ...currentValues, initialized: true };
       return;
     }
-    if (studyStatus === 'computed') {
+
+    // Check if any value actually changed
+    const hasChanged =
+      currentValues.startDate !== prevValuesRef.current.startDate ||
+      currentValues.endDate !== prevValuesRef.current.endDate ||
+      currentValues.operatingDays !== prevValuesRef.current.operatingDays ||
+      currentValues.startupDuration !== prevValuesRef.current.startupDuration;
+
+    if (hasChanged && studyStatus === 'computed') {
       setStudyStatus('draft');
     }
-  }, [startDate, endDate, operatingDays, startupDuration]);
+
+    prevValuesRef.current = { ...currentValues, initialized: true };
+  }, [startDate, endDate, operatingDays, startupDuration, studyStatus]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -574,6 +609,29 @@ export default function StudyPage() {
     });
   }, [activeClasses]);
 
+  // Populate firstYearRampUp with defaults when startDate is set and classes have no values
+  useEffect(() => {
+    if (!startDate) return;
+    setFirstYearRampUp(prev => {
+      const y1End = new Date(startDate.getFullYear(), startDate.getMonth() + 11, 1);
+      const mKeys = getMonthKeys(startDate, y1End);
+      let updated = { ...prev };
+      let changed = false;
+
+      for (const [cls, defaults] of Object.entries(DEFAULT_RAMPUP)) {
+        const entries = prev[cls] || {};
+        const hasValues = Object.keys(entries).some(k => k.match(/^\d{4}-\d{2}$/));
+        if (hasValues) continue;
+        const rampUp: Record<string, number> = {};
+        mKeys.forEach((mk, i) => { rampUp[mk] = defaults[i] ?? 0; });
+        updated = { ...updated, [cls]: rampUp };
+        changed = true;
+      }
+
+      return changed ? updated : prev;
+    });
+  }, [startDate]);
+
   const handleCompute = useCallback(() => {
     setStudyStatus('computing');
     computeTimerRef.current = setTimeout(() => {
@@ -701,6 +759,11 @@ export default function StudyPage() {
       fleetPlanData,
       routeFrequencyData,
       discountForNormalFares,
+      routeLoadFactorOverrides: routeLoadFactorData,
+      targetedYearlyLF,
+      firstYearRampUp,
+      seasonalityCorrection,
+      maxLoadFactor,
     };
     saveToStorage(studyId, dataToSave);
   }, 500);
@@ -711,6 +774,7 @@ export default function StudyPage() {
     studyStatus, periodType, simulationYears, startDate, endDate, operatingDays, startupDuration,
     fleetEntries, costOperationsData, costOwnershipData, crewConfigData,
     routeEntries, routePricingData, fleetPlanData, routeFrequencyData, discountForNormalFares,
+    routeLoadFactorData, targetedYearlyLF, firstYearRampUp, seasonalityCorrection, maxLoadFactor,
     debouncedSave
   ]);
 

@@ -98,6 +98,18 @@ export function yearKeyToLabel(key: string, periodType: 'dates' | 'duration', st
   return String(startDate.getFullYear() + idx - 1);
 }
 
+export function getMonthIndex(monthKey: string, startDate: Date): number {
+  const [year, month] = monthKey.split('-').map(Number);
+  return (year - startDate.getFullYear()) * 12 + (month - (startDate.getMonth() + 1)) + 1;
+}
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+export function getSeasonalityMonthName(monthKey: string): string {
+  const monthNum = parseInt(monthKey.split('-')[1], 10);
+  return MONTH_NAMES[monthNum - 1];
+}
+
 export function formatCurrency(v: number): string {
   return `$${v.toLocaleString('en-US')}`;
 }

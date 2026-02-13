@@ -1,9 +1,10 @@
 import type { PersistedStudyData } from '../pages/types';
 
-// Helper to generate complete mock data for computed studies
-function createComputedStudy(config: {
+// Helper to generate complete mock data for studies
+function createStudyMock(config: {
   studyName: string;
   workspaceName: string;
+  studyStatus?: 'draft' | 'computing' | 'computed';
   startDate: string;
   endDate: string;
   fleet: Array<{
@@ -21,7 +22,7 @@ function createComputedStudy(config: {
     destination: string;
   }>;
 }): PersistedStudyData {
-  const { studyName, workspaceName, startDate, endDate, fleet, routes } = config;
+  const { studyName, workspaceName, studyStatus = 'computed', startDate, endDate, fleet, routes } = config;
 
   // Get all unique cabin classes from fleet
   const allClasses = new Set<string>();
@@ -31,7 +32,7 @@ function createComputedStudy(config: {
   return {
     studyName,
     workspaceName,
-    studyStatus: 'computed',
+    studyStatus,
     periodType: 'dates',
     simulationYears: 4,
     startDate,
@@ -95,7 +96,7 @@ function createComputedStudy(config: {
 // Default mock data for demo studies
 export const MOCK_STUDIES: Record<string, PersistedStudyData> = {
   // NovAir - Launch Revenue Forecast (Computed)
-  '1-1': createComputedStudy({
+  '1-1': createStudyMock({
     studyName: 'Launch Revenue Forecast',
     workspaceName: 'NovAir',
     startDate: '2026-01-01T00:00:00.000Z',
@@ -115,7 +116,7 @@ export const MOCK_STUDIES: Record<string, PersistedStudyData> = {
   }),
 
   // Zephyr Airlines - Transatlantic Network (Computed)
-  '2-1': createComputedStudy({
+  '2-1': createStudyMock({
     studyName: 'Transatlantic Network',
     workspaceName: 'Zephyr Airlines',
     startDate: '2026-01-01T00:00:00.000Z',
@@ -137,7 +138,7 @@ export const MOCK_STUDIES: Record<string, PersistedStudyData> = {
   }),
 
   // SkyBridge Regional - Regional Route Map (Computed)
-  '3-1': createComputedStudy({
+  '3-1': createStudyMock({
     studyName: 'Regional Route Map',
     workspaceName: 'SkyBridge Regional',
     startDate: '2026-01-01T00:00:00.000Z',
@@ -159,7 +160,7 @@ export const MOCK_STUDIES: Record<string, PersistedStudyData> = {
   }),
 
   // AeroVerde - SAF Supply Chain Plan (Computed)
-  '4-1': createComputedStudy({
+  '4-1': createStudyMock({
     studyName: 'SAF Supply Chain Plan',
     workspaceName: 'AeroVerde',
     startDate: '2026-01-01T00:00:00.000Z',
@@ -178,7 +179,7 @@ export const MOCK_STUDIES: Record<string, PersistedStudyData> = {
   }),
 
   // Solaris Airways - Mediterranean Route Plan (Computed)
-  '5-1': createComputedStudy({
+  '5-1': createStudyMock({
     studyName: 'Mediterranean Route Plan',
     workspaceName: 'Solaris Airways',
     startDate: '2026-01-01T00:00:00.000Z',
@@ -196,6 +197,47 @@ export const MOCK_STUDIES: Record<string, PersistedStudyData> = {
       { id: 'route-6', origin: 'FRA', destination: 'DBV' },
       { id: 'route-7', origin: 'FRA', destination: 'OLB' },
       { id: 'route-8', origin: 'FRA', destination: 'NAP' },
+    ],
+  }),
+
+  // ========== COMPUTING STUDIES ==========
+
+  // NovAir - CDG Hub Slot Strategy (Computing)
+  '1-3': createStudyMock({
+    studyName: 'CDG Hub Slot Strategy',
+    workspaceName: 'NovAir',
+    studyStatus: 'computing',
+    startDate: '2026-03-01T00:00:00.000Z',
+    endDate: '2030-02-28T00:00:00.000Z',
+    fleet: [
+      { id: 'fleet-1', aircraftType: 'A320neo', engine: 'LEAP-1A', layout: '180Y', numberOfAircraft: 6, ownership: 'Owned', cabinClasses: [{ code: 'Y', seats: 180 }] },
+      { id: 'fleet-2', aircraftType: 'A321neo', engine: 'LEAP-1A', layout: '16J/180Y', numberOfAircraft: 4, ownership: 'Leased', cabinClasses: [{ code: 'J', seats: 16 }, { code: 'Y', seats: 180 }] },
+    ],
+    routes: [
+      { id: 'route-1', origin: 'CDG', destination: 'LHR' },
+      { id: 'route-2', origin: 'CDG', destination: 'FRA' },
+      { id: 'route-3', origin: 'CDG', destination: 'AMS' },
+      { id: 'route-4', origin: 'CDG', destination: 'MAD' },
+      { id: 'route-5', origin: 'CDG', destination: 'MUC' },
+    ],
+  }),
+
+  // AeroVerde - Carbon Offset Revenue (Computing)
+  '4-2': createStudyMock({
+    studyName: 'Carbon Offset Revenue',
+    workspaceName: 'AeroVerde',
+    studyStatus: 'computing',
+    startDate: '2026-01-01T00:00:00.000Z',
+    endDate: '2030-12-31T00:00:00.000Z',
+    fleet: [
+      { id: 'fleet-1', aircraftType: 'A320neo', engine: 'LEAP-1A', layout: '156Y', numberOfAircraft: 5, ownership: 'Owned', cabinClasses: [{ code: 'Y', seats: 156 }] },
+      { id: 'fleet-2', aircraftType: 'A321neo', engine: 'LEAP-1A', layout: '8J/198Y', numberOfAircraft: 3, ownership: 'Leased', cabinClasses: [{ code: 'J', seats: 8 }, { code: 'Y', seats: 198 }] },
+    ],
+    routes: [
+      { id: 'route-1', origin: 'AMS', destination: 'CDG' },
+      { id: 'route-2', origin: 'AMS', destination: 'LHR' },
+      { id: 'route-3', origin: 'AMS', destination: 'FRA' },
+      { id: 'route-4', origin: 'AMS', destination: 'CPH' },
     ],
   }),
 };

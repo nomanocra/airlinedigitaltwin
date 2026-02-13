@@ -123,4 +123,9 @@ export interface PersistedStudyData {
   fleetPlanData: Array<{ routeId: string; allocatedAircraftId: string | null }>;
   routeFrequencyData: Array<{ routeId: string; frequencies: Record<string, number> }>;
   discountForNormalFares: number;
+  routeLoadFactorOverrides?: Array<{ routeId: string; classType: string; [key: string]: number | string }>;
+  targetedYearlyLF?: Record<string, Record<string, number>>;
+  firstYearRampUp?: Record<string, Record<string, number>>;
+  seasonalityCorrection?: Record<string, number>;
+  maxLoadFactor?: Record<string, number>;
 }

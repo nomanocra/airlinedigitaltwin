@@ -10,6 +10,59 @@ import { SimpleTooltip } from '@/design-system/components/Tooltip';
 import { LoadFactorSummary } from '../LoadFactorSummary';
 import type { LoadFactorTabType, RouteEntry } from '../../pages/types';
 import { CLASS_LABELS } from '../../utils/cabinClassUtils';
+import { getMonthKeys, getMonthIndex, getSeasonalityMonthName } from '../../utils/periodUtils';
+
+function LFCellRenderer({
+  computedValue,
+  overrideValue,
+  onSetOverride,
+  onClearOverride,
+}: {
+  computedValue: number;
+  overrideValue: number | undefined;
+  onSetOverride: (value: number) => void;
+  onClearOverride: () => void;
+}) {
+  const isOverridden = overrideValue !== undefined;
+  const displayValue = isOverridden ? overrideValue : computedValue;
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
+
+  return (
+    <div
+      className={isOverridden ? 'lf-cell--overridden' : ''}
+      style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}
+    >
+      <TextInput
+        size="S"
+        showLabel={false}
+        value={editing ? editValue : `${displayValue}%`}
+        onChange={(e) => {
+          if (editing) setEditValue(e.target.value);
+        }}
+        onFocus={() => {
+          setEditing(true);
+          setEditValue(String(displayValue));
+        }}
+        onBlur={() => {
+          setEditing(false);
+          const parsed = parseInt(editValue.replace('%', '').trim(), 10);
+          if (!isNaN(parsed) && parsed !== computedValue) {
+            onSetOverride(parsed);
+          } else if (!isNaN(parsed) && parsed === computedValue && isOverridden) {
+            onClearOverride();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+        }}
+        showRightIconButton={isOverridden}
+        rightIconButton="close"
+        onRightIconButtonClick={onClearOverride}
+      />
+    </div>
+  );
+}
 
 export interface LoadFactorSectionProps {
   startDate: Date | undefined;
@@ -119,13 +172,40 @@ export function LoadFactorSection({
     [firstYearRampUp, activeClasses]
   );
 
-  // Load Factor per Route — show only active classes, preserve data for inactive ones
+  // Computed LF values per class per month
+  const allMonthKeys = useMemo(() => getMonthKeys(startDate, endDate), [startDate, endDate]);
+
+  const computedLF = useMemo(() => {
+    const result: Record<string, Record<string, number>> = {};
+    if (!startDate) return result;
+
+    for (const cls of activeClasses) {
+      result[cls] = {};
+      for (const mk of allMonthKeys) {
+        const monthIdx = getMonthIndex(mk, startDate);
+        if (monthIdx <= 12) {
+          // Y1: ramp-up direct
+          result[cls][mk] = firstYearRampUp[cls]?.[mk] ?? 0;
+        } else {
+          // Y2+: targeted × seasonality, capped
+          const yearKey = `Y${Math.ceil(monthIdx / 12)}`;
+          const monthName = getSeasonalityMonthName(mk);
+          const targeted = targetedYearlyLF[cls]?.[yearKey] ?? 0;
+          const seasonality = seasonalityCorrection[monthName] ?? 100;
+          const maxLF = maxLoadFactor[cls] ?? 100;
+          result[cls][mk] = Math.min(Math.round(targeted * seasonality / 100), maxLF);
+        }
+      }
+    }
+    return result;
+  }, [startDate, allMonthKeys, activeClasses, firstYearRampUp, targetedYearlyLF, seasonalityCorrection, maxLoadFactor]);
+
+  // Load Factor per Route — rows are route × class combinations (no pre-filled values)
   const routeLoadFactorRowData = useMemo(() => {
-    const rows: Array<{ routeId: string; classType: string; routeDisplay: string; [key: string]: number | string }> = [];
+    const rows: Array<{ routeId: string; classType: string; routeDisplay: string }> = [];
     routeEntries.forEach(route => {
       activeClasses.forEach(cls => {
-        const existing = routeLoadFactorData.find(r => r.routeId === route.id && r.classType === cls);
-        rows.push(existing ? { ...existing, routeDisplay: `${route.origin} - ${route.destination}` } : {
+        rows.push({
           routeId: route.id,
           classType: cls,
           routeDisplay: `${route.origin} - ${route.destination}`,
@@ -133,7 +213,7 @@ export function LoadFactorSection({
       });
     });
     return rows;
-  }, [routeEntries, routeLoadFactorData, activeClasses]);
+  }, [routeEntries, activeClasses]);
 
   // O&D grouping — alternating colors + first row tracking
   const routeLFGroupIndex = useMemo(() => {
@@ -171,26 +251,58 @@ export function LoadFactorSection({
     return isFirst ? `${colorClass} lf-row-group-first` : colorClass;
   }, [routeLFGroupIndex, routeLFFirstRow]);
 
+  // Set an override value for a route/class/month
+  const setOverride = useCallback((routeId: string, classType: string, monthKey: string, value: number) => {
+    setRouteLoadFactorData(prev => {
+      const existing = [...prev];
+      const idx = existing.findIndex(r => r.routeId === routeId && r.classType === classType);
+      if (idx >= 0) {
+        existing[idx] = { ...existing[idx], [monthKey]: value };
+      } else {
+        existing.push({ routeId, classType, [monthKey]: value });
+      }
+      return existing;
+    });
+  }, [setRouteLoadFactorData]);
+
+  // Clear an override for a route/class/month
+  const clearOverride = useCallback((routeId: string, classType: string, monthKey: string) => {
+    setRouteLoadFactorData(prev => {
+      const existing = [...prev];
+      const idx = existing.findIndex(r => r.routeId === routeId && r.classType === classType);
+      if (idx < 0) return prev;
+      const entry = { ...existing[idx] };
+      delete entry[monthKey];
+      // If no more month overrides remain, remove the entry entirely
+      const hasMonthKeys = Object.keys(entry).some(k => k.match(/^\d{4}-\d{2}$/));
+      if (!hasMonthKeys) {
+        existing.splice(idx, 1);
+      } else {
+        existing[idx] = entry;
+      }
+      return existing;
+    });
+  }, [setRouteLoadFactorData]);
+
   const routeLoadFactorColDefs = useMemo<ColDef[]>(() => {
     const monthCols = generateMonthColumns(startDate, endDate).map(col => ({
       ...col,
       cellRenderer: (props: ICellRendererParams) => {
-        const handleChange = (newValue: number) => {
-          setRouteLoadFactorData(prev => {
-            const existing = [...prev];
-            const idx = existing.findIndex(r => r.routeId === props.data.routeId && r.classType === props.data.classType);
-            if (idx >= 0) {
-              existing[idx] = { ...existing[idx], [col.field as string]: newValue };
-            } else {
-              existing.push({ ...props.data, [col.field as string]: newValue });
-            }
-            return existing;
-          });
-        };
+        const monthKey = col.field as string;
+        const { routeId, classType } = props.data;
+        const overrideEntry = routeLoadFactorData.find(
+          r => r.routeId === routeId && r.classType === classType
+        );
+        const overrideValue = overrideEntry?.[monthKey] as number | undefined;
+        const computedValue = computedLF[classType]?.[monthKey] ?? 0;
+
         return (
-          <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
-            <NumberInput value={props.value ?? 0} onChange={handleChange} size="S" min={0} showLabel={false} variant="Stepper" />
-          </div>
+          <LFCellRenderer
+            computedValue={computedValue}
+            overrideValue={overrideValue}
+            onSetOverride={(v) => setOverride(routeId, classType, monthKey, v)}
+            onClearOverride={() => clearOverride(routeId, classType, monthKey)}
+          />
         );
       },
     }));
@@ -209,7 +321,7 @@ export function LoadFactorSection({
       { field: 'classType', headerName: 'Class', width: 120, pinned: 'left' as const, valueGetter: (params: { data: { classType: string } }) => CLASS_LABELS[params.data?.classType] || params.data?.classType },
       ...monthCols,
     ];
-  }, [startDate, endDate, generateMonthColumns, routeLFFirstRow]);
+  }, [startDate, endDate, generateMonthColumns, routeLFFirstRow, routeLoadFactorData, computedLF, setOverride, clearOverride]);
 
   return (
     <div className="study-page__fleet">
