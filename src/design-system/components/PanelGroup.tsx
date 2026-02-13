@@ -82,21 +82,19 @@ export function PanelGroup({
   const iconSize = iconSizes[size];
 
   return (
-    <button type="button" className={classes} onClick={onClick}>
-      <span className="panel-group__arrow">
-        <Icon
-          name="keyboard_arrow_down"
-          size={iconSize}
-          color={open ? '#ffffff' : 'var(--cool-grey-40, #b3bbc8)'}
-        />
-      </span>
-      <span className="panel-group__label">{label}</span>
-      {actions && (
-        <span className="panel-group__actions" onClick={(e) => e.stopPropagation()}>
-          {actions}
+    <div className={classes}>
+      <button type="button" className="panel-group__header" onClick={onClick}>
+        <span className="panel-group__arrow">
+          <Icon
+            name="keyboard_arrow_down"
+            size={iconSize}
+            color={open ? '#ffffff' : 'var(--cool-grey-40, #b3bbc8)'}
+          />
         </span>
-      )}
-    </button>
+        <span className="panel-group__label">{label}</span>
+      </button>
+      {actions && <span className="panel-group__actions">{actions}</span>}
+    </div>
   );
 }
 

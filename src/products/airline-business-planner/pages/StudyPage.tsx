@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, type ICellRendererParams, type ColDef } from 'ag-grid-community';
@@ -1832,12 +1832,13 @@ export default function StudyPage() {
   }, []);
 
   // Study lifecycle: draft → computing → computed
-  // Map incoming status to local status
+  // Map incoming status to local status (check location.state first, then persisted data)
   const getInitialStatus = (): 'draft' | 'computing' | 'computed' => {
-    if (!studyData?.status) return 'draft';
-    switch (studyData.status) {
-      case 'Computed': return 'computed';
-      case 'Computing': return 'computing';
+    const raw = studyData?.status || persistedData?.studyStatus;
+    if (!raw) return 'draft';
+    switch (raw.toLowerCase()) {
+      case 'computed': return 'computed';
+      case 'computing': return 'computing';
       default: return 'draft';
     }
   };
@@ -1995,7 +1996,7 @@ export default function StudyPage() {
     const dataToSave: PersistedStudyData = {
       studyName,
       workspaceName,
-      studyStatus: studyData?.status || studyStatus,
+      studyStatus,
       periodType,
       simulationYears,
       startDate: startDate?.toISOString() || null,
@@ -2034,7 +2035,7 @@ export default function StudyPage() {
   useEffect(() => {
     debouncedSave();
   }, [
-    periodType, simulationYears, startDate, endDate, operatingDays, startupDuration,
+    studyStatus, periodType, simulationYears, startDate, endDate, operatingDays, startupDuration,
     fleetEntries, costOperationsData, costOwnershipData, crewConfigData,
     routeEntries, routePricingData, fleetPlanData, routeFrequencyData, discountForNormalFares,
     debouncedSave

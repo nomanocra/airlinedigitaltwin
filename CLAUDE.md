@@ -167,3 +167,33 @@ src/
 ## Produits
 
 - **Airline Business Planner** : `src/products/airline-business-planner/`
+
+## Utilisation des Subagents
+
+Quand l'utilisateur demande une tâche, utiliser un **subagent** (Task tool) pour la réaliser. Cela permet de :
+- Paralléliser les recherches
+- Isoler le contexte des tâches complexes
+- Garder le contexte principal propre
+
+### Types de subagents disponibles
+
+| Type | Usage |
+|------|-------|
+| `Explore` | Recherche approfondie dans le codebase, exploration de fichiers |
+| `Plan` | Planification d'implémentation, architecture |
+| `Bash` | Commandes shell, git, npm |
+| `general-purpose` | Tâches générales, recherches multi-étapes |
+
+### Quand utiliser un subagent
+
+- Recherche de code ou de fichiers (utiliser `Explore`)
+- Implémentation d'une nouvelle feature (utiliser `Plan` puis coder)
+- Tâches qui nécessitent plusieurs étapes de recherche
+- Commandes longues en arrière-plan (`run_in_background: true`)
+
+### Exemple
+
+```
+User: "Trouve tous les endroits où on utilise le composant Modal"
+→ Lancer un subagent Explore pour cette recherche
+```

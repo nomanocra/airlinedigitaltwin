@@ -526,17 +526,11 @@
   align-items: end;
 }
 
-.study-page__container-tabs + .study-page__container-tab-content {
-  margin-top: -12px;
-}
-
-/* Computed table in tab content */
-.study-page__container-tab-content--table {
-  background-color: var(--background-secondary, #fafafa);
+.study-page__table-scroll-wrapper {
   overflow-x: auto;
 }
 
-.study-page__container-tabs + .study-page__container-tab-content--table {
+.study-page__container-tabs + .study-page__container-tab-content {
   margin-top: -12px;
 }
 
