@@ -51,10 +51,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .study-page__form-row > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   width: 260px;
   max-width: 260px;
 }
@@ -67,7 +70,7 @@
 .study-page__field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   width: auto !important;
   max-width: none !important;
 }
@@ -486,10 +489,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .study-page__form-grid > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   width: 160px;
 }
 
@@ -502,6 +508,26 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Container tabs within sections */
+.study-page__container-tabs {
+  display: flex;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--text-tertiary, #b3bbc8);
+}
+
+.study-page__container-tab-content {
+  background-color: var(--background-secondary, #fafafa);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.study-page__container-tabs + .study-page__container-tab-content {
+  margin-top: -12px;
 }
 
 /* Read-only calculated field placeholder */

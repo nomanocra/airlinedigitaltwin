@@ -139,3 +139,16 @@
 .create-study-modal__textarea::placeholder {
   color: var(--text-secondary, #63728a);
 }
+
+/* Info text for Move modal */
+.create-study-modal__info-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary, #63728a);
+  margin: 0;
+}
+
+.create-study-modal__info-text strong {
+  color: var(--text-main, #14171d);
+}

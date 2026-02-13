@@ -67,21 +67,27 @@ function saveToStorage(studyId: string | undefined, data: PersistedStudyData): v
   }
 }
 
-// Debounce helper
+// Debounce helper - uses ref to keep callback stable
 function useDebouncedCallback<T extends (...args: Parameters<T>) => void>(
   callback: T,
   delay: number
 ): T {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const callbackRef = useRef(callback);
+
+  // Always update the ref to latest callback
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
   return useCallback((...args: Parameters<T>) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      callback(...args);
+      callbackRef.current(...args);
     }, delay);
-  }, [callback, delay]) as T;
+  }, [delay]) as T;
 }
 import { AppHeader } from '@/design-system/composites/AppHeader';
 import { LeftPanel } from '@/design-system/composites/LeftPanel';
@@ -113,6 +119,7 @@ import { EditRouteModal, type RouteEntryForEdit } from '../components/EditRouteM
 import { ImportAirlineFleetModal } from '../components/ImportAirlineFleetModal';
 import { ImportAirlineNetworkModal } from '../components/ImportAirlineNetworkModal';
 import { NetworkSummary } from '../components/NetworkSummary';
+import { LoadFactorSummary } from '../components/LoadFactorSummary';
 import { NetworkMapView } from '../components/NetworkMapView';
 import { AddRouteModal } from '../components/AddRouteModal';
 import '@/design-system/tokens/ag-grid-theme.css';
@@ -128,7 +135,7 @@ type RoutesViewMode = 'table' | 'map';
 type NetworkTabType = 'routes' | 'pricing' | 'fleet-plan' | 'frequencies' | 'summary';
 
 // Load Factor tab types
-type LoadFactorTabType = 'general' | 'per-route';
+type LoadFactorTabType = 'general' | 'per-route' | 'summary';
 
 // Operational Cost tab types
 type OperationalCostTabType = 'fuel-cost' | 'crew-costs' | 'catering-costs' | 'maintenance-costs' | 'selling-distribution';
@@ -387,17 +394,20 @@ export default function StudyPage() {
   const [flightCrewAttrition, setFlightCrewAttrition] = useState(3);
   const [crewFixedWagesSubTab, setCrewFixedWagesSubTab] = useState<CrewCostSubTabType>('wages');
   const [crewFixedWages, setCrewFixedWages] = useState({
-    captainBaseSalary: 12000, firstOfficerBaseSalary: 8000, cabinManagerBaseSalary: 4000,
-    cabinAttendantBaseSalary: 2500, captainHousingAllowance: 3000, firstOfficerHousingAllowance: 2000,
-    cabinManagerHousingAllowance: 1500, cabinAttendantHousingAllowance: 1000,
-    captainTransportAllowance: 500, firstOfficerTransportAllowance: 400, cabinManagerTransportAllowance: 300,
+    annualSalaryIncrease: 2.5,
+    captainGrossWage: 100, companyChargesCaptain: 4,
+    firstOfficerGrossWage: 100, companyChargesFirstOfficer: 100,
+    flightCrewAdditionalSalary: 100,
+    cabinCrewTeamLeaderWage: 100, companyChargesCabinCrewTeamLeader: 100,
+    cabinAttendantWage: 100, companyChargesCabinAttendant: 100,
+    cabinCrewAdditionalSalary: 100,
   });
   const [crewVariableWagesSubTab, setCrewVariableWagesSubTab] = useState<CrewCostSubTabType>('wages');
-  const [crewVariableWages, setCrewVariableWages] = useState({ perDiem: 150, flightHourPay: 50 });
+  const [crewVariableWages, setCrewVariableWages] = useState({ flightCrewVariablePay: 50, cabinCrewVariablePay: 50 });
   const [crewTrainingSubTab, setCrewTrainingSubTab] = useState<CrewCostSubTabType>('wages');
   const [crewTraining, setCrewTraining] = useState({
-    captainInitialTraining: 25000, firstOfficerInitialTraining: 20000, cabinCrewInitialTraining: 5000,
-    recurrentTrainingPerCrew: 3000, simulatorCostPerSession: 8000,
+    operatorConversionCourse: 100, typeRatingCost: 100, pilotsAlreadyQualified: 100,
+    flightCrewRecurrentTraining: 100, cabinCrewTrainingCost: 100,
   });
   // Catering
   const [cateringCostEconomy, setCateringCostEconomy] = useState(20);
@@ -3043,6 +3053,7 @@ export default function StudyPage() {
               <div className="study-page__fleet-tabs">
                 <Tab label="General Load Factor" size="M" status={loadFactorTab === 'general' ? 'Active' : 'Default'} onClick={() => setLoadFactorTab('general')} />
                 <Tab label="Load Factor per Route" size="M" status={loadFactorTab === 'per-route' ? 'Active' : 'Default'} disabled={!hasRoutes} onClick={() => { if (hasRoutes) setLoadFactorTab('per-route'); }} />
+                <Tab label="Summary" size="M" status={loadFactorTab === 'summary' ? 'Active' : 'Default'} onClick={() => setLoadFactorTab('summary')} />
               </div>
 
               {loadFactorTab === 'general' && (
@@ -3145,6 +3156,16 @@ export default function StudyPage() {
                   </div>
                 </div>
               )}
+
+              {loadFactorTab === 'summary' && (
+                <div className="study-page__tab-content">
+                  <LoadFactorSummary
+                    startDate={startDate}
+                    endDate={endDate}
+                    periodType={periodType}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -3206,9 +3227,9 @@ export default function StudyPage() {
                       <h3 className="study-page__section-title">General Crew Costs</h3>
                     </div>
                     <div className="study-page__form-grid--wide study-page__form-grid">
-                      <NumberInput label="Crew Ratio per Aircraft" value={crewRatioPerAircraft} onChange={setCrewRatioPerAircraft} size="S" min={0} step={0.1} showLabel showInfo infoText="Number of crew sets per aircraft" />
-                      <NumberInput label="Cabin Crew Attrition Rate per Month (%)" value={cabinCrewAttrition} onChange={setCabinCrewAttrition} size="S" min={0} step={0.01} showLabel showInfo infoText="Monthly cabin crew attrition rate" />
-                      <NumberInput label="Flight Crew Attrition per Year" value={flightCrewAttrition} onChange={setFlightCrewAttrition} size="S" min={0} showLabel showInfo infoText="Yearly flight crew attrition count" />
+                      <NumberInput label="Crew Ratio per Aircraft" value={crewRatioPerAircraft} onChange={setCrewRatioPerAircraft} size="S" min={0} step={0.1} showLabel showInfo infoText="Number of crews needed to operate an A/C for a full month" />
+                      <NumberInput label="Cabin Crew Attrition Rate per Month (%)" value={cabinCrewAttrition} onChange={setCabinCrewAttrition} size="S" min={0} step={0.01} showLabel showInfo infoText="Percentage of crew members that could quit or retire each month" />
+                      <NumberInput label="Flight Crew Attrition per Year" value={flightCrewAttrition} onChange={setFlightCrewAttrition} size="S" min={0} showLabel showInfo infoText="Number of pilots that could quit or retire each year." />
                     </div>
                   </div>
 
@@ -3217,35 +3238,28 @@ export default function StudyPage() {
                     <div className="study-page__section-title-row">
                       <h3 className="study-page__section-title">Crew Fixed Wages</h3>
                     </div>
-                    <div className="study-page__sub-tabs">
-                      <ButtonGroup
-                        options={[
-                          { value: 'wages', label: 'Crew Fixed Wages' },
-                          { value: 'monthly-costs', label: 'Monthly Costs per Workers' },
-                        ]}
-                        value={crewFixedWagesSubTab}
-                        onChange={(v) => setCrewFixedWagesSubTab(v as CrewCostSubTabType)}
-                        size="S"
-                      />
+                    <div className="study-page__container-tabs">
+                      <Tab label="Crew Fixed Wages" variant="Container" size="S" status={crewFixedWagesSubTab === 'wages' ? 'Active' : 'Default'} onClick={() => setCrewFixedWagesSubTab('wages')} />
+                      <Tab label="Monthly Costs per Workers" variant="Container" size="S" status={crewFixedWagesSubTab === 'monthly-costs' ? 'Active' : 'Default'} onClick={() => setCrewFixedWagesSubTab('monthly-costs')} />
                     </div>
                     {crewFixedWagesSubTab === 'wages' && (
-                      <div className="study-page__form-grid--wide study-page__form-grid">
-                        <NumberInput label="Captain Base Salary ($)" value={crewFixedWages.captainBaseSalary} onChange={(v) => setCrewFixedWages(p => ({ ...p, captainBaseSalary: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="First Officer Base Salary ($)" value={crewFixedWages.firstOfficerBaseSalary} onChange={(v) => setCrewFixedWages(p => ({ ...p, firstOfficerBaseSalary: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Cabin Manager Base Salary ($)" value={crewFixedWages.cabinManagerBaseSalary} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinManagerBaseSalary: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Cabin Attendant Base Salary ($)" value={crewFixedWages.cabinAttendantBaseSalary} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinAttendantBaseSalary: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Captain Housing Allowance ($)" value={crewFixedWages.captainHousingAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, captainHousingAllowance: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="First Officer Housing Allowance ($)" value={crewFixedWages.firstOfficerHousingAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, firstOfficerHousingAllowance: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Cabin Manager Housing Allowance ($)" value={crewFixedWages.cabinManagerHousingAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinManagerHousingAllowance: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Cabin Attendant Housing Allowance ($)" value={crewFixedWages.cabinAttendantHousingAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinAttendantHousingAllowance: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Captain Transport Allowance ($)" value={crewFixedWages.captainTransportAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, captainTransportAllowance: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="First Officer Transport Allowance ($)" value={crewFixedWages.firstOfficerTransportAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, firstOfficerTransportAllowance: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Cabin Manager Transport Allowance ($)" value={crewFixedWages.cabinManagerTransportAllowance} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinManagerTransportAllowance: v }))} size="S" min={0} showLabel />
+                      <div className="study-page__container-tab-content">
+                        <NumberInput label="Annual Salary Increse (%)" value={crewFixedWages.annualSalaryIncrease} onChange={(v) => setCrewFixedWages(p => ({ ...p, annualSalaryIncrease: v }))} size="S" min={0} step={0.1} showLabel />
+                        <NumberInput label="Captain Gross Wage per Month ($)" value={crewFixedWages.captainGrossWage} onChange={(v) => setCrewFixedWages(p => ({ ...p, captainGrossWage: v }))} size="S" min={0} showLabel showInfo infoText="Exclude company charges" />
+                        <NumberInput label="Company Charges per Captain (%)" value={crewFixedWages.companyChargesCaptain} onChange={(v) => setCrewFixedWages(p => ({ ...p, companyChargesCaptain: v }))} size="S" min={0} showLabel showInfo infoText="Depends on the local taxation system" />
+                        <NumberInput label="First Officer Gross Wage per Month ($)" value={crewFixedWages.firstOfficerGrossWage} onChange={(v) => setCrewFixedWages(p => ({ ...p, firstOfficerGrossWage: v }))} size="S" min={0} showLabel showInfo infoText="Wage at the beginning of the project." />
+                        <NumberInput label="Company Charges per First Officer (%)" value={crewFixedWages.companyChargesFirstOfficer} onChange={(v) => setCrewFixedWages(p => ({ ...p, companyChargesFirstOfficer: v }))} size="S" min={0} showLabel showInfo infoText="As a percentage of the gross wage. Depends on the local taxation system" />
+                        <NumberInput label="Flight Crew Additional Salary If More Than 60h ($/H)" value={crewFixedWages.flightCrewAdditionalSalary} onChange={(v) => setCrewFixedWages(p => ({ ...p, flightCrewAdditionalSalary: v }))} size="S" min={0} showLabel />
+                        <NumberInput label="Cabin Crew Team Leader Wage Per Month ($)" value={crewFixedWages.cabinCrewTeamLeaderWage} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinCrewTeamLeaderWage: v }))} size="S" min={0} showLabel showInfo infoText="Wage at the beginning of the project." />
+                        <NumberInput label="Company Charges Per Cabin Crew Team Leader (%)" value={crewFixedWages.companyChargesCabinCrewTeamLeader} onChange={(v) => setCrewFixedWages(p => ({ ...p, companyChargesCabinCrewTeamLeader: v }))} size="S" min={0} showLabel showInfo infoText="As a percentage of the gross wage. Depends on the local taxation system" />
+                        <NumberInput label="Cabin Attendant Wage per Month ($)" value={crewFixedWages.cabinAttendantWage} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinAttendantWage: v }))} size="S" min={0} showLabel showInfo infoText="Wage at the beginning of the project." />
+                        <NumberInput label="Company Charges per Cabin Attendant (%)" value={crewFixedWages.companyChargesCabinAttendant} onChange={(v) => setCrewFixedWages(p => ({ ...p, companyChargesCabinAttendant: v }))} size="S" min={0} showLabel showInfo infoText="As a percentage of the gross wage. Depends on the local taxation system" />
+                        <NumberInput label="Cabin Crew Additional Salary If More Than 60h ($/H)" value={crewFixedWages.cabinCrewAdditionalSalary} onChange={(v) => setCrewFixedWages(p => ({ ...p, cabinCrewAdditionalSalary: v }))} size="S" min={0} showLabel />
                       </div>
                     )}
                     {crewFixedWagesSubTab === 'monthly-costs' && (
-                      <div className="study-page__readonly-field" style={{ width: '100%', maxWidth: '100%' }}>
-                        <div className="study-page__readonly-value" style={{ width: '100%', minHeight: 80, justifyContent: 'center' }}>Calculated values will appear here</div>
+                      <div className="study-page__container-tab-content" style={{ minHeight: 80, justifyContent: 'center' }}>
+                        <div className="study-page__readonly-value">Calculated values will appear here</div>
                       </div>
                     )}
                   </div>
@@ -3255,26 +3269,19 @@ export default function StudyPage() {
                     <div className="study-page__section-title-row">
                       <h3 className="study-page__section-title">Variable Wages</h3>
                     </div>
-                    <div className="study-page__sub-tabs">
-                      <ButtonGroup
-                        options={[
-                          { value: 'wages', label: 'Variable Wages' },
-                          { value: 'monthly-costs', label: 'Wages Costs per Month' },
-                        ]}
-                        value={crewVariableWagesSubTab}
-                        onChange={(v) => setCrewVariableWagesSubTab(v as CrewCostSubTabType)}
-                        size="S"
-                      />
+                    <div className="study-page__container-tabs">
+                      <Tab label="Variable Wages" variant="Container" size="S" status={crewVariableWagesSubTab === 'wages' ? 'Active' : 'Default'} onClick={() => setCrewVariableWagesSubTab('wages')} />
+                      <Tab label="Wages Costs per Month" variant="Container" size="S" status={crewVariableWagesSubTab === 'monthly-costs' ? 'Active' : 'Default'} onClick={() => setCrewVariableWagesSubTab('monthly-costs')} />
                     </div>
                     {crewVariableWagesSubTab === 'wages' && (
-                      <div className="study-page__form-grid--wide study-page__form-grid">
-                        <NumberInput label="Per Diem ($)" value={crewVariableWages.perDiem} onChange={(v) => setCrewVariableWages(p => ({ ...p, perDiem: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Flight Hour Pay ($)" value={crewVariableWages.flightHourPay} onChange={(v) => setCrewVariableWages(p => ({ ...p, flightHourPay: v }))} size="S" min={0} showLabel />
+                      <div className="study-page__container-tab-content">
+                        <NumberInput label="Flight Crew Variable Pay per BH ($/H)" value={crewVariableWages.flightCrewVariablePay} onChange={(v) => setCrewVariableWages(p => ({ ...p, flightCrewVariablePay: v }))} size="S" min={0} showLabel />
+                        <NumberInput label="Cabin Crew Variable Pay per BH ($/H)" value={crewVariableWages.cabinCrewVariablePay} onChange={(v) => setCrewVariableWages(p => ({ ...p, cabinCrewVariablePay: v }))} size="S" min={0} showLabel />
                       </div>
                     )}
                     {crewVariableWagesSubTab === 'monthly-costs' && (
-                      <div className="study-page__readonly-field" style={{ width: '100%', maxWidth: '100%' }}>
-                        <div className="study-page__readonly-value" style={{ width: '100%', minHeight: 80, justifyContent: 'center' }}>Calculated values will appear here</div>
+                      <div className="study-page__container-tab-content" style={{ minHeight: 80, justifyContent: 'center' }}>
+                        <div className="study-page__readonly-value">Calculated values will appear here</div>
                       </div>
                     )}
                   </div>
@@ -3284,29 +3291,22 @@ export default function StudyPage() {
                     <div className="study-page__section-title-row">
                       <h3 className="study-page__section-title">Training Costs</h3>
                     </div>
-                    <div className="study-page__sub-tabs">
-                      <ButtonGroup
-                        options={[
-                          { value: 'wages', label: 'Training Cost' },
-                          { value: 'monthly-costs', label: 'Training Costs per Month' },
-                        ]}
-                        value={crewTrainingSubTab}
-                        onChange={(v) => setCrewTrainingSubTab(v as CrewCostSubTabType)}
-                        size="S"
-                      />
+                    <div className="study-page__container-tabs">
+                      <Tab label="Training Cost" variant="Container" size="S" status={crewTrainingSubTab === 'wages' ? 'Active' : 'Default'} onClick={() => setCrewTrainingSubTab('wages')} />
+                      <Tab label="Training Costs per Month" variant="Container" size="S" status={crewTrainingSubTab === 'monthly-costs' ? 'Active' : 'Default'} onClick={() => setCrewTrainingSubTab('monthly-costs')} />
                     </div>
                     {crewTrainingSubTab === 'wages' && (
-                      <div className="study-page__form-grid--wide study-page__form-grid">
-                        <NumberInput label="Captain Initial Training ($)" value={crewTraining.captainInitialTraining} onChange={(v) => setCrewTraining(p => ({ ...p, captainInitialTraining: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="First Officer Initial Training ($)" value={crewTraining.firstOfficerInitialTraining} onChange={(v) => setCrewTraining(p => ({ ...p, firstOfficerInitialTraining: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Cabin Crew Initial Training ($)" value={crewTraining.cabinCrewInitialTraining} onChange={(v) => setCrewTraining(p => ({ ...p, cabinCrewInitialTraining: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Recurrent Training per Crew ($)" value={crewTraining.recurrentTrainingPerCrew} onChange={(v) => setCrewTraining(p => ({ ...p, recurrentTrainingPerCrew: v }))} size="S" min={0} showLabel />
-                        <NumberInput label="Simulator Cost per Session ($)" value={crewTraining.simulatorCostPerSession} onChange={(v) => setCrewTraining(p => ({ ...p, simulatorCostPerSession: v }))} size="S" min={0} showLabel />
+                      <div className="study-page__container-tab-content">
+                        <NumberInput label="Operator Conversion course per flight crew ($)" value={crewTraining.operatorConversionCourse} onChange={(v) => setCrewTraining(p => ({ ...p, operatorConversionCourse: v }))} size="S" min={0} showLabel showInfo infoText="Pilot training for the airline. To be performed by each pilot crew once they join the airline" />
+                        <NumberInput label="Type rating Cost for non A/C type qualified pilots ($)" value={crewTraining.typeRatingCost} onChange={(v) => setCrewTraining(p => ({ ...p, typeRatingCost: v }))} size="S" min={0} showLabel showInfo infoText="Pilot training for pilots not qualified to fly a given A/C type." />
+                        <NumberInput label="Pilots already qualified for the A/C type (%)" value={crewTraining.pilotsAlreadyQualified} onChange={(v) => setCrewTraining(p => ({ ...p, pilotsAlreadyQualified: v }))} size="S" min={0} showLabel />
+                        <NumberInput label="Flight Crew Recurrent Training Cost per FC team ($/year)" value={crewTraining.flightCrewRecurrentTraining} onChange={(v) => setCrewTraining(p => ({ ...p, flightCrewRecurrentTraining: v }))} size="S" min={0} showLabel showInfo infoText="Captain + F/O + Instructor. Includes accommodation." />
+                        <NumberInput label="Cabin Crew Training Cost per Cabin Crew Member ($/year)" value={crewTraining.cabinCrewTrainingCost} onChange={(v) => setCrewTraining(p => ({ ...p, cabinCrewTrainingCost: v }))} size="S" min={0} showLabel showInfo infoText="Captain + F/O + Instructor. Includes accommodation." />
                       </div>
                     )}
                     {crewTrainingSubTab === 'monthly-costs' && (
-                      <div className="study-page__readonly-field" style={{ width: '100%', maxWidth: '100%' }}>
-                        <div className="study-page__readonly-value" style={{ width: '100%', minHeight: 80, justifyContent: 'center' }}>Calculated values will appear here</div>
+                      <div className="study-page__container-tab-content" style={{ minHeight: 80, justifyContent: 'center' }}>
+                        <div className="study-page__readonly-value">Calculated values will appear here</div>
                       </div>
                     )}
                   </div>
@@ -3343,7 +3343,9 @@ export default function StudyPage() {
                   <h2 className="study-page__fleet-title">Selling and distribution costs</h2>
 
                   <div className="study-page__section">
-                    <NumberInput label="Initial Marketing budget ($)" value={initialMarketingBudget} onChange={setInitialMarketingBudget} size="S" min={0} showLabel />
+                    <div className="study-page__form-grid--wide study-page__form-grid">
+                      <NumberInput label="Initial Marketing budget ($)" value={initialMarketingBudget} onChange={setInitialMarketingBudget} size="S" min={0} showLabel />
+                    </div>
                   </div>
 
                   <div className="study-page__section">
@@ -3423,7 +3425,9 @@ export default function StudyPage() {
                         <span className="study-page__section-info-icon"><Icon name="info" size={16} /></span>
                       </SimpleTooltip>
                     </div>
-                    <NumberInput value={codeShareDeduction} onChange={setCodeShareDeduction} size="S" min={0} max={100} showLabel={false} />
+                    <div className="study-page__form-grid--wide study-page__form-grid">
+                      <NumberInput value={codeShareDeduction} onChange={setCodeShareDeduction} size="S" min={0} max={100} showLabel={false} />
+                    </div>
                   </div>
                 </div>
               )}

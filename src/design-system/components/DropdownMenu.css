@@ -82,6 +82,10 @@
    DESTRUCTIVE ITEM
    ============================================================================ */
 
+.dropdown-menu-item--destructive {
+  color: var(--feedback-error-default, #e4002b);
+}
+
 .dropdown-menu-item--destructive .dropdown-menu-item__icon {
   color: var(--feedback-error-default, #e4002b);
 }

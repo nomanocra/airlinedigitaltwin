@@ -8,20 +8,21 @@ import {
   Tooltip,
   LabelList,
   Cell,
+  Rectangle,
 } from 'recharts';
 import { IconButton } from '@/design-system/components/IconButton';
 import { Select } from '@/design-system/components/Select';
 import { ChartCard } from '@/design-system/composites/ChartCard';
 import './NetworkSummary.css';
 
-// Color palette for A/C types
+// Color palette for A/C types (fill + darker hover)
 const AC_TYPE_COLORS = [
-  'var(--primary-default, #063b9e)',
-  'var(--sea-blue-50, #1a73e8)',
-  'var(--cool-grey-50, #6b7280)',
-  'var(--warm-grey-50, #78716c)',
-  'var(--sea-blue-30, #64b5f6)',
-  'var(--cool-grey-70, #374151)',
+  { fill: 'var(--primary-default, #063b9e)', hover: 'var(--sea-blue-80, #002d80)' },
+  { fill: 'var(--sea-blue-50, #638ee0)', hover: 'var(--sea-blue-60, #255fcc)' },
+  { fill: 'var(--cool-grey-50, #919cb0)', hover: 'var(--cool-grey-60, #63728a)' },
+  { fill: 'var(--warm-grey-50, #c5c5c5)', hover: 'var(--warm-grey-60, #a3a3a3)' },
+  { fill: 'var(--sea-blue-30, #b3cbf8)', hover: 'var(--sea-blue-40, #86a8e9)' },
+  { fill: 'var(--cool-grey-70, #505d74)', hover: 'var(--cool-grey-80, #3c4657)' },
 ];
 
 // Hook: real-time container size via ResizeObserver (no debounce)
@@ -123,16 +124,15 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
   const flightsPerAcTypeData = useMemo(() => {
     if (fleetEntries.length === 0) return [];
 
-    // Generate mock flight data per A/C type
-    // In a real app, this would come from actual flight data
     return fleetEntries.map((entry, index) => {
-      // Base flights calculation with some randomness
       const baseFlights = entry.numberOfAircraft * (flightsYearFilter === 'all' ? 850 : 170);
       const variance = Math.round(baseFlights * 0.2 * (Math.random() - 0.5));
+      const palette = AC_TYPE_COLORS[index % AC_TYPE_COLORS.length];
       return {
         aircraftType: entry.aircraftType,
         flights: baseFlights + variance,
-        color: AC_TYPE_COLORS[index % AC_TYPE_COLORS.length],
+        color: palette.fill,
+        hoverColor: palette.hover,
       };
     });
   }, [fleetEntries, flightsYearFilter]);
@@ -171,16 +171,17 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
           {distanceSize.width > 0 && distanceSize.height > 0 && (
             <BarChart width={distanceSize.width} height={distanceSize.height} data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
-              <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+              <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'var(--text-secondary, #63728a)' }} />
               <YAxis
-                tick={{ fontSize: 12 }}
-                label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
+                tick={{ fontSize: 11, fill: 'var(--text-secondary, #63728a)' }}
+                label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fontWeight: 700, fill: 'var(--text-secondary, #63728a)' } }}
               />
               <Tooltip cursor={false} />
               <Bar
                 dataKey="distance"
                 fill="var(--primary-default, #063b9e)"
                 radius={[2, 2, 0, 0]}
+                activeBar={{ fill: 'var(--sea-blue-80, #002d80)' }}
               >
                 <LabelList dataKey="distance" position="top" style={{ fontSize: 11, fontWeight: 700, fill: 'var(--primary-default, #063b9e)', stroke: '#ffffff', strokeWidth: 3, paintOrder: 'stroke fill' }} />
               </Bar>
@@ -217,13 +218,19 @@ export function NetworkSummary({ routeEntries, fleetEntries, startDate, endDate,
           {flightsSize.width > 0 && flightsSize.height > 0 && (
             <BarChart width={flightsSize.width} height={flightsSize.height} data={flightsPerAcTypeData} margin={{ top: 25, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-default, #ccd4e0)" />
-              <XAxis dataKey="aircraftType" tick={{ fontSize: 11 }} />
+              <XAxis dataKey="aircraftType" tick={{ fontSize: 11, fill: 'var(--text-secondary, #63728a)' }} />
               <YAxis
-                tick={{ fontSize: 12 }}
-                label={{ value: 'Flights', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fill: 'var(--text-secondary, #6b7280)' } }}
+                tick={{ fontSize: 11, fill: 'var(--text-secondary, #63728a)' }}
+                label={{ value: 'Flights', angle: -90, position: 'insideLeft', offset: 0, style: { fontSize: 12, fontWeight: 700, fill: 'var(--text-secondary, #63728a)' } }}
               />
               <Tooltip cursor={false} />
-              <Bar dataKey="flights" radius={[2, 2, 0, 0]}>
+              <Bar
+                dataKey="flights"
+                radius={[2, 2, 0, 0]}
+                activeBar={(props: any) => (
+                  <Rectangle {...props} fill={props.payload?.hoverColor || props.fill} />
+                )}
+              >
                 {flightsPerAcTypeData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}

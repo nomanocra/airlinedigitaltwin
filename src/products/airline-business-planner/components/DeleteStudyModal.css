@@ -1,0 +1,35 @@
+/**
+ * DeleteStudyModal Styles
+ */
+
+.delete-study-modal .modal__footer {
+  justify-content: space-between;
+}
+
+.delete-study-modal__message {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--text-main, #14171d);
+  margin: 0;
+}
+
+.delete-study-modal__message strong {
+  font-weight: 600;
+}
+
+/* Destructive button style */
+.delete-study-modal__delete-btn.button[data-variant="Default"] {
+  background-color: var(--feedback-error-default, #e4002b);
+  border-color: var(--feedback-error-default, #e4002b);
+}
+
+.delete-study-modal__delete-btn.button[data-variant="Default"]:hover {
+  background-color: #c70026;
+  border-color: #c70026;
+}
+
+.delete-study-modal__delete-btn.button[data-variant="Default"]:active {
+  background-color: #a50020;
+  border-color: #a50020;
+}
