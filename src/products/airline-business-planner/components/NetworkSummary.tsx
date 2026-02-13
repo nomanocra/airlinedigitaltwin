@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -13,6 +13,7 @@ import {
 import { IconButton } from '@/design-system/components/IconButton';
 import { Select } from '@/design-system/components/Select';
 import { ChartCard } from '@/design-system/composites/ChartCard';
+import { useContainerSize } from '../hooks/useContainerSize';
 import './NetworkSummary.css';
 
 // Color palette for A/C types (fill + darker hover)
@@ -24,29 +25,6 @@ const AC_TYPE_COLORS = [
   { fill: 'var(--sea-blue-30, #b3cbf8)', hover: 'var(--sea-blue-40, #86a8e9)' },
   { fill: 'var(--cool-grey-70, #505d74)', hover: 'var(--cool-grey-80, #3c4657)' },
 ];
-
-// Hook: real-time container size via ResizeObserver (no debounce)
-function useContainerSize<T extends HTMLElement>(): [React.RefObject<T | null>, { width: number; height: number }] {
-  const ref = useRef<T | null>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
-
-  const updateSize = useCallback(() => {
-    if (ref.current) {
-      setSize({ width: ref.current.clientWidth, height: ref.current.clientHeight });
-    }
-  }, []);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    updateSize();
-    const ro = new ResizeObserver(() => updateSize());
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [updateSize]);
-
-  return [ref, size];
-}
 
 interface RouteEntry {
   id: string;

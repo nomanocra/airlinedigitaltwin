@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ComposedChart,
   Bar,
@@ -11,30 +11,8 @@ import {
 } from 'recharts';
 import { IconButton } from '@/design-system/components/IconButton';
 import { ChartCard } from '@/design-system/composites/ChartCard';
+import { useContainerSize } from '../hooks/useContainerSize';
 import './LoadFactorSummary.css';
-
-// Hook: real-time container size via ResizeObserver
-function useContainerSize<T extends HTMLElement>(): [React.RefObject<T | null>, { width: number; height: number }] {
-  const ref = useRef<T | null>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
-
-  const updateSize = useCallback(() => {
-    if (ref.current) {
-      setSize({ width: ref.current.clientWidth, height: ref.current.clientHeight });
-    }
-  }, []);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    updateSize();
-    const ro = new ResizeObserver(() => updateSize());
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [updateSize]);
-
-  return [ref, size];
-}
 
 interface LoadFactorSummaryProps {
   startDate?: Date;
