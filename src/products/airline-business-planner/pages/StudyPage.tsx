@@ -1,94 +1,18 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, type ICellRendererParams, type ColDef } from 'ag-grid-community';
 import { useFavicon } from '@/hooks/useFavicon';
-
-// ========== LOCAL STORAGE PERSISTENCE ==========
-const STORAGE_PREFIX = 'abp_study_';
-
-interface PersistedStudyData {
-  // Meta
-  studyName: string;
-  workspaceName: string;
-  studyStatus: string;
-  // Period
-  periodType: 'dates' | 'duration';
-  simulationYears: number;
-  startDate: string | null;
-  endDate: string | null;
-  operatingDays: number;
-  startupDuration: number;
-  // Fleet
-  fleetEntries: Array<{
-    id: string;
-    aircraftType: string;
-    engine: string;
-    layout: string;
-    numberOfAircraft: number;
-    enterInService: string;
-    retirement?: string;
-    ownership: 'Owned' | 'Leased';
-  }>;
-  costOperationsData: Array<{ id: string; groundHandlingCharge: number; fuelAgeingFactor: number }>;
-  costOwnershipData: Array<{ id: string; monthlyLeaseRate: number; acValueUponAcquisition: number; sparesProvisioningPerFamily: number }>;
-  crewConfigData: Array<{ id: string; captainPerCrew: number; firstOfficerPerCrew: number; cabinManagerPerCrew: number; cabinAttendantPerCrew: number }>;
-  // Network
-  routeEntries: Array<{ id: string; origin: string; destination: string; startDate: string; endDate: string }>;
-  routePricingData: Array<{ routeId: string; marketYield: number; discountStrategy: string; yield: number; fare: number }>;
-  fleetPlanData: Array<{ routeId: string; allocatedAircraftId: string | null }>;
-  routeFrequencyData: Array<{ routeId: string; frequencies: Record<string, number> }>;
-  discountForNormalFares: number;
-}
-
-function getStorageKey(studyId: string | undefined): string {
-  return `${STORAGE_PREFIX}${studyId || 'default'}`;
-}
-
-function loadFromStorage(studyId: string | undefined): PersistedStudyData | null {
-  try {
-    const key = getStorageKey(studyId);
-    const data = localStorage.getItem(key);
-    if (data) {
-      return JSON.parse(data) as PersistedStudyData;
-    }
-  } catch (e) {
-    console.warn('Failed to load study from localStorage:', e);
-  }
-  return null;
-}
-
-function saveToStorage(studyId: string | undefined, data: PersistedStudyData): void {
-  try {
-    const key = getStorageKey(studyId);
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
-    console.warn('Failed to save study to localStorage:', e);
-  }
-}
-
-// Debounce helper - uses ref to keep callback stable
-function useDebouncedCallback<T extends (...args: Parameters<T>) => void>(
-  callback: T,
-  delay: number
-): T {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const callbackRef = useRef(callback);
-
-  // Always update the ref to latest callback
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
-
-  return useCallback((...args: Parameters<T>) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      callbackRef.current(...args);
-    }, delay);
-  }, [delay]) as T;
-}
+import { loadFromStorage, saveToStorage, useDebouncedCallback } from '../hooks/useStudyPersistence';
+import type {
+  FleetTabType, FleetViewMode, RoutesViewMode, NetworkTabType,
+  LoadFactorTabType, OperationalCostTabType, CrewCostSubTabType,
+  RevenueTabType, FinancialTabType,
+  FleetCostOperationsEntry, FleetCostOwnershipEntry, CrewConfigEntry,
+  RouteEntry, RoutePricingEntry, FleetPlanEntry, RouteFrequencyEntry,
+  GanttAircraftRow, Scenario, PersistedStudyData,
+} from './types';
+import { ASSUMPTION_ITEMS, OUTPUT_ITEMS } from './constants';
 import { AppHeader } from '@/design-system/composites/AppHeader';
 import { LeftPanel } from '@/design-system/composites/LeftPanel';
 import { PanelHeader } from '@/design-system/composites/PanelHeader';
@@ -127,120 +51,6 @@ import './StudyPage.css';
 
 // Register AG-Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-// Fleet sub-tab types
-type FleetTabType = 'fleet' | 'cost-operations' | 'cost-ownership' | 'crew';
-type FleetViewMode = 'table' | 'gantt';
-type RoutesViewMode = 'table' | 'map';
-type NetworkTabType = 'routes' | 'pricing' | 'fleet-plan' | 'frequencies' | 'summary';
-
-// Load Factor tab types
-type LoadFactorTabType = 'general' | 'per-route' | 'summary';
-
-// Operational Cost tab types
-type OperationalCostTabType = 'fuel-cost' | 'crew-costs' | 'catering-costs' | 'maintenance-costs' | 'selling-distribution';
-type CrewCostSubTabType = 'wages' | 'monthly-costs';
-
-// Revenue tab types
-type RevenueTabType = 'ancillary' | 'cargo';
-
-// Financial tab types
-type FinancialTabType = 'inflation' | 'taxes' | 'owned-ac' | 'leased-ac' | 'tooling' | 'working-capital';
-
-// Fleet Cost Operations
-interface FleetCostOperationsEntry {
-  id: string;
-  groundHandlingCharge: number;  // USD/sector
-  fuelAgeingFactor: number;      // %
-}
-
-// Fleet Cost Ownership
-interface FleetCostOwnershipEntry {
-  id: string;
-  monthlyLeaseRate: number;
-  acValueUponAcquisition: number;
-  sparesProvisioningPerFamily: number;
-  // monthlyInsurance = acValueUponAcquisition * 0.01 / 12 (calculated)
-}
-
-// Crew Configuration
-interface CrewConfigEntry {
-  id: string;
-  captainPerCrew: number;
-  firstOfficerPerCrew: number;
-  cabinManagerPerCrew: number;
-  cabinAttendantPerCrew: number;
-}
-
-// Routes
-interface RouteEntry {
-  id: string;
-  origin: string;
-  destination: string;
-  startDate: Date;
-  endDate: Date;
-}
-
-// Pricing
-interface RoutePricingEntry {
-  routeId: string;
-  marketYield: number;
-  discountStrategy: string;
-  yield: number;
-  fare: number;  // calculated
-}
-
-// Fleet Plan
-interface FleetPlanEntry {
-  routeId: string;
-  allocatedAircraftId: string | null;
-}
-
-// Frequencies
-interface RouteFrequencyEntry {
-  routeId: string;
-  frequencies: Record<string, number>;  // "YYYY-MM" -> count
-}
-
-// Gantt Row (expanded)
-interface GanttAircraftRow {
-  id: string;
-  fleetEntryId: string;
-  aircraftIndex: number;  // 1, 2, 3...
-  aircraftType: string;
-  engine: string;
-  layout: string;
-  enterInService: Date;
-  retirement?: Date;
-  ownership: 'Owned' | 'Leased';
-}
-
-// Assumption items configuration
-const ASSUMPTION_ITEMS = [
-  { id: 'period', label: 'Global Settings', icon: 'calendar_month' },
-  { id: 'fleet', label: 'Fleet', icon: 'AIR_fleet' },
-  { id: 'network', label: 'Network', icon: 'share' },
-  { id: 'load-factor', label: 'Load factor', icon: 'airline_seat_recline_extra' },
-  { id: 'operational-cost', label: 'Operational Cost', icon: 'trending_down' },
-  { id: 'revenue', label: 'Revenue', icon: 'trending_up' },
-  { id: 'financial', label: 'Financial', icon: 'account_balance' },
-  { id: 'investment', label: 'Investment & Capitalisation', icon: 'monetization_on' },
-];
-
-// Output items configuration
-const OUTPUT_ITEMS = [
-  { id: 'crew-cost', label: 'Crew Cost', icon: 'group' },
-  { id: 'economics', label: 'Economics Performance', icon: 'show_chart' },
-  { id: 'pnl', label: 'Profit & Loss', icon: 'bar_chart' },
-];
-
-interface Scenario {
-  id: number;
-  name: string;
-  isOpen: boolean;
-  assumptionsOpen: boolean;
-  outputsOpen: boolean;
-}
 
 export default function StudyPage() {
   const navigate = useNavigate();
