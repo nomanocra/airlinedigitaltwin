@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { useFavicon } from '@/hooks/useFavicon';
 import { loadFromStorage, saveToStorage, useDebouncedCallback } from '../hooks/useStudyPersistence';
@@ -46,41 +46,14 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 export default function StudyPage() {
   const navigate = useNavigate();
   const { studyId } = useParams();
-  const location = useLocation();
-  const locationState = location.state as {
-    studyName?: string;
-    workspaceName?: string;
-    studyData?: {
-      status: string;
-      startDate: string;
-      endDate: string;
-      fleet?: Array<{
-        id: string;
-        aircraftType: string;
-        engine: string;
-        layout: string;
-        numberOfAircraft: number;
-        enterInService: string;
-      }>;
-      routes?: Array<{
-        id: string;
-        origin: string;
-        destination: string;
-        startDate: string;
-        endDate: string;
-      }>;
-    };
-  } | null;
 
-  // Load persisted data from localStorage (fallback if no location.state)
+  // Load persisted data from localStorage (initializes from mock if empty)
   const persistedData = useMemo(() => {
-    if (locationState?.studyData) return null; // Use location.state if available
     return loadFromStorage(studyId);
-  }, [studyId, locationState]);
+  }, [studyId]);
 
-  const studyName = locationState?.studyName || persistedData?.studyName || 'Study Name';
-  const workspaceName = locationState?.workspaceName || persistedData?.workspaceName || 'Workspace Name';
-  const studyData = locationState?.studyData;
+  const studyName = persistedData?.studyName || 'Study Name';
+  const workspaceName = persistedData?.workspaceName || 'Workspace Name';
 
   // Helper to parse date strings
   const parseDate = (dateStr: string | undefined | null): Date | undefined => {
@@ -106,20 +79,20 @@ export default function StudyPage() {
     itemId: 'period',
   });
 
-  // Form state (Simulation Period) - pre-fill from studyData or persistedData
+  // Form state (Simulation Period) - pre-fill from persistedData
   const [periodType, setPeriodType] = useState<'dates' | 'duration'>(() => persistedData?.periodType || 'dates');
   const [simulationYears, setSimulationYears] = useState<number>(() => persistedData?.simulationYears || 4);
-  const [startDate, setStartDate] = useState<Date | undefined>(() => parseDate(studyData?.startDate) || parseDate(persistedData?.startDate));
-  const [endDate, setEndDate] = useState<Date | undefined>(() => parseDate(studyData?.endDate) || parseDate(persistedData?.endDate));
+  const [startDate, setStartDate] = useState<Date | undefined>(() => parseDate(persistedData?.startDate));
+  const [endDate, setEndDate] = useState<Date | undefined>(() => parseDate(persistedData?.endDate));
   // Saved dates for restoring when switching back from duration to dates mode
-  const savedDatesRef = useRef<{ start?: Date; end?: Date }>({ start: parseDate(studyData?.startDate) || parseDate(persistedData?.startDate), end: parseDate(studyData?.endDate) || parseDate(persistedData?.endDate) });
+  const savedDatesRef = useRef<{ start?: Date; end?: Date }>({ start: parseDate(persistedData?.startDate), end: parseDate(persistedData?.endDate) });
   // Saved fleet/route entry dates per mode
   const savedFleetDatesRef = useRef<Record<string, { enterInService: Date; retirement?: Date }>>({});
   const savedRouteDatesRef = useRef<Record<string, { startDate: Date; endDate: Date }>>({});
   const savedFleetDatesDurationRef = useRef<Record<string, { enterInService: Date; retirement?: Date }>>({});
   const savedRouteDatesDurationRef = useRef<Record<string, { startDate: Date; endDate: Date }>>({});
-  const [operatingDays, setOperatingDays] = useState<number>(() => persistedData?.operatingDays ?? (studyData ? 365 : 0));
-  const [startupDuration, setStartupDuration] = useState<number>(() => persistedData?.startupDuration ?? (studyData ? 6 : 0));
+  const [operatingDays, setOperatingDays] = useState<number>(() => persistedData?.operatingDays ?? 0);
+  const [startupDuration, setStartupDuration] = useState<number>(() => persistedData?.startupDuration ?? 0);
 
   // Fleet cost and crew data
   const [costOperationsData, setCostOperationsData] = useState<FleetCostOperationsEntry[]>(() => persistedData?.costOperationsData || []);
@@ -128,12 +101,6 @@ export default function StudyPage() {
 
   // Network state
   const [routeEntries, setRouteEntries] = useState<RouteEntry[]>(() => {
-    if (studyData?.routes) {
-      return studyData.routes.map(r => ({
-        id: r.id, origin: r.origin, destination: r.destination,
-        startDate: new Date(r.startDate), endDate: new Date(r.endDate),
-      }));
-    }
     if (persistedData?.routeEntries) {
       return persistedData.routeEntries.map(r => ({
         id: r.id, origin: r.origin, destination: r.destination,
@@ -242,21 +209,8 @@ export default function StudyPage() {
   const [acPreparationAmortRate, setAcPreparationAmortRate] = useState(3);
   const [workingCapitalData, setWorkingCapitalData] = useState<Array<{ category: string; item: string; [key: string]: number | string }>>([]);
 
-  // Fleet data - pre-fill from studyData or persistedData
+  // Fleet data - pre-fill from persistedData
   const [fleetEntries, setFleetEntries] = useState<FleetEntry[]>(() => {
-    if (studyData?.fleet) {
-      return studyData.fleet.map((f, index) => ({
-        id: f.id,
-        aircraftType: f.aircraftType,
-        engine: f.engine,
-        layout: f.layout,
-        numberOfAircraft: f.numberOfAircraft,
-        enterInService: new Date(f.enterInService),
-        retirement: undefined,
-        ownership: (index % 2 === 0 ? 'Owned' : 'Leased') as const,
-        cabinClasses: parseLayoutClasses(f.layout),
-      }));
-    }
     if (persistedData?.fleetEntries) {
       return persistedData.fleetEntries.map(f => ({
         id: f.id,
@@ -460,7 +414,7 @@ export default function StudyPage() {
 
   // Study lifecycle: draft → computing → computed
   const getInitialStatus = (): 'draft' | 'computing' | 'computed' => {
-    const raw = studyData?.status || persistedData?.studyStatus;
+    const raw = persistedData?.studyStatus;
     if (!raw) return 'draft';
     switch (raw.toLowerCase()) {
       case 'computed': return 'computed';
@@ -493,7 +447,7 @@ export default function StudyPage() {
   }, []);
 
   // Initialize cost/crew data when fleet entries change
-  const isComputedStudy = studyData?.status === 'Computed';
+  const isComputedStudy = persistedData?.studyStatus === 'computed';
   useEffect(() => {
     setCostOperationsData(prev => {
       const existingIds = new Set(prev.map(c => c.id));

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { PersistedStudyData } from '../pages/types';
+import { getMockStudyData } from '../data/mockStudies';
 
 const STORAGE_PREFIX = 'abp_study_';
 
@@ -7,12 +8,24 @@ export function getStorageKey(studyId: string | undefined): string {
   return `${STORAGE_PREFIX}${studyId || 'default'}`;
 }
 
+/**
+ * Load study data from localStorage.
+ * If no data exists, initialize from mock data (if available) and save to localStorage.
+ */
 export function loadFromStorage(studyId: string | undefined): PersistedStudyData | null {
   try {
     const key = getStorageKey(studyId);
     const data = localStorage.getItem(key);
+
     if (data) {
       return JSON.parse(data) as PersistedStudyData;
+    }
+
+    // No data in localStorage - try to initialize from mock data
+    const mockData = getMockStudyData(studyId);
+    if (mockData) {
+      localStorage.setItem(key, JSON.stringify(mockData));
+      return mockData;
     }
   } catch (e) {
     console.warn('Failed to load study from localStorage:', e);
